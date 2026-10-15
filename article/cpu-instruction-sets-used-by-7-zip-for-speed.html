@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU Instruction Sets Used by 7-Zip for Speed - 7-zip</title>
+    <meta name="description" content="7-Zip achieves its industry-leading compression and archive performance by tapping directly into modern processor architectures. By utilizing advanced SIMD (Single Instruction, Multiple Data) sets such as AVX2 and AVX-512, alongside dedicated cryptographi">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/cpu-instruction-sets-used-by-7-zip-for-speed">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="CPU Instruction Sets Used by 7-Zip for Speed - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/cpu-instruction-sets-used-by-7-zip-for-speed" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip achieves its industry-leading compression and archive performance by tapping directly into modern processor architectures. By utilizing advanced SIMD (Single Instruction, Multiple Data) sets such as AVX2 and AVX-512, alongside dedicated cryptographi" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="cpu-instruction-sets-used-by-7-zip-for-speed">CPU Instruction
+Sets Used by 7-Zip for Speed</h1>
+<p>7-Zip achieves its industry-leading compression and archive
+performance by tapping directly into modern processor architectures. By
+utilizing advanced SIMD (Single Instruction, Multiple Data) sets such as
+AVX2 and AVX-512, alongside dedicated cryptographic and hashing
+instructions, 7-Zip accelerates resource-heavy tasks like LZMA/LZMA2
+compression, AES encryption, and data integrity verification.</p>
+<h3 id="avx2-and-avx-512">AVX2 and AVX-512</h3>
+<p>Recent versions of 7-Zip utilize Advanced Vector
+Extensions—specifically AVX2 and AVX-512—to parallelize data-heavy
+operations:</p>
+<ul>
+<li><strong>AVX2 (256-bit registers):</strong> 7-Zip leverages AVX2
+primarily for dictionary searches, data matching routines in the
+LZMA/LZMA2 algorithms, and computing cryptographic hashes (SHA-256 and
+SHA-1). Processing 256 bits of data simultaneously significantly lowers
+CPU cycle usage during both compression and decompression.</li>
+<li><strong>AVX-512 (512-bit registers):</strong> Added to modern 7-Zip
+builds, AVX-512 instructions (including AVX-512F, AVX-512BW, and
+AVX-512VL) accelerate parallel CRC-32, CRC-64, and SHA hashing across
+multiple data streams at once. AVX-512 also speeds up the byte-matching
+loops inside LZMA compression, allowing supported Intel and AMD
+processors to process archival data at multi-gigabyte-per-second
+throughput.</li>
+</ul>
+<h3 id="aes-ni-and-pclmulqdq">AES-NI and PCLMULQDQ</h3>
+<p>For archives protected with AES-256 encryption, 7-Zip utilizes the
+<strong>AES-NI</strong> (Advanced Encryption Standard New Instructions)
+hardware extension. This offloads the encryption and decryption rounds
+directly to silicon, preventing CPU bottlenecks and providing
+near-instant decryption speeds.</p>
+<p>Coupled with AES-NI, 7-Zip uses <strong>PCLMULQDQ</strong>
+(Carry-Less Multiplication) to accelerate CRC-32 and CRC-64 checksum
+computations. This enables parallel calculation of archive checksums
+without relying on slower table-based lookup methods.</p>
+<h3 id="intel-and-amd-sha-extensions-sha-ni">Intel and AMD SHA
+Extensions (SHA-NI)</h3>
+<p>To verify archive integrity and generate hash values, 7-Zip natively
+supports hardware SHA instructions:</p>
+<ul>
+<li><strong>Intel/AMD SHA Extensions:</strong> These instructions
+accelerate SHA-1 and SHA-256 digest calculations by a factor of four to
+ten compared to standard software implementations. 7-Zip invokes these
+instructions automatically when creating or validating checksums.</li>
+</ul>
+<h3 id="sse-sse2-and-sse41">SSE, SSE2, and SSE4.1</h3>
+<p>On older x86/x64 systems without AVX capabilities, 7-Zip relies on
+standard Streaming SIMD Extensions:</p>
+<ul>
+<li><strong>SSE2 &amp; SSSE3:</strong> Used for baseline 128-bit memory
+operations and basic vector comparisons.</li>
+<li><strong>SSE4.2:</strong> Provides the dedicated hardware
+<code>CRC32</code> instruction, which accelerates cyclic redundancy
+checks on CPUs that lack AVX or PCLMULQDQ optimizations.</li>
+</ul>
+<h3 id="arm-neon-and-armv8-crypto-extensions">ARM NEON and ARMv8 Crypto
+Extensions</h3>
+<p>For ARM-based systems (such as Apple Silicon or 64-bit ARM
+Linux/Windows devices), 7-Zip uses equivalent instruction sets:</p>
+<ul>
+<li><strong>ARM NEON:</strong> Powers general 128-bit vectorization for
+compression routines.</li>
+<li><strong>ARMv8 Cryptography Extensions:</strong> Provides
+hardware-level acceleration for AES, SHA-1, SHA-256, and CRC-32,
+matching the performance profiles of x86 AES-NI and SHA extensions.</li>
+</ul>
+<p>7-Zip automatically detects your CPU's supported instruction sets at
+runtime and branches to the fastest available code path, requiring no
+manual configuration from the user.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

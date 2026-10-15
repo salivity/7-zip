@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can 7-Zip Decompress Files from HTTP or FTP? - 7-zip</title>
+    <meta name="description" content="7-Zip cannot natively decompress archives directly from remote HTTP or FTP network URLs through its standard user interface or command-line syntax. However, users can achieve stream-based extraction using command-line piping with external tools like curl">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/can-7-zip-decompress-files-from-http-or-ftp">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can 7-Zip Decompress Files from HTTP or FTP? - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/can-7-zip-decompress-files-from-http-or-ftp" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip cannot natively decompress archives directly from remote HTTP or FTP network URLs through its standard user interface or command-line syntax. However, users can achieve stream-based extraction using command-line piping with external tools like curl" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-7-zip-decompress-files-from-http-or-ftp">Can 7-Zip
+Decompress Files from HTTP or FTP?</h1>
+<p>7-Zip cannot natively decompress archives directly from remote HTTP
+or FTP network URLs through its standard user interface or command-line
+syntax. However, users can achieve stream-based extraction using
+command-line piping with external tools like <code>curl</code> or by
+mounting remote locations as local file system paths, provided the
+specific archive format supports sequential data streams without
+requiring random seeking.</p>
+<h3 id="native-support-limitations">Native Support Limitations</h3>
+<p>7-Zip was designed as a local file archiver. It does not contain an
+internal HTTP, HTTPS, or FTP client protocol stack. If you pass a URL
+such as <code>https://example.com/archive.zip</code> or
+<code>ftp://example.com/archive.7z</code> into either the 7-Zip
+Graphical User Interface (GUI) or the standard Command Line interface
+(<code>7z.exe</code>), the program treats the string as an invalid local
+file path and returns an error.</p>
+<h3 id="the-technical-challenge-streaming-vs-seeking">The Technical
+Challenge: Streaming vs. Seeking</h3>
+<p>Archive structures heavily dictate whether streaming extraction over
+a network is technically viable:</p>
+<ul>
+<li><strong>Non-Streamable Formats (.zip, .7z):</strong> Standard
+<code>.zip</code> and <code>.7z</code> archives store their central
+directory (the file index and metadata) at the end of the archive. To
+list or extract files, the decompression engine must jump (seek)
+directly to the end of the file before reading individual items. A
+standard sequential network stream does not allow random seeking without
+downloading or buffering the entire file first.</li>
+<li><strong>Streamable Formats (.tar, .gz, .bz2, .xz):</strong> Formats
+like <code>tar.gz</code> are designed for sequential reading. Metadata
+is stored alongside each individual file header, meaning decompressors
+can process data as it arrives sequentially through a network
+pipeline.</li>
+</ul>
+<h3 id="workarounds-for-network-extraction">Workarounds for Network
+Extraction</h3>
+<h4 id="1-command-line-piping-stdin">1. Command-Line Piping (stdin)</h4>
+<p>You can download data from HTTP or FTP via a streaming utility like
+<code>curl</code> or <code>wget</code> and pipe standard output directly
+into 7-Zip using the <code>-si</code> (read from standard input)
+switch.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> https://example.com/archive.tar.gz <span class="kw">|</span> <span class="ex">7z</span> x <span class="at">-si</span> <span class="at">-ttar</span></span></code></pre></div>
+<p>This method only works reliably with formats that do not require
+backward seeking. If you attempt to stream standard <code>.zip</code> or
+<code>.7z</code> files through standard input, extraction may fail
+unless 7-Zip can buffer the entire payload into system memory.</p>
+<h4 id="2-virtual-network-mounting">2. Virtual Network Mounting</h4>
+<p>To open any archive format without a full prior manual download, you
+can mount the remote FTP or HTTP/WebDAV server as a local drive letter
+using third-party mounting software such as Rclone, WinFsp, or
+curlftpfs.</p>
+<p>When mounted, the software handles network byte-range requests on
+demand, allowing 7-Zip to seek to the end of the file to read the
+archive index just as it would on a physical hard drive.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

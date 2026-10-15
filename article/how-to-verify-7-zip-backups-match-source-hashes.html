@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Verify 7-Zip Backups Match Source Hashes - 7-zip</title>
+    <meta name="description" content="Verifying that a 7-Zip compressed backup perfectly matches your source data requires comparing individual file checksums rather than comparing the final .7z file hash to the original folder. Because compression, archive headers, and metadata alter the ove">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-verify-7-zip-backups-match-source-hashes">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Verify 7-Zip Backups Match Source Hashes - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-verify-7-zip-backups-match-source-hashes" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Verifying that a 7-Zip compressed backup perfectly matches your source data requires comparing individual file checksums rather than comparing the final .7z file hash to the original folder. Because compression, archive headers, and metadata alter the ove" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-verify-7-zip-backups-match-source-hashes">How to Verify
+7-Zip Backups Match Source Hashes</h1>
+<p>Verifying that a 7-Zip compressed backup perfectly matches your
+source data requires comparing individual file checksums rather than
+comparing the final <code>.7z</code> file hash to the original folder.
+Because compression, archive headers, and metadata alter the overall
+container hash, verification relies on generating cryptographic
+checksums (such as SHA-256) of your source files and checking them
+against the contents stored within the archive. This guide covers how to
+extract and match these hashes using 7-Zip's built-in hashing features
+and command-line checksum tools.</p>
+<h3 id="why-direct-file-to-archive-hashing-fails">Why Direct
+File-to-Archive Hashing Fails</h3>
+<p>A <code>.7z</code> archive is a container that compresses data and
+adds structural metadata, timestamps, and headers. Calculating a SHA-256
+hash of <code>backup.7z</code> will never match the hash of the original
+directory or files. To confirm that the backup is an exact duplicate,
+you must verify the integrity of the uncompressed data streams contained
+inside the archive.</p>
+<hr />
+<h3 id="method-1-using-7-zips-built-in-hash-command">Method 1: Using
+7-Zip's Built-in Hash Command</h3>
+<p>7-Zip includes a native hashing command (<code>h</code>) that can
+calculate checksums for files on your drive as well as the uncompressed
+files stored inside an archive, without needing to extract the archive
+to disk.</p>
+<h4 id="step-1-calculate-hashes-for-the-source-files">Step 1: Calculate
+Hashes for the Source Files</h4>
+<p>Open your terminal (Command Prompt, PowerShell, or Linux terminal)
+and run:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> h <span class="at">-scrcSHA256</span> <span class="st">&quot;C:\Path\To\Source\*&quot;</span></span></code></pre></div>
+<p>This command outputs the individual SHA-256 hashes of every file in
+the directory, followed by a cumulative hash for the entire data
+stream.</p>
+<h4 id="step-2-calculate-hashes-for-the-archive-contents">Step 2:
+Calculate Hashes for the Archive Contents</h4>
+<p>Run the hash command directly against the <code>.7z</code>
+archive:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> h <span class="at">-scrcSHA256</span> <span class="st">&quot;C:\Path\To\backup.7z&quot;</span></span></code></pre></div>
+<p>7-Zip will decompress the archive in memory and calculate the SHA-256
+hashes of the files inside.</p>
+<h4 id="step-3-compare-the-outputs">Step 3: Compare the Outputs</h4>
+<p>Compare the individual file hashes and the final summary hash from
+both operations. If the cumulative data stream hashes match, the files
+stored in the archive are identical to the source files.</p>
+<hr />
+<h3 id="method-2-generating-a-checksum-manifest">Method 2: Generating a
+Checksum Manifest</h3>
+<p>For automated or mission-critical backups, generating an independent
+checksum manifest file prior to compression is the standard
+practice.</p>
+<h4 id="step-1-create-a-checksum-file-of-source-data">Step 1: Create a
+Checksum File of Source Data</h4>
+<p>Generate a manifest containing the relative paths and hashes of all
+source files.</p>
+<ul>
+<li><p><strong>On Linux / macOS:</strong></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /path/to/source</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> . <span class="at">-type</span> f <span class="at">-exec</span> sha256sum {} + <span class="op">&gt;</span> manifest.sha256</span></code></pre></div></li>
+<li><p><strong>On Windows (PowerShell):</strong></p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Recurse <span class="op">-</span>File <span class="op">|</span> Get-FileHash <span class="op">-</span>Algorithm SHA256 <span class="op">|</span> <span class="fu">Select-Object</span> Hash<span class="op">,</span> Path <span class="op">|</span> <span class="fu">Export-Csv</span> <span class="op">-</span>NoTypeInformation manifest<span class="op">.</span><span class="fu">csv</span></span></code></pre></div></li>
+</ul>
+<h4 id="step-2-test-integrity-via-extraction-or-pipe">Step 2: Test
+Integrity via Extraction or Pipe</h4>
+<p>You can include <code>manifest.sha256</code> directly inside your
+<code>.7z</code> backup. To verify the backup later:</p>
+<ol type="1">
+<li><p>Extract the backup to a temporary directory:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x backup.7z <span class="at">-o</span>/tmp/restore_test/</span></code></pre></div></li>
+<li><p>Run the checksum verification tool against the manifest:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /tmp/restore_test</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sha256sum</span> <span class="at">-c</span> manifest.sha256</span></code></pre></div></li>
+</ol>
+<p>If all files report <code>OK</code>, the restored data exactly
+matches the state of the files when the manifest was generated.</p>
+<hr />
+<h3 id="method-3-internal-archive-integrity-test">Method 3: Internal
+Archive Integrity Test</h3>
+<p>If the archive was created without external corruption during the
+process, 7-Zip records CRC-32 or CRC-64 checksums for every file
+directly inside the archive headers.</p>
+<p>To verify that the archive has not suffered bit rot or corruption
+since creation, run:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> t backup.7z</span></code></pre></div>
+<p>The <code>t</code> (test) command decompresses all files in memory
+and compares the calculated CRC values against the stored header values.
+While this does not compare against the live source directory, it
+guarantees that the files inside the archive match the exact condition
+they were in when 7-Zip read and compressed them.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

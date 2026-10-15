@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run 7-Zip in Node.js with Child Process - 7-zip</title>
+    <meta name="description" content="Node.js can execute 7-Zip directly using its built-in childprocess module. This approach allows developers to compress and extract files without relying on native Node.js archive libraries by calling the external 7-Zip command-line executable (7z, 7za, or">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/run-7-zip-in-node-js-with-child-process">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Run 7-Zip in Node.js with Child Process - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/run-7-zip-in-node-js-with-child-process" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Node.js can execute 7-Zip directly using its built-in childprocess module. This approach allows developers to compress and extract files without relying on native Node.js archive libraries by calling the external 7-Zip command-line executable (7z, 7za, or" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="run-7-zip-in-nodejs-with-child-process">Run 7-Zip in Node.js
+with Child Process</h1>
+<p>Node.js can execute 7-Zip directly using its built-in
+<code>child_process</code> module. This approach allows developers to
+compress and extract files without relying on native Node.js archive
+libraries by calling the external 7-Zip command-line executable
+(<code>7z</code>, <code>7za</code>, or <code>7zr</code>). This guide
+covers how to implement this using <code>execFile</code> and
+<code>spawn</code>, along with essential arguments and best practices
+for error handling and performance.</p>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>To execute 7-Zip from Node.js, the 7-Zip binary must be accessible to
+your application:</p>
+<ul>
+<li><strong>Windows:</strong> Install 7-Zip and add its installation
+path (e.g., <code>C:\Program Files\7-Zip</code>) to your system's PATH,
+or provide the absolute path directly in your script.</li>
+<li><strong>Linux/macOS:</strong> Install the standalone binary using
+your package manager (e.g., <code>sudo apt install p7zip-full</code> on
+Debian/Ubuntu or <code>brew install p7zip</code> on macOS).</li>
+</ul>
+<h3 id="using-execfile-for-simple-operations">Using
+<code>execFile</code> for Simple Operations</h3>
+<p>The <code>execFile</code> method is ideal for quick operations where
+the output size is predictable and you want to invoke the binary
+directly without spawning a system shell, which enhances security.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { execFile } <span class="op">=</span> <span class="pp">require</span>(<span class="st">&#39;child_process&#39;</span>)<span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> archivePath <span class="op">=</span> <span class="st">&#39;output.7z&#39;</span><span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> filesToCompress <span class="op">=</span> [<span class="st">&#39;file1.txt&#39;</span><span class="op">,</span> <span class="st">&#39;file2.txt&#39;</span>]<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Command syntax: 7z a [archiveName] [files...]</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> args <span class="op">=</span> [<span class="st">&#39;a&#39;</span><span class="op">,</span> archivePath<span class="op">,</span> <span class="op">...</span>filesToCompress<span class="op">,</span> <span class="st">&#39;-y&#39;</span>]<span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">execFile</span>(<span class="st">&#39;7z&#39;</span><span class="op">,</span> args<span class="op">,</span> (error<span class="op">,</span> stdout<span class="op">,</span> stderr) <span class="kw">=&gt;</span> {</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="vs">`Execution error: </span><span class="sc">${</span>error<span class="op">.</span><span class="at">message</span><span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (stderr) {</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="vs">`7-Zip stderr: </span><span class="sc">${</span>stderr<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Archive created successfully:</span><span class="sc">\n${</span>stdout<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<h3 id="using-spawn-for-large-archives-and-real-time-feedback">Using
+<code>spawn</code> for Large Archives and Real-Time Feedback</h3>
+<p>For large archives or long-running tasks, <code>spawn</code> is the
+preferred method because it streams standard output and error streams
+without buffering limits.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { spawn } <span class="op">=</span> <span class="pp">require</span>(<span class="st">&#39;child_process&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> args <span class="op">=</span> [<span class="st">&#39;x&#39;</span><span class="op">,</span> <span class="st">&#39;archive.7z&#39;</span><span class="op">,</span> <span class="st">&#39;-o./extracted_files&#39;</span><span class="op">,</span> <span class="st">&#39;-y&#39;</span>]<span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> sevenZip <span class="op">=</span> <span class="fu">spawn</span>(<span class="st">&#39;7z&#39;</span><span class="op">,</span> args)<span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>sevenZip<span class="op">.</span><span class="at">stdout</span><span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;data&#39;</span><span class="op">,</span> (data) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Progress: </span><span class="sc">${</span>data<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>sevenZip<span class="op">.</span><span class="at">stderr</span><span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;data&#39;</span><span class="op">,</span> (data) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="vs">`Error output: </span><span class="sc">${</span>data<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>sevenZip<span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;close&#39;</span><span class="op">,</span> (code) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (code <span class="op">===</span> <span class="dv">0</span>) {</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Extraction completed successfully.&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="vs">`7-Zip process exited with code </span><span class="sc">${</span>code<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<h3 id="common-7-zip-arguments">Common 7-Zip Arguments</h3>
+<ul>
+<li><code>a</code>: Add files to an archive.</li>
+<li><code>x</code>: Extract files with full paths.</li>
+<li><code>e</code>: Extract files without directory structure.</li>
+<li><code>-o{Directory}</code>: Specify the output destination directory
+(note: there is no space between <code>-o</code> and the directory
+path).</li>
+<li><code>-p{Password}</code>: Set or provide a password for protected
+archives.</li>
+<li><code>-y</code>: Assume "Yes" to all interactive queries (prevents
+the process from hanging).</li>
+<li><code>-mx={0-9}</code>: Set the compression level, ranging from 0
+(copy/no compression) to 9 (ultra compression).</li>
+</ul>
+<h3 id="best-practices">Best Practices</h3>
+<ol type="1">
+<li><strong>Avoid <code>exec</code>:</strong> Prefer
+<code>execFile</code> or <code>spawn</code> over <code>exec</code> to
+prevent command injection risks, as they pass arguments as an array
+rather than evaluating a shell string.</li>
+<li><strong>Handle Exit Codes:</strong> 7-Zip uses specific exit codes
+(e.g., <code>0</code> for success, <code>1</code> for warning,
+<code>2</code> for fatal error). Always evaluate the process exit code
+rather than relying exclusively on standard error streams.</li>
+<li><strong>Absolute Paths:</strong> When deploying in containerized
+environments (like Docker) or running as a service, specify absolute
+paths to the 7-Zip executable to prevent <code>ENOENT</code>
+errors.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

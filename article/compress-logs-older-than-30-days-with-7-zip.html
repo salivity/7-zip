@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compress Logs Older Than 30 Days With 7-Zip - 7-zip</title>
+    <meta name="description" content="Managing server storage requires automating the cleanup and archiving of growing log files. This guide demonstrates how to write an automated PowerShell script that identifies .log files older than 30 days, compresses each file into a high-ratio archive u">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/compress-logs-older-than-30-days-with-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Compress Logs Older Than 30 Days With 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/compress-logs-older-than-30-days-with-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Managing server storage requires automating the cleanup and archiving of growing log files. This guide demonstrates how to write an automated PowerShell script that identifies .log files older than 30 days, compresses each file into a high-ratio archive u" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="compress-logs-older-than-30-days-with-7-zip">Compress Logs Older
+Than 30 Days With 7-Zip</h1>
+<p>Managing server storage requires automating the cleanup and archiving
+of growing log files. This guide demonstrates how to write an automated
+PowerShell script that identifies <code>.log</code> files older than 30
+days, compresses each file into a high-ratio archive using the 7-Zip
+command-line utility, and safely removes the original uncompressed files
+to reclaim storage space.</p>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>Before running the script, ensure the following requirements are
+met:</p>
+<ul>
+<li>7-Zip is installed (the standard path is typically
+<code>C:\Program Files\7-Zip\7z.exe</code>).</li>
+<li>You have read, write, and execute permissions in the target log
+folder.</li>
+<li>PowerShell is available on the system.</li>
+</ul>
+<hr />
+<h3 id="the-powershell-automation-script">The PowerShell Automation
+Script</h3>
+<p>Save the following code as a <code>.ps1</code> file, such as
+<code>Compress-OldLogs.ps1</code>:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Configuration</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">$LogFolder</span> <span class="op">=</span> <span class="st">&quot;C:\Path\To\Your\Logs&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">$SevenZipExe</span> <span class="op">=</span> <span class="st">&quot;C:\Program Files\7-Zip\7z.exe&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">$DaysOld</span> <span class="op">=</span> <span class="dv">30</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">$Extension</span> <span class="op">=</span> <span class="st">&quot;*.log&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify 7-Zip installation</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(-not</span> <span class="op">(</span><span class="fu">Test-Path</span> <span class="op">-</span>Path <span class="va">$SevenZipExe</span><span class="op">))</span> <span class="op">{</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Write-Error</span> <span class="st">&quot;7-Zip executable not found at </span><span class="va">$SevenZipExe</span><span class="st">&quot;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">exit</span> <span class="dv">1</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate threshold date</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="va">$CutoffDate</span> <span class="op">=</span> <span class="op">(</span><span class="fu">Get-Date</span><span class="op">).</span><span class="fu">AddDays</span><span class="op">(-</span><span class="va">$DaysOld</span><span class="op">)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Retrieve and process target files</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="va">$LogFolder</span> <span class="op">-</span>Filter <span class="va">$Extension</span> <span class="op">-</span>File <span class="op">|</span> <span class="fu">Where-Object</span> <span class="op">{</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">$_</span><span class="op">.</span><span class="fu">LastWriteTime</span> <span class="op">-lt</span> <span class="va">$CutoffDate</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="va">$ArchiveFile</span> <span class="op">=</span> <span class="st">&quot;</span><span class="op">$(</span><span class="va">$_</span><span class="op">.</span><span class="fu">FullName</span><span class="op">)</span><span class="st">.7z&quot;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Run 7-Zip compression with delete-on-success flag (-sdel)</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;</span> <span class="va">$SevenZipExe</span> a <span class="op">-</span>t7z <span class="op">-</span>mx<span class="op">=</span><span class="dv">7</span> <span class="op">-</span>sdel <span class="st">&quot;</span><span class="va">$ArchiveFile</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="op">$(</span><span class="va">$_</span><span class="op">.</span><span class="fu">FullName</span><span class="op">)</span><span class="st">&quot;</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span><span class="va">$LASTEXITCODE</span> <span class="op">-eq</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">Write-Output</span> <span class="st">&quot;Successfully compressed: </span><span class="op">$(</span><span class="va">$_</span><span class="op">.</span><span class="fu">Name</span><span class="op">)</span><span class="st">&quot;</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="fu">Write-Warning</span> <span class="st">&quot;Failed to compress: </span><span class="op">$(</span><span class="va">$_</span><span class="op">.</span><span class="fu">Name</span><span class="op">)</span><span class="st">&quot;</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<hr />
+<h3 id="script-breakdown-and-command-parameters">Script Breakdown and
+Command Parameters</h3>
+<ul>
+<li><strong><code>Get-ChildItem</code> and
+<code>Where-Object</code></strong>: Recursively or directly locates
+files matching the <code>$Extension</code> pattern where the
+<code>LastWriteTime</code> attribute is earlier than the calculated
+cutoff date (<code>(Get-Date).AddDays(-30)</code>).</li>
+<li><strong><code>a</code></strong>: The 7-Zip command to create or add
+files to an archive.</li>
+<li><strong><code>-t7z</code></strong>: Sets the archive format to
+<code>.7z</code>, which provides superior compression ratios compared to
+standard <code>.zip</code>.</li>
+<li><strong><code>-mx=7</code></strong>: Specifies the compression level
+on a scale from 0 to 9. Level 7 (Maximum) provides strong compression
+without excessive CPU overhead.</li>
+<li><strong><code>-sdel</code></strong>: Instructs 7-Zip to delete the
+source file only after the archive is successfully generated, preventing
+duplicate copies and ensuring failed compressions do not delete
+data.</li>
+</ul>
+<hr />
+<h3 id="scheduling-the-script">Scheduling the Script</h3>
+<p>To run the script automatically without manual intervention,
+configure Windows Task Scheduler:</p>
+<ol type="1">
+<li><p>Open <strong>Task Scheduler</strong> and select <strong>Create
+Basic Task</strong>.</p></li>
+<li><p>Set your preferred trigger (e.g., Daily or Weekly).</p></li>
+<li><p>Under the <strong>Action</strong> step, choose <strong>Start a
+program</strong>.</p></li>
+<li><p>In the <strong>Program/script</strong> field, enter:</p>
+<pre class="text"><code>powershell.exe</code></pre></li>
+<li><p>In the <strong>Add arguments</strong> field, enter:</p>
+<pre class="text"><code>-ExecutionPolicy Bypass -File &quot;C:\Scripts\Compress-OldLogs.ps1&quot;</code></pre></li>
+<li><p>Finish the setup, ensuring the task is set to run whether the
+user is logged on or not with highest privileges.</p></li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

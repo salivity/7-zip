@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Handles Long File Paths in Windows - 7-zip</title>
+    <meta name="description" content="Windows systems historically enforce a 260-character maximum path length (MAXPATH), which often leads to errors when creating, extracting, or moving deeply nested folders. 7-Zip bypasses this limitation by utilizing native wide-character Windows APIs and">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-handles-long-file-paths-in-windows">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Handles Long File Paths in Windows - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-handles-long-file-paths-in-windows" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Windows systems historically enforce a 260-character maximum path length (MAXPATH), which often leads to errors when creating, extracting, or moving deeply nested folders. 7-Zip bypasses this limitation by utilizing native wide-character Windows APIs and" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-handles-long-file-paths-in-windows">How 7-Zip Handles
+Long File Paths in Windows</h1>
+<p>Windows systems historically enforce a 260-character maximum path
+length (<code>MAX_PATH</code>), which often leads to errors when
+creating, extracting, or moving deeply nested folders. 7-Zip bypasses
+this limitation by utilizing native wide-character Windows APIs and the
+extended-length path prefix, allowing it to read, compress, and extract
+files with paths up to roughly 32,767 characters without relying on
+Windows Explorer.</p>
+<h3 id="the-win32-limitation-max_path">The Win32 Limitation
+(<code>MAX_PATH</code>)</h3>
+<p>In standard Win32 applications, the maximum path limit is set to 260
+characters, which includes the drive letter, colon, backslash, directory
+names, filename, and a terminating null character. When file paths
+exceed this threshold, default Windows components—such as Windows
+Explorer—often return errors stating that the destination path is too
+long or that the file cannot be found.</p>
+<h3 id="the-extended-length-prefix-">The Extended-Length Prefix
+(<code>\\?\</code>)</h3>
+<p>7-Zip circumvents the 260-character ceiling by prefixing absolute
+paths with the extended-length path indicator: <code>\\?\</code>.</p>
+<p>When Windows sees the <code>\\?\</code> prefix, it instructs the
+operating system to:</p>
+<ul>
+<li>Bypass standard Win32 path normalization and parsing routines.</li>
+<li>Hand the path directly to the underlying file system (such as
+NTFS).</li>
+<li>Extend the allowable path length from 260 characters to
+approximately 32,767 characters.</li>
+</ul>
+<p>For network locations, 7-Zip can similarly use the
+<code>\\?\UNC\</code> prefix to reference long network shares (e.g.,
+<code>\\?\UNC\server\share\path</code>).</p>
+<h3 id="wide-character-unicode-api-support">Wide-Character (Unicode) API
+Support</h3>
+<p>To process extended paths, an application must use Unicode-aware
+functions. 7-Zip is compiled to use wide-character Windows API functions
+(ending in <code>W</code>, such as <code>CreateFileW</code> rather than
+the ANSI-based <code>CreateFileA</code>). Combined with the
+<code>\\?\</code> prefix, these APIs allow 7-Zip to traverse, read, and
+write deep directory trees seamlessly.</p>
+<h3 id="archive-format-capabilities">Archive Format Capabilities</h3>
+<p>In addition to handling long paths at the file system level, 7-Zip's
+native format (<code>.7z</code>) stores directory structures using
+standard Unicode metadata without an arbitrary 260-character limit.
+While legacy <code>.zip</code> implementations occasionally truncated
+path segments, modern 7-Zip implementations handle deep folder
+structures properly across both <code>.7z</code> and modern
+<code>.zip</code> specifications.</p>
+<h3 id="practical-implications-for-users">Practical Implications for
+Users</h3>
+<p>While 7-Zip can extract files that exceed 260 characters, Windows
+Explorer might not be able to open, rename, or delete the extracted
+files afterward. If this occurs, users can employ 7-Zip's built-in File
+Manager (<code>7zFM.exe</code>) as an alternative file browser to
+manipulate or delete the files, as it operates entirely outside the
+standard Explorer limitations.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

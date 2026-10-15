@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Handles Language and Localization Files - 7-zip</title>
+    <meta name="description" content="7-Zip uses a lightweight, text-based localization architecture to support dozens of languages across its interface. Instead of compiling separate binary resources for each locale, the software relies on external plain text translation files that map inter">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-handles-language-and-localization-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Handles Language and Localization Files - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-handles-language-and-localization-files" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip uses a lightweight, text-based localization architecture to support dozens of languages across its interface. Instead of compiling separate binary resources for each locale, the software relies on external plain text translation files that map inter" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-handles-language-and-localization-files">How 7-Zip
+Handles Language and Localization Files</h1>
+<p>7-Zip uses a lightweight, text-based localization architecture to
+support dozens of languages across its interface. Instead of compiling
+separate binary resources for each locale, the software relies on
+external plain text translation files that map internal resource
+identifiers to translated strings. This article explains how 7-Zip
+organizes, reads, and applies these language files, and how users can
+customize or create new translations without modifying the application's
+source code.</p>
+<h3 id="the-lang-directory-and-file-storage">The <code>Lang</code>
+Directory and File Storage</h3>
+<p>7-Zip stores all its localization assets in a dedicated subfolder
+named <code>Lang</code>, located inside the primary installation
+directory (typically <code>C:\Program Files\7-Zip\Lang</code>).</p>
+<p>Each supported language is represented by a single text file ending
+with the <code>.txt</code> extension. The files are usually named using
+standard ISO language codes or language names, such as
+<code>en.txt</code> for English, <code>de.txt</code> for German, or
+<code>fr.txt</code> for French. Because these files reside outside the
+main executable binaries (<code>7zG.exe</code> and
+<code>7zFM.exe</code>), the program can add, update, or remove language
+support without requiring binary recompilation or application
+reinstallations.</p>
+<h3 id="structure-of-7-zip-translation-files">Structure of 7-Zip
+Translation Files</h3>
+<p>Each <code>.txt</code> file in the <code>Lang</code> directory
+follows a straightforward key-value format readable by any standard text
+editor. The file consists of two primary components:</p>
+<ol type="1">
+<li><strong>Header Metadata</strong>: The beginning of the file
+specifies the language name in English, the native language name, and
+optional credits for the translator.</li>
+<li><strong>Numeric ID Mappings</strong>: The body of the file maps
+specific numerical IDs directly to their translated text strings.</li>
+</ol>
+<p>A typical entry resembles the following structure:</p>
+<pre class="text"><code>; Language Name
+English
+English
+
+401
+OK
+402
+Cancel</code></pre>
+<p>In this system, the numeric identifier corresponds to a specific
+control, menu item, dialog prompt, or error message inside 7-Zip's
+graphical user interface.</p>
+<h3 id="runtime-loading-and-string-replacement">Runtime Loading and
+String Replacement</h3>
+<p>When a user selects a language in 7-Zip (<code>Tools</code> &gt;
+<code>Options</code> &gt; <code>Language</code>), the application
+performs the following runtime sequence:</p>
+<ul>
+<li><strong>File Parsing</strong>: 7-Zip opens the selected
+<code>.txt</code> file from the <code>Lang</code> directory and reads
+the ID-to-string mappings into memory.</li>
+<li><strong>UI Dynamic Replacement</strong>: During window creation and
+dialog rendering, 7-Zip queries the loaded language map using the
+control or message ID. If a translated string exists for that ID, it
+dynamically replaces the default interface text.</li>
+<li><strong>Fallback Behavior</strong>: English is hardcoded into the
+7-Zip binaries as the default fallback. If a specific translation file
+is missing certain IDs—or if a file becomes corrupted—7-Zip
+automatically falls back to the embedded English string, preventing
+blank buttons or missing labels in the UI.</li>
+</ul>
+<h3 id="creating-and-modifying-localization-files">Creating and
+Modifying Localization Files</h3>
+<p>Because 7-Zip uses standard text files, creating a custom
+localization or editing an existing one requires only basic text editing
+tools:</p>
+<ol type="1">
+<li>Open the <code>Lang</code> directory with administrative
+permissions.</li>
+<li>Duplicate an existing, up-to-date translation file (such as
+<code>en.txt</code>).</li>
+<li>Rename the copy to match the target language code.</li>
+<li>Translate the strings beneath each numeric ID while preserving the
+ID numbers.</li>
+<li>Save the file using UTF-8 encoding to preserve special characters
+and non-Latin scripts.</li>
+</ol>
+<p>Once saved in the <code>Lang</code> directory, the newly created
+language appears immediately in 7-Zip's language selection menu.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

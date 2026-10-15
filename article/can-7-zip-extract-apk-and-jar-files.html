@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can 7-Zip Extract APK and JAR Files? - 7-zip</title>
+    <meta name="description" content="7-Zip can easily extract files from both Android APK packages and Java JAR archives without requiring specialized extraction software. Because APK and JAR formats are built on the standard ZIP compression format, 7-Zip natively reads their contents. This">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/can-7-zip-extract-apk-and-jar-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can 7-Zip Extract APK and JAR Files? - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/can-7-zip-extract-apk-and-jar-files" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip can easily extract files from both Android APK packages and Java JAR archives without requiring specialized extraction software. Because APK and JAR formats are built on the standard ZIP compression format, 7-Zip natively reads their contents. This" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-7-zip-extract-apk-and-jar-files">Can 7-Zip Extract APK and
+JAR Files?</h1>
+<p>7-Zip can easily extract files from both Android APK packages and
+Java JAR archives without requiring specialized extraction software.
+Because APK and JAR formats are built on the standard ZIP compression
+format, 7-Zip natively reads their contents. This article explains how
+7-Zip handles these archives, how to extract them step-by-step, and what
+to consider when working with the extracted data.</p>
+<h3 id="why-7-zip-supports-apk-and-jar-files">Why 7-Zip Supports APK and
+JAR Files</h3>
+<p>Both Android application packages (<code>.apk</code>) and Java
+archives (<code>.jar</code>) are essentially ZIP files with specialized
+directory structures and file extensions. Since 7-Zip identifies
+archives based on their internal file headers rather than just their
+file extensions, it treats APK and JAR files as standard ZIP
+archives.</p>
+<h3 id="how-to-extract-files-using-7-zip">How to Extract Files Using
+7-Zip</h3>
+<p>You can extract files from an APK or JAR file using two primary
+methods:</p>
+<ol type="1">
+<li><strong>Using the Windows Context Menu:</strong>
+<ul>
+<li>Right-click the <code>.apk</code> or <code>.jar</code> file.</li>
+<li>Hover over the <strong>7-Zip</strong> submenu.</li>
+<li>Select <strong>Extract Here</strong> or <strong>Extract to
+"[Filename]"</strong> to unpack the entire archive into a folder.</li>
+</ul></li>
+<li><strong>Using the 7-Zip File Manager:</strong>
+<ul>
+<li>Open 7-Zip File Manager.</li>
+<li>Navigate to the location of the <code>.apk</code> or
+<code>.jar</code> file.</li>
+<li>Double-click the file to open and browse its internal
+structure.</li>
+<li>Select individual files or folders and click
+<strong>Extract</strong> to save them to a specific destination.</li>
+</ul></li>
+</ol>
+<p><em>Note:</em> If the context menu does not show 7-Zip options for
+these extensions, you can temporarily rename the extension from
+<code>.apk</code> or <code>.jar</code> to <code>.zip</code>, then
+extract the files normally.</p>
+<h3 id="what-to-expect-after-extraction">What to Expect After
+Extraction</h3>
+<p>While 7-Zip unpacks the contents completely, the extracted files may
+still require additional tools to view or modify:</p>
+<ul>
+<li><strong>Android APKs:</strong> Extracting an APK yields resources,
+asset folders, compiled binary XML files (such as
+<code>AndroidManifest.xml</code>), and Dalvik executable files
+(<code>classes.dex</code>). 7-Zip does not decompile these files into
+human-readable source code; you will need reverse-engineering tools like
+APKTool or JADX to decompile the bytecode and read the manifest.</li>
+<li><strong>Java JARs:</strong> A JAR file unpacks into standard
+resource files, the <code>META-INF</code> folder containing the
+manifest, and compiled Java bytecode (<code>.class</code> files). To
+view the original Java source code (<code>.java</code>), you must run
+the extracted <code>.class</code> files through a Java decompiler.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

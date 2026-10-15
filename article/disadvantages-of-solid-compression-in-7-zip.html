@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disadvantages of Solid Compression in 7-Zip - 7-zip</title>
+    <meta name="description" content="Solid compression in 7-Zip treats multiple files as a single, continuous data stream to achieve significantly higher compression ratios, especially when dealing with many similar or small files. However, this efficiency comes with distinct trade-offs. Whi">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/disadvantages-of-solid-compression-in-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Disadvantages of Solid Compression in 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/disadvantages-of-solid-compression-in-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Solid compression in 7-Zip treats multiple files as a single, continuous data stream to achieve significantly higher compression ratios, especially when dealing with many similar or small files. However, this efficiency comes with distinct trade-offs. Whi" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="disadvantages-of-solid-compression-in-7-zip">Disadvantages of
+Solid Compression in 7-Zip</h1>
+<p>Solid compression in 7-Zip treats multiple files as a single,
+continuous data stream to achieve significantly higher compression
+ratios, especially when dealing with many similar or small files.
+However, this efficiency comes with distinct trade-offs. While it
+maximizes storage savings, solid compression introduces notable
+drawbacks regarding extraction speeds, data vulnerability, archive
+modification efficiency, and system resource demands.</p>
+<h3 id="slower-individual-file-extraction">Slower Individual File
+Extraction</h3>
+<p>In a standard archive, extracting a single file is instantaneous
+because each file is compressed independently. In a solid archive, 7-Zip
+cannot decompress a specific file in isolation. To access a single file
+located toward the end of the archive, the program must decompress all
+preceding data in that solid block. This makes viewing, searching, or
+extracting individual files significantly slower.</p>
+<h3 id="increased-risk-of-total-data-loss">Increased Risk of Total Data
+Loss</h3>
+<p>Solid archives are highly sensitive to data corruption. In a
+non-solid archive, a bad sector or corrupted byte usually only damages
+the specific file residing in that sector. In contrast, corruption
+within a solid block breaks the continuous data stream, often rendering
+that file and every subsequent file in the block completely
+unrecoverable.</p>
+<h3 id="inefficient-updating-and-modifying">Inefficient Updating and
+Modifying</h3>
+<p>Modifying a solid archive—such as updating, adding, or deleting a
+single file—is an intensive process. Because the entire block is treated
+as one entity, 7-Zip cannot simply swap out the targeted file. Instead,
+it must decompress and recompress the entire block to apply the changes,
+leading to prolonged wait times and unnecessary disk wear.</p>
+<h3 id="higher-resource-consumption">Higher Resource Consumption</h3>
+<p>Decompressing files from solid archives demands more system memory
+and processor power. Because the decompression engine must process
+preceding files to reach the target data, systems with limited RAM or
+slower processors may experience system slowdowns or high memory
+overhead during basic operations.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

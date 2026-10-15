@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can 7-Zip Open UEFI BIOS Firmware Files? - 7-zip</title>
+    <meta name="description" content="Yes, 7-Zip can open and unpack many UEFI BIOS firmware images for inspection. Starting with version 15.06, the popular open-source archiver integrated native parsing support for UEFI/BIOS ROM images and UEFI Firmware Volumes. This article explains how 7-Z">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/can-7-zip-open-uefi-bios-firmware-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can 7-Zip Open UEFI BIOS Firmware Files? - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/can-7-zip-open-uefi-bios-firmware-files" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Yes, 7-Zip can open and unpack many UEFI BIOS firmware images for inspection. Starting with version 15.06, the popular open-source archiver integrated native parsing support for UEFI/BIOS ROM images and UEFI Firmware Volumes. This article explains how 7-Z" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-7-zip-open-uefi-bios-firmware-files">Can 7-Zip Open UEFI
+BIOS Firmware Files?</h1>
+<p>Yes, 7-Zip can open and unpack many UEFI BIOS firmware images for
+inspection. Starting with version 15.06, the popular open-source
+archiver integrated native parsing support for UEFI/BIOS ROM images and
+UEFI Firmware Volumes. This article explains how 7-Zip handles these
+files, the process for inspecting them, and the limitations you might
+encounter compared to dedicated BIOS analysis tools.</p>
+<h3 id="how-7-zip-handles-uefi-images">How 7-Zip Handles UEFI
+Images</h3>
+<p>7-Zip includes a built-in parser for the UEFI Firmware File System
+(FFS) and Firmware Volume (FV) specifications. When presented with a raw
+firmware image—typically carrying file extensions such as
+<code>.bin</code>, <code>.rom</code>, <code>.fd</code>, or
+<code>.cap</code>—7-Zip can recognize the underlying volume structures
+and parse them as a standard hierarchical archive.</p>
+<p>Inside the archive, 7-Zip typically reveals:</p>
+<ul>
+<li><strong>Firmware Volumes (FVs):</strong> Represented as nested
+folders containing platform components.</li>
+<li><strong>PE32/COFF Modules:</strong> The underlying executable
+drivers (DXE, PEI modules) that execute during the boot sequence.</li>
+<li><strong>Raw Data Sections:</strong> Microcode updates, setup
+utilities, cryptographic certificates, and graphics assets.</li>
+</ul>
+<h3 id="how-to-inspect-bios-files-using-7-zip">How to Inspect BIOS Files
+Using 7-Zip</h3>
+<ol type="1">
+<li><strong>Obtain the BIOS File:</strong> Download the firmware update
+from your hardware manufacturer. If the update is wrapped inside an
+<code>.exe</code> installer (common with vendors like Dell or Lenovo),
+you can often extract the <code>.exe</code> itself using 7-Zip to locate
+the payload <code>.bin</code> or <code>.cap</code> file.</li>
+<li><strong>Open with 7-Zip:</strong> Right-click the firmware file,
+navigate to the <strong>7-Zip</strong> context menu, and select
+<strong>Open archive</strong>.</li>
+<li><strong>Navigate the File System:</strong> Browse through the
+numbered and labeled directories to view individual files, extract
+specific PE32 modules, or search for embedded strings.</li>
+</ol>
+<h3 id="limitations-of-using-7-zip-for-bios-inspection">Limitations of
+Using 7-Zip for BIOS Inspection</h3>
+<p>While 7-Zip is useful for quick extraction and viewing, it has
+specific constraints:</p>
+<ul>
+<li><strong>Read-Only Access:</strong> 7-Zip does not allow you to
+modify, inject, or repackage UEFI modules back into a working firmware
+image.</li>
+<li><strong>Proprietary Wrappers and Encryption:</strong> Some
+manufacturers encrypt or wrap their BIOS updates in proprietary
+container formats (such as signed capsule headers or vendor-specific
+compression algorithms) that 7-Zip cannot parse without prior
+unpacking.</li>
+<li><strong>Lack of UEFI Metadata:</strong> 7-Zip presents files using
+basic internal identifiers rather than displaying standard UEFI GUIDs,
+module dependency sections, or protocol structures.</li>
+</ul>
+<p>For advanced BIOS modding, reverse engineering, or parsing images
+with vendor-specific headers, dedicated tools such as UEFITool or
+Chipsec provide deeper protocol inspection and editing capabilities.
+However, for rapid, zero-setup inspection of standard UEFI binaries,
+7-Zip functions reliably.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

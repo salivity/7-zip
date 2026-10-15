@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Completely Remove 7-Zip from Windows - 7-zip</title>
+    <meta name="description" content="Standard uninstallation of 7-Zip often leaves behind context menu entries, temporary extraction caches, and configuration settings in the Windows Registry. This guide provides a direct, step-by-step procedure to completely uninstall 7-Zip, purge its resid">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-completely-remove-7-zip-from-windows">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Completely Remove 7-Zip from Windows - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-completely-remove-7-zip-from-windows" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Standard uninstallation of 7-Zip often leaves behind context menu entries, temporary extraction caches, and configuration settings in the Windows Registry. This guide provides a direct, step-by-step procedure to completely uninstall 7-Zip, purge its resid" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-completely-remove-7-zip-from-windows">How to Completely
+Remove 7-Zip from Windows</h1>
+<p>Standard uninstallation of 7-Zip often leaves behind context menu
+entries, temporary extraction caches, and configuration settings in the
+Windows Registry. This guide provides a direct, step-by-step procedure
+to completely uninstall 7-Zip, purge its residual shell integration
+keys, and delete all associated temporary files from your system.</p>
+<h3 id="step-1-uninstall-7-zip-via-windows-settings">Step 1: Uninstall
+7-Zip via Windows Settings</h3>
+<ol type="1">
+<li>Press <code>Windows Key + I</code> to open
+<strong>Settings</strong>.</li>
+<li>Navigate to <strong>Apps</strong> &gt; <strong>Installed
+apps</strong> (or <strong>Apps &amp; features</strong> on Windows
+10).</li>
+<li>Search for <strong>7-Zip</strong> in the list.</li>
+<li>Click the three dots next to it (or click the program name) and
+select <strong>Uninstall</strong>.</li>
+<li>Follow the on-screen prompts to complete the base removal.</li>
+</ol>
+<h3 id="step-2-delete-residual-program-and-user-data-folders">Step 2:
+Delete Residual Program and User Data Folders</h3>
+<p>After running the uninstaller, manually verify and delete any
+leftover application directories:</p>
+<ol type="1">
+<li>Press <code>Windows Key + R</code>, type
+<code>C:\Program Files\7-Zip</code>, and press <strong>Enter</strong>.
+If the folder exists, delete it.</li>
+<li>If you ran a 32-bit version on a 64-bit OS, check
+<code>C:\Program Files (x86)\7-Zip</code> and delete it if present.</li>
+<li>Press <code>Windows Key + R</code>, type <code>%APPDATA%</code>, and
+press <strong>Enter</strong>. Look for a folder named
+<strong>7-Zip</strong> and delete it.</li>
+</ol>
+<h3 id="step-3-clear-7-zip-temporary-files">Step 3: Clear 7-Zip
+Temporary Files</h3>
+<p>When 7-Zip extracts archives directly into other applications via
+drag-and-drop, it caches files in the Windows temporary directory.</p>
+<ol type="1">
+<li>Press <code>Windows Key + R</code>, type <code>%TEMP%</code>, and
+press <strong>Enter</strong>.</li>
+<li>Look for folders prefixed with <code>7z</code> (such as
+<code>7zE...</code> or <code>7zO...</code>).</li>
+<li>Delete these folders. You can also safely delete all files in the
+<code>%TEMP%</code> folder that are not currently in use by other
+processes.</li>
+</ol>
+<h3 id="step-4-remove-shell-extensions-and-registry-keys">Step 4: Remove
+Shell Extensions and Registry Keys</h3>
+<p>Leftover registry entries cause orphan context menu options and
+lingering file associations.</p>
+<p><em>Note: Modifying the Windows Registry carries risk. Back up your
+registry by going to <strong>File &gt; Export</strong> in the Registry
+Editor before proceeding.</em></p>
+<ol type="1">
+<li>Press <code>Windows Key + R</code>, type <code>regedit</code>, and
+press <strong>Enter</strong>.</li>
+<li>Delete the primary configuration keys:
+<ul>
+<li>Navigate to <code>HKEY_CURRENT_USER\Software\7-Zip</code> and delete
+the <strong>7-Zip</strong> key.</li>
+<li>Navigate to <code>HKEY_LOCAL_MACHINE\SOFTWARE\7-Zip</code> and
+delete the <strong>7-Zip</strong> key.</li>
+</ul></li>
+<li>Remove shell context menu handlers:
+<ul>
+<li>Go to
+<code>HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\7-Zip</code> and
+delete the <strong>7-Zip</strong> key.</li>
+<li>Go to
+<code>HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\7-Zip</code>
+and delete the <strong>7-Zip</strong> key.</li>
+<li>Go to
+<code>HKEY_CLASSES_ROOT\Folder\shellex\ContextMenuHandlers\7-Zip</code>
+and delete the <strong>7-Zip</strong> key.</li>
+</ul></li>
+<li>Search for orphaned CLSID shell entries:
+<ul>
+<li>Press <code>Ctrl + F</code> while inside the Registry Editor.</li>
+<li>Search for <code>7-zip.dll</code>.</li>
+<li>Delete any associated keys that reference this file path.</li>
+</ul></li>
+</ol>
+<h3 id="step-5-restart-windows-explorer">Step 5: Restart Windows
+Explorer</h3>
+<p>To apply the changes and ensure the context menu completely
+refreshes:</p>
+<ol type="1">
+<li>Press <code>Ctrl + Shift + Esc</code> to launch <strong>Task
+Manager</strong>.</li>
+<li>Locate <strong>Windows Explorer</strong> under the
+<strong>Processes</strong> tab.</li>
+<li>Right-click it and select <strong>Restart</strong>.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

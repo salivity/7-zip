@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspect Hidden Partitions in Raw Disk Dumps Using 7-Zip - 7-zip</title>
+    <meta name="description" content="This guide explains how to use 7-Zip as a lightweight forensic utility to inspect partition layouts and uncover hidden partitions within raw disk dumps. While primarily an archiving tool, 7-Zip includes built-in parsers for Master Boot Record (MBR) and GU">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/inspect-hidden-partitions-in-raw-disk-dumps-using-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Inspect Hidden Partitions in Raw Disk Dumps Using 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/inspect-hidden-partitions-in-raw-disk-dumps-using-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to use 7-Zip as a lightweight forensic utility to inspect partition layouts and uncover hidden partitions within raw disk dumps. While primarily an archiving tool, 7-Zip includes built-in parsers for Master Boot Record (MBR) and GU" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="inspect-hidden-partitions-in-raw-disk-dumps-using-7-zip">Inspect
+Hidden Partitions in Raw Disk Dumps Using 7-Zip</h1>
+<p>This guide explains how to use 7-Zip as a lightweight forensic
+utility to inspect partition layouts and uncover hidden partitions
+within raw disk dumps. While primarily an archiving tool, 7-Zip includes
+built-in parsers for Master Boot Record (MBR) and GUID Partition Table
+(GPT) structures. By opening raw sector-by-sector disk images directly
+in 7-Zip, you can examine hidden system partitions, OEM recovery areas,
+and unlisted volumes without mounting the image to the host operating
+system.</p>
+<h3 id="1-prepare-the-raw-disk-dump">1. Prepare the Raw Disk Dump</h3>
+<p>7-Zip can parse raw binary disk dumps natively, including files with
+extensions such as <code>.img</code>, <code>.vhd</code>, or
+<code>.bin</code>. If your dump was created using tools like
+<code>dd</code>, <code>FTK Imager</code>, or <code>ddrescue</code> and
+has a <code>.dd</code> or <code>.raw</code> extension, 7-Zip might not
+recognize it via double-click associations. In this case, you can either
+append <code>.img</code> to the filename or open it directly through the
+7-Zip File Manager interface.</p>
+<h3 id="2-open-the-dump-as-an-archive">2. Open the Dump as an
+Archive</h3>
+<p>To inspect the partition scheme:</p>
+<ol type="1">
+<li>Open <strong>7-Zip File Manager</strong>.</li>
+<li>Navigate to the directory containing the disk image.</li>
+<li>Select the file, right-click it, and choose <strong>Open
+archive</strong>.</li>
+<li>Alternatively, from the Windows Explorer context menu, right-click
+the file and select <strong>7-Zip &gt; Open archive</strong>.</li>
+</ol>
+<p>If the context menu does not offer the "Open archive" option, select
+<strong>7-Zip &gt; Open archive &gt; *</strong> to force 7-Zip to
+analyze the file signature and parse any detected file systems or
+partition tables.</p>
+<h3 id="3-read-the-partition-structure">3. Read the Partition
+Structure</h3>
+<p>When 7-Zip opens a full-disk dump containing a valid partition table,
+it displays each partition as an individual item inside the root level
+of the archive. These items represent the physical layout of the
+disk:</p>
+<ul>
+<li>Partitions are typically named numerically by their order on the
+disk (for example, <code>0.img</code>, <code>1.fat</code>,
+<code>2.ntfs</code>).</li>
+<li>File extensions appended by 7-Zip indicate detected file systems,
+such as NTFS, FAT32, EXT, or raw binary streams
+(<code>.img</code>).</li>
+<li>Hidden OEM recovery partitions, EFI System Partitions (ESP), and
+Microsoft Reserved (MSR) partitions appear in this view, even if they
+lack drive letters or are flagged as hidden in standard operating
+systems.</li>
+</ul>
+<h3 id="4-analyze-partition-metadata">4. Analyze Partition Metadata</h3>
+<p>To inspect the properties of hidden volumes:</p>
+<ol type="1">
+<li>Select the partition inside the 7-Zip window.</li>
+<li>Click <strong>Info</strong> on the toolbar or press
+<code>Alt + Enter</code>.</li>
+<li>Review the size, compressed size, and file system characteristics.
+The offset and raw sector boundaries can be determined by comparing
+partition sizes against the full image size.</li>
+</ol>
+<h3 id="5-browse-and-extract-hidden-content">5. Browse and Extract
+Hidden Content</h3>
+<p>Double-click any detected file system volume within 7-Zip to open it
+like a folder. 7-Zip will parse the volume's internal directory tree,
+allowing you to:</p>
+<ul>
+<li>Browse files inside hidden or protected volumes without altering
+file timestamps or access metadata on the host.</li>
+<li>Extract specific files or full directory trees by dragging them to a
+local destination or clicking <strong>Extract</strong>.</li>
+<li>Extract entire sub-partitions as separate <code>.img</code> files
+for deeper analysis in specialized forensic suites.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Extracts RAR and RAR5 Files - 7-zip</title>
+    <meta name="description" content="7-Zip extracts files from RAR and RAR5 archives by utilizing a dedicated, reverse-engineered, and ported decompression engine integrated directly into its open-source codebase. While 7-Zip cannot create RAR archives due to proprietary licensing restrictio">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-extracts-rar-and-rar-5-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Extracts RAR and RAR5 Files - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-extracts-rar-and-rar-5-files" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip extracts files from RAR and RAR5 archives by utilizing a dedicated, reverse-engineered, and ported decompression engine integrated directly into its open-source codebase. While 7-Zip cannot create RAR archives due to proprietary licensing restrictio" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-extracts-rar-and-rar5-files">How 7-Zip Extracts RAR
+and RAR5 Files</h1>
+<p>7-Zip extracts files from RAR and RAR5 archives by utilizing a
+dedicated, reverse-engineered, and ported decompression engine
+integrated directly into its open-source codebase. While 7-Zip cannot
+create RAR archives due to proprietary licensing restrictions imposed by
+WinRAR’s developer, it can read and decompress them seamlessly. This
+process involves parsing unique archive signatures, interpreting
+distinct metadata structures, handling encryption protocols, and running
+customized decompression algorithms that accommodate differences between
+legacy RAR formats and the modern RAR5 format.</p>
+<h3 id="the-licensing-behind-rar-support">The Licensing Behind RAR
+Support</h3>
+<p>The RAR format is a proprietary standard developed by Eugene Roshal
+and owned by win.rar GmbH. The full compression algorithm remains
+closed-source, and its license explicitly forbids developers from
+reverse-engineering the compression mechanism to create non-WinRAR RAR
+encoders.</p>
+<p>However, Roshal provides a free, source-code distribution of the
+decompression engine called <strong>unRAR</strong>. The author of 7-Zip,
+Igor Pavlov, integrated a modified version of this decompression logic
+directly into 7-Zip's modular file-processing architecture. This allows
+7-Zip to unpack RAR files natively without requiring WinRAR or any
+external dynamic link libraries (DLLs) installed on the system.</p>
+<h3 id="parsing-archive-headers-and-metadata">Parsing Archive Headers
+and Metadata</h3>
+<p>When 7-Zip opens an archive, it determines the file type by reading
+the "magic bytes" (file signatures) at the beginning of the file rather
+than relying solely on the <code>.rar</code> extension:</p>
+<ul>
+<li><strong>Legacy RAR (RAR 1.5 to RAR 4.x):</strong> Identified by the
+byte sequence <code>52 61 72 21 1A 07 00</code>.</li>
+<li><strong>RAR5:</strong> Identified by the byte sequence
+<code>52 61 72 21 1A 07 01 00</code>.</li>
+</ul>
+<p>Once the signature is verified, 7-Zip processes the archive headers.
+Legacy RAR versions use fixed-format headers with 16-bit and 32-bit
+fields to store information such as file names, timestamps, and
+attributes.</p>
+<p>In contrast, RAR5 completely revamped this structure, employing
+variable-length integers (vints) to reduce header overhead and
+introducing extensible metadata blocks. 7-Zip parses these blocks
+sequentially to map the file directory, file sizes, and flags indicating
+whether compression or encryption was applied.</p>
+<h3 id="decryption-handling">Decryption Handling</h3>
+<p>If the archive is password-protected, 7-Zip prompts the user for the
+password before unpacking the compressed payloads:</p>
+<ul>
+<li><strong>Legacy RAR:</strong> Uses AES-128 in Cipher Block Chaining
+(CBC) mode. Password hashing is performed using a modified algorithm
+based on SHA-1 repeated thousands of times to derive the decryption
+key.</li>
+<li><strong>RAR5:</strong> Upgraded to stronger AES-256 encryption in
+CBC mode. It derives the decryption key using the standard PBKDF2
+(Password-Based Key Derivation Function 2) algorithm combined with
+HMAC-SHA-256.</li>
+</ul>
+<p>7-Zip decrypts the data blocks in memory before passing the decrypted
+stream to the decompression pipeline.</p>
+<h3 id="decompressing-legacy-rar-formats">Decompressing Legacy RAR
+Formats</h3>
+<p>Decompressing legacy RAR (primarily RAR 2.x, 3.x, and 4.x) requires
+handling a combination of specialized algorithms:</p>
+<ol type="1">
+<li><strong>Lempel-Ziv (LZSS):</strong> Scans for repeated byte patterns
+using sliding dictionary sizes ranging up to 4 MB.</li>
+<li><strong>Huffman Coding:</strong> Encodes frequent symbols with
+shorter bit-lengths to optimize pattern representations.</li>
+<li><strong>PPMd (Prediction by Partial Matching):</strong> Used
+primarily in RAR3 for text compression, using statistical models to
+predict incoming characters.</li>
+<li><strong>Specialized Multimedia Filters:</strong> Specific
+pre-processing algorithms tailored for uncompressed audio, RGB images,
+and Itanium executable binaries to improve compression ratios.</li>
+</ol>
+<p>7-Zip maintains separate internal code branches to decode each of
+these legacy variations according to the flags stored in the archive’s
+file headers.</p>
+<h3 id="decompressing-modern-rar5-archives">Decompressing Modern RAR5
+Archives</h3>
+<p>RAR5 discarded many legacy components to streamline performance and
+improve modern multi-core decompression speeds:</p>
+<ul>
+<li><strong>Expanded Dictionary Sizes:</strong> RAR5 supports dictionary
+sizes up to several gigabytes (commonly between 32 MB and 1 GB, and up
+to 4 GB in specialized setups). 7-Zip allocates the designated buffer
+size dynamically in system RAM to track back-references across large
+files.</li>
+<li><strong>Simplified Algorithms:</strong> RAR5 dropped PPMd and the
+old multimedia filters, relying entirely on a modernized LZSS variant
+coupled with dynamic Huffman coding.</li>
+<li><strong>X86 Executable Filters:</strong> RAR5 retains specialized
+delta-encoding filters specifically for modern x86/x64 executable code,
+which 7-Zip reverses during file reconstruction.</li>
+</ul>
+<p>7-Zip decodes the bitstream using prefix trees (Huffman tables),
+reconstructs the raw byte streams using reference offsets from the
+sliding dictionary, and writes the output directly to the destination
+path.</p>
+<h3 id="checksums-and-integrity-verification">Checksums and Integrity
+Verification</h3>
+<p>The final step in 7-Zip's extraction process is integrity
+verification:</p>
+<ul>
+<li>In <strong>Legacy RAR</strong>, 7-Zip computes a 32-bit Cyclic
+Redundancy Check (CRC32) over the extracted bytes and compares it
+against the CRC value stored in the file header.</li>
+<li>In <strong>RAR5</strong>, archives can use either CRC32 or the
+cryptographic BLAKE2sp 256-bit hash. 7-Zip calculates the corresponding
+checksum in parallel with file writing.</li>
+</ul>
+<p>If the calculated hash matches the header value, 7-Zip marks the
+extraction as successful and sets the original file attributes,
+timestamps, and permissions on the host file system.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

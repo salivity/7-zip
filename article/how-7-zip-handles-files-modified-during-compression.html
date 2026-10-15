@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Handles Files Modified During Compression - 7-zip</title>
+    <meta name="description" content="When source files are modified during compression, 7-Zip handles the operation based on operating system file locks, active command-line switches, and file stream consistency. In most cases, modifying a file during archiving leads to sharing violations, i">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-handles-files-modified-during-compression">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Handles Files Modified During Compression - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-handles-files-modified-during-compression" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When source files are modified during compression, 7-Zip handles the operation based on operating system file locks, active command-line switches, and file stream consistency. In most cases, modifying a file during archiving leads to sharing violations, i" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-handles-files-modified-during-compression">How 7-Zip
+Handles Files Modified During Compression</h1>
+<p>When source files are modified during compression, 7-Zip handles the
+operation based on operating system file locks, active command-line
+switches, and file stream consistency. In most cases, modifying a file
+during archiving leads to sharing violations, inconsistent data states,
+or read warnings, typically resulting in 7-Zip completing the archive
+with a non-zero exit code to alert the user to potential data integrity
+issues.</p>
+<h3 id="default-file-locking-behavior">Default File Locking
+Behavior</h3>
+<p>By default, 7-Zip requests standard read access to files. If another
+process opens a file with exclusive write locks, 7-Zip cannot read the
+file. In the graphical interface, this triggers an error dialog, while
+the command-line interface reports:</p>
+<p><code>System error: The process cannot access the file because it is being used by another process.</code></p>
+<p>In this scenario, 7-Zip skips the locked file, compresses the
+remaining files, and exits with Exit Code 1 (Warning) or Exit Code 2
+(Fatal Error), depending on the severity and total number of skipped
+items.</p>
+<h3 id="behavior-with-the-shared-write-switch--ssw">Behavior with the
+Shared Write Switch (<code>-ssw</code>)</h3>
+<p>To bypass read locks on files currently being written by other
+processes, 7-Zip includes the <code>-ssw</code> (Share write mode)
+switch. When this switch is active:</p>
+<ol type="1">
+<li><strong>Shared Read Access:</strong> 7-Zip opens the file handle
+even if another process maintains an open write handle.</li>
+<li><strong>Sequential Streaming:</strong> 7-Zip reads the file
+sequentially from start to finish. It does not monitor the file for
+real-time changes made by other applications while reading.</li>
+<li><strong>Inconsistent Snapshots:</strong> If an application modifies
+sectors of the file that 7-Zip has already passed, those updates are
+excluded. If an application modifies sectors ahead of the read pointer,
+the new data is included. This phenomenon, known as a "torn read," can
+create a corrupted or logically inconsistent state inside the archive
+for databases, log files, or active virtual disks.</li>
+</ol>
+<h3 id="file-size-changes-during-read-operations">File Size Changes
+During Read Operations</h3>
+<p>If an external process alters the file size while 7-Zip is streaming
+its data, the outcome depends on whether the file expanded or
+shrunk:</p>
+<ul>
+<li><strong>File Truncation (Shrinking):</strong> If the file becomes
+smaller while 7-Zip reads it, 7-Zip encounters an unexpected End-of-File
+(EOF) before reaching the initially queried file length. This produces a
+file read error, and 7-Zip flags the archive entry as incomplete or
+failed.</li>
+<li><strong>File Expansion (Growing):</strong> If the file grows, 7-Zip
+generally stops reading at the byte length recorded when the file handle
+was opened, or it reads up to the new EOF depending on how the file
+system updates the stream boundary. Any discrepancy between cached
+metadata and actual compressed payload length will register as a
+warning.</li>
+</ul>
+<h3 id="checksums-and-integrity-verification">Checksums and Integrity
+Verification</h3>
+<p>7-Zip records file metadata (such as timestamps and original size)
+alongside a CRC32 or SHA-256 checksum calculated from the stream it
+actually processed. If a file changes while being read:</p>
+<ul>
+<li>The checksum stored in the archive reflects the stream 7-Zip
+received, not necessarily a valid snapshot of the original file on
+disk.</li>
+<li>7-Zip will successfully test the archive later against its own
+internal checksum, but extracting the file may yield application-level
+errors if the data was torn or half-written during the initial
+compression pass.</li>
+</ul>
+<h3 id="recommended-workarounds-for-active-files">Recommended
+Workarounds for Active Files</h3>
+<p>Because 7-Zip lacks a native Volume Shadow Copy Service (VSS) engine
+on the desktop version, relying on standard compression for active files
+carries data corruption risks. For live files that change
+continuously:</p>
+<ul>
+<li>Create a Volume Shadow Copy (VSS) snapshot prior to running 7-Zip to
+freeze the filesystem state.</li>
+<li>Pause or stop writing services before beginning the compression
+task.</li>
+<li>Inspect 7-Zip exit codes in automated scripts (where <code>0</code>
+indicates success, <code>1</code> indicates warnings/skipped files, and
+<code>2</code> indicates fatal errors) to catch modification-induced
+read failures.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

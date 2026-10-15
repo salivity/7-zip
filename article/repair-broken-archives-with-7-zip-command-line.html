@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repair Broken Archives with 7-Zip Command Line - 7-zip</title>
+    <meta name="description" content="This guide covers how to diagnose, salvage, and recover data from damaged or corrupted archives using the 7-Zip command-line interface (7z). While 7-Zip does not feature a dedicated one-click repair command like some proprietary archivers, its command-lin">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/repair-broken-archives-with-7-zip-command-line">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Repair Broken Archives with 7-Zip Command Line - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/repair-broken-archives-with-7-zip-command-line" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide covers how to diagnose, salvage, and recover data from damaged or corrupted archives using the 7-Zip command-line interface (7z). While 7-Zip does not feature a dedicated one-click repair command like some proprietary archivers, its command-lin" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="repair-broken-archives-with-7-zip-command-line">Repair Broken
+Archives with 7-Zip Command Line</h1>
+<p>This guide covers how to diagnose, salvage, and recover data from
+damaged or corrupted archives using the 7-Zip command-line interface
+(<code>7z</code>). While 7-Zip does not feature a dedicated one-click
+repair command like some proprietary archivers, its command-line tool
+provides powerful testing, type-forcing, and error-bypassing parameters
+to extract uncorrupted files and rebuild broken multi-part volumes.</p>
+<h3 id="step-1-diagnose-the-damage-with-the-test-command">Step 1:
+Diagnose the Damage with the Test Command</h3>
+<p>Before attempting recovery, run a diagnostic test to identify whether
+the corruption affects the file headers, compressed data blocks, or
+specific subfiles.</p>
+<p>Open your terminal or Command Prompt and run:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> t damaged_archive.7z</span></code></pre></div>
+<ul>
+<li><code>t</code>: Tests archive integrity by verifying CRC checksums
+without writing files to the disk.</li>
+</ul>
+<p>If the output displays specific subfiles with errors, note their
+paths. Files not flagged with CRC or data errors can usually be
+extracted intact.</p>
+<h3 id="step-2-force-extract-recoverable-files">Step 2: Force Extract
+Recoverable Files</h3>
+<p>When an archive has partial corruption, a standard GUI extraction may
+abort completely. The command line allows you to bypass prompts and pull
+out any uncorrupted files:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x damaged_archive.7z <span class="at">-y</span> <span class="at">-aos</span></span></code></pre></div>
+<ul>
+<li><code>x</code>: Extracts files with full paths preserved.</li>
+<li><code>-y</code>: Automatically answers "yes" to all prompts,
+preventing the process from hanging on corrupt blocks.</li>
+<li><code>-aos</code>: Skips extracting existing files if you are
+running multiple recovery attempts.</li>
+</ul>
+<p>If the archive format is standard <code>.zip</code>, you can also
+attempt:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> e damaged_archive.zip <span class="at">-y</span></span></code></pre></div>
+<ul>
+<li><code>e</code>: Extracts files directly into the current directory,
+ignoring broken directory trees that may reside in corrupt header
+blocks.</li>
+</ul>
+<h3 id="step-3-explicitly-force-archive-parser-type">Step 3: Explicitly
+Force Archive Parser Type</h3>
+<p>If an archive's header is partially overwritten, 7-Zip might fail to
+detect the container type automatically. You can force the parser using
+the <code>-t</code> switch:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x damaged_archive.bin <span class="at">-t7z</span></span></code></pre></div>
+<p>Or for a damaged ZIP container:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x damaged_archive.bin <span class="at">-tzip</span></span></code></pre></div>
+<p>Forcing the parser instructs 7-Zip to search the entire binary stream
+for signature headers rather than relying on standard offsets.</p>
+<h3 id="step-4-fix-damaged-multi-volume-split-archives">Step 4: Fix
+Damaged Multi-Volume (Split) Archives</h3>
+<p>If you are dealing with split archives (e.g., <code>.7z.001</code>,
+<code>.7z.002</code>) and one segment is missing or corrupt, you can
+rebuild a contiguous file before extracting.</p>
+<p>On Windows Command Prompt:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">copy</span> <span class="at">/b</span> damaged_archive.7z.001 + damaged_archive.7z.002 + damaged_archive.7z.003 combined.7z</span></code></pre></div>
+<p>On Linux or macOS:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> damaged_archive.7z.<span class="pp">*</span> <span class="op">&gt;</span> combined.7z</span></code></pre></div>
+<p>Once merged, attempt extraction with forced detection:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x combined.7z <span class="at">-t7z</span></span></code></pre></div>
+<h3 id="step-5-handling-corrupt-start-headers">Step 5: Handling Corrupt
+Start Headers</h3>
+<p>If 7-Zip reports a <code>Headers Error</code> or
+<code>Can not open the file as archive</code>, the beginning of the file
+is damaged. You can scan for the embedded archive payload and attempt
+extraction from a shifted offset:</p>
+<ol type="1">
+<li><p>Check if an end header exists:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> l <span class="at">-t7z.split</span> damaged_archive.7z</span></code></pre></div></li>
+<li><p>If files are listed, extract using the non-standard parser:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x <span class="at">-t</span><span class="pp">*</span> damaged_archive.7z</span></code></pre></div>
+<p>The <code>-t*</code> switch enables all parsers and attempts wild
+extraction across supported archive signatures inside raw data.</p></li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

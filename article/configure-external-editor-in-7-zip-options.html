@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configure External Editor in 7-Zip Options - 7-zip</title>
+    <meta name="description" content="By default, 7-Zip uses the basic Windows Notepad to open and edit files directly within compressed archives. Configuring an external text editor, such as Notepad++, Visual Studio Code, or Sublime Text, provides syntax highlighting, advanced search, and be">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/configure-external-editor-in-7-zip-options">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Configure External Editor in 7-Zip Options - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/configure-external-editor-in-7-zip-options" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="By default, 7-Zip uses the basic Windows Notepad to open and edit files directly within compressed archives. Configuring an external text editor, such as Notepad++, Visual Studio Code, or Sublime Text, provides syntax highlighting, advanced search, and be" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="configure-external-editor-in-7-zip-options">Configure External
+Editor in 7-Zip Options</h1>
+<p>By default, 7-Zip uses the basic Windows Notepad to open and edit
+files directly within compressed archives. Configuring an external text
+editor, such as Notepad++, Visual Studio Code, or Sublime Text, provides
+syntax highlighting, advanced search, and better performance when
+modifying archived documents. This guide walks you through the
+step-by-step process of setting up your preferred editor inside the
+7-Zip configuration settings.</p>
+<h3 id="step-by-step-configuration">Step-by-Step Configuration</h3>
+<ol type="1">
+<li><p><strong>Launch 7-Zip File Manager</strong><br />
+Open the Windows Start menu, search for <strong>7-Zip File
+Manager</strong>, and open the application.</p></li>
+<li><p><strong>Access Options</strong><br />
+In the top menu bar, click on <strong>Tools</strong> and select
+<strong>Options...</strong> from the dropdown menu.</p></li>
+<li><p><strong>Navigate to the Editor Tab</strong><br />
+In the Options window, locate the tabs along the top and click on the
+<strong>Editor</strong> tab.</p></li>
+<li><p><strong>Specify the External Editor Path</strong></p>
+<ul>
+<li>Under the <strong>Editor:</strong> field, click the ellipsis button
+(<strong>...</strong>) to open the file browser.</li>
+<li>Navigate to the executable (<code>.exe</code>) file of your desired
+editor. Common examples include:
+<ul>
+<li><strong>Notepad++:</strong>
+<code>C:\Program Files\Notepad++\notepad++.exe</code></li>
+<li><strong>VS Code:</strong>
+<code>C:\Users\&lt;YourUsername&gt;\AppData\Local\Programs\Microsoft VS Code\Code.exe</code></li>
+<li><strong>Sublime Text:</strong>
+<code>C:\Program Files\Sublime Text\sublime_text.exe</code></li>
+</ul></li>
+<li>Select the executable and click <strong>Open</strong>.</li>
+</ul></li>
+<li><p><strong>Configure a Diff Viewer (Optional)</strong><br />
+On the same screen, you can also define an external comparison tool
+under the <strong>Diff:</strong> field (such as WinMerge or Beyond
+Compare) using the same browsing method.</p></li>
+<li><p><strong>Save Changes</strong><br />
+Click <strong>Apply</strong>, then click <strong>OK</strong> to close
+the Options window.</p></li>
+</ol>
+<h3 id="testing-the-configuration">Testing the Configuration</h3>
+<p>To verify that your external editor is active, open any archive file
+in 7-Zip File Manager, highlight a file inside the archive, and press
+<strong>F4</strong> (or right-click the file and select
+<strong>Edit</strong>). The selected file will immediately launch inside
+your newly configured external program. Any changes saved in the editor
+will prompt 7-Zip to update the archive automatically.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

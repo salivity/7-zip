@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Compression Levels from Store to Ultra - 7-zip</title>
+    <meta name="description" content="7-Zip provides six distinct compression levels ranging from Store to Ultra, designed to balance processing speed, resource usage, and final archive size. This guide details each available level, explaining how they work, their impact on system performance">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-compression-levels-from-store-to-ultra">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Compression Levels from Store to Ultra - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-compression-levels-from-store-to-ultra" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip provides six distinct compression levels ranging from Store to Ultra, designed to balance processing speed, resource usage, and final archive size. This guide details each available level, explaining how they work, their impact on system performance" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-compression-levels-from-store-to-ultra">7-Zip Compression
+Levels from Store to Ultra</h1>
+<p>7-Zip provides six distinct compression levels ranging from Store to
+Ultra, designed to balance processing speed, resource usage, and final
+archive size. This guide details each available level, explaining how
+they work, their impact on system performance, and when to use them for
+optimal archiving.</p>
+<h3 id="1-store-level-0">1. Store (Level 0)</h3>
+<ul>
+<li><strong>Compression Ratio:</strong> None (0%)</li>
+<li><strong>Speed:</strong> Instantaneous</li>
+<li><strong>Dictionary Size:</strong> 0 KB</li>
+<li><strong>Overview:</strong> The Store level does not compress files;
+it simply packages them into a single archive container. Because the CPU
+performs no compression algorithms, the process is limited only by your
+drive's read and write speeds. It is ideal for grouping
+already-compressed formats (such as JPEG, MP3, MP4, or ZIP) or creating
+rapid backups without CPU overhead.</li>
+</ul>
+<h3 id="2-fastest-level-1">2. Fastest (Level 1)</h3>
+<ul>
+<li><strong>Compression Ratio:</strong> Low</li>
+<li><strong>Speed:</strong> Very fast</li>
+<li><strong>Dictionary Size:</strong> 64 KB</li>
+<li><strong>Overview:</strong> Fastest applies minimal compression
+algorithms to reduce file size slightly while maintaining high
+processing speeds. It requires negligible RAM and CPU power, making it
+suitable for older hardware, quick file transfers, or large datasets
+where time is prioritized over disk space.</li>
+</ul>
+<h3 id="3-fast-level-3">3. Fast (Level 3)</h3>
+<ul>
+<li><strong>Compression Ratio:</strong> Moderate-low</li>
+<li><strong>Speed:</strong> Fast</li>
+<li><strong>Dictionary Size:</strong> 1 MB</li>
+<li><strong>Overview:</strong> Fast provides a slight improvement in
+compression efficiency over the Fastest setting while still completing
+tasks quickly. It is an intermediate option when you want smaller files
+than Store or Fastest provide, but do not want the longer wait times
+associated with higher settings.</li>
+</ul>
+<h3 id="4-normal-level-5">4. Normal (Level 5)</h3>
+<ul>
+<li><strong>Compression Ratio:</strong> Standard / Balanced</li>
+<li><strong>Speed:</strong> Moderate</li>
+<li><strong>Dictionary Size:</strong> 16 MB</li>
+<li><strong>Overview:</strong> Normal is the default setting in 7-Zip.
+It delivers an optimal compromise between compression speed, CPU usage,
+and output size for everyday use. Most standard file formats (like text
+documents, executables, and general directories) achieve significant
+size reduction under this setting with modest memory requirements.</li>
+</ul>
+<h3 id="5-maximum-level-7">5. Maximum (Level 7)</h3>
+<ul>
+<li><strong>Compression Ratio:</strong> High</li>
+<li><strong>Speed:</strong> Slow</li>
+<li><strong>Dictionary Size:</strong> 32 MB</li>
+<li><strong>Overview:</strong> Maximum increases dictionary size and
+search depth to significantly reduce archive sizes. This setting
+consumes noticeably more RAM and CPU cycles, resulting in longer
+compression times. It is best suited for distribution packages,
+long-term storage, or sending large data sets over bandwidth-constrained
+networks.</li>
+</ul>
+<h3 id="6-ultra-level-9">6. Ultra (Level 9)</h3>
+<ul>
+<li><strong>Compression Ratio:</strong> Highest possible</li>
+<li><strong>Speed:</strong> Very slow</li>
+<li><strong>Dictionary Size:</strong> 64 MB (or higher depending on
+configuration)</li>
+<li><strong>Overview:</strong> Ultra utilizes the deepest compression
+parameters and largest dictionary sizes available in the 7z format. It
+demands substantial system memory—often several gigabytes depending on
+thread count—and taxes the processor heavily. Use Ultra when minimizing
+final file size is critical, such as archiving large databases or
+software builds for long-term cold storage.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

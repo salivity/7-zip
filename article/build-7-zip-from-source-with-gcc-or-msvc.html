@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build 7-Zip from Source with GCC or MSVC - 7-zip</title>
+    <meta name="description" content="Building 7-Zip directly from raw source code allows you to create tailored binaries, optimize performance for specific CPU architectures, and inspect code for security compliance. This guide explains how to compile the official 7-Zip standalone console ve">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/build-7-zip-from-source-with-gcc-or-msvc">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Build 7-Zip from Source with GCC or MSVC - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/build-7-zip-from-source-with-gcc-or-msvc" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Building 7-Zip directly from raw source code allows you to create tailored binaries, optimize performance for specific CPU architectures, and inspect code for security compliance. This guide explains how to compile the official 7-Zip standalone console ve" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="build-7-zip-from-source-with-gcc-or-msvc">Build 7-Zip from
+Source with GCC or MSVC</h1>
+<p>Building 7-Zip directly from raw source code allows you to create
+tailored binaries, optimize performance for specific CPU architectures,
+and inspect code for security compliance. This guide explains how to
+compile the official 7-Zip standalone console version (<code>7zz</code>)
+from scratch using either the Microsoft Visual C++ (MSVC) compiler on
+Windows or the GNU Compiler Collection (GCC) on Linux.</p>
+<h3 id="1-download-and-extract-the-source-code">1. Download and Extract
+the Source Code</h3>
+<ol type="1">
+<li><p>Download the latest source code archive (e.g.,
+<code>7zXXXX-src.tar.xz</code> or <code>7zXXXX-src.7z</code>) from the
+official 7-Zip distribution.</p></li>
+<li><p>Extract the archive into a dedicated directory:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xf</span> 7z<span class="pp">*</span>-src.tar.xz <span class="at">-C</span> 7zip-src</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> 7zip-src</span></code></pre></div>
+<p>On Windows, extract using an existing 7-Zip installation or file
+archiver.</p></li>
+</ol>
+<hr />
+<h3 id="2-building-with-msvc-on-windows">2. Building with MSVC on
+Windows</h3>
+<p>7-Zip provides NMake-compatible makefiles for the Visual C++
+toolchain.</p>
+<h4 id="prerequisites">Prerequisites</h4>
+<ul>
+<li>Visual Studio (or Visual Studio Build Tools) with the "Desktop
+development with C++" workload installed.</li>
+</ul>
+<h4 id="compilation-steps">Compilation Steps</h4>
+<ol type="1">
+<li><p>Open the <strong>x64 Native Tools Command Prompt for
+VS</strong>.</p></li>
+<li><p>Navigate to the <code>Alone2</code> directory, which builds the
+unified standalone console version:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> CPP\7zip\Bundles\Alone2</span></code></pre></div></li>
+<li><p>Run <code>nmake</code> while specifying the architecture:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nmake CPU=AMD64</span></code></pre></div>
+<p><em>(For 32-bit x86 builds, use <code>nmake CPU=x86</code> inside the
+x86 Native Tools Command Prompt).</em></p></li>
+<li><p>Once compilation finishes, the resulting <code>7zz.exe</code>
+binary will be located inside the generated output directory:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>b\c\x64\7zz.exe</span></code></pre></div></li>
+</ol>
+<hr />
+<h3 id="3-building-with-gcc-on-linux--posix">3. Building with GCC on
+Linux / POSIX</h3>
+<p>Modern official 7-Zip releases include native makefiles tailored for
+GCC on POSIX platforms.</p>
+<h4 id="prerequisites-1">Prerequisites</h4>
+<ul>
+<li><code>gcc</code>, <code>g++</code>, and <code>make</code> installed
+(e.g., via <code>sudo apt install build-essential</code> on
+Debian/Ubuntu).</li>
+</ul>
+<h4 id="compilation-steps-1">Compilation Steps</h4>
+<ol type="1">
+<li><p>Open a terminal and navigate to the <code>Alone2</code> bundle
+directory:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> CPP/7zip/Bundles/Alone2</span></code></pre></div></li>
+<li><p>Invoke <code>make</code> using the bundled GCC makefile
+configuration:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-f</span> ../../cmpl_gcc.mak</span></code></pre></div>
+<p>To build using parallel jobs for faster compilation, append the
+<code>-j</code> flag:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-f</span> ../../cmpl_gcc.mak <span class="at">-j</span><span class="va">$(</span><span class="fu">nproc</span><span class="va">)</span></span></code></pre></div></li>
+<li><p>After compilation completes, the compiled executable
+<code>7zz</code> is located in the target directory:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./b/g/7zz</span></span></code></pre></div></li>
+</ol>
+<hr />
+<h3 id="4-verification">4. Verification</h3>
+<p>Run the generated binary without arguments to verify that the compile
+process was successful and to confirm the version number:</p>
+<ul>
+<li><p><strong>Windows:</strong></p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>b\c\x64\7zz.exe</span></code></pre></div></li>
+<li><p><strong>Linux:</strong></p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./b/g/7zz</span></span></code></pre></div></li>
+</ul>
+<p>The terminal will display the 7-Zip banner along with the supported
+compression formats and available command-line switches.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

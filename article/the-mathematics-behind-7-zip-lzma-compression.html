@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Mathematics Behind 7-Zip LZMA Compression - 7-zip</title>
+    <meta name="description" content="The high data density achieved by the Lempel-Ziv-Markov chain Algorithm (LZMA) in 7-Zip is fundamentally powered by the combination of an extended LZ77 sliding-window dictionary, adaptive Markov chain context modeling, and range coding. While dictionary m">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/the-mathematics-behind-7-zip-lzma-compression">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="The Mathematics Behind 7-Zip LZMA Compression - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/the-mathematics-behind-7-zip-lzma-compression" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The high data density achieved by the Lempel-Ziv-Markov chain Algorithm (LZMA) in 7-Zip is fundamentally powered by the combination of an extended LZ77 sliding-window dictionary, adaptive Markov chain context modeling, and range coding. While dictionary m" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="the-mathematics-behind-7-zip-lzma-compression">The Mathematics
+Behind 7-Zip LZMA Compression</h1>
+<p>The high data density achieved by the Lempel-Ziv-Markov chain
+Algorithm (LZMA) in 7-Zip is fundamentally powered by the combination of
+an extended LZ77 sliding-window dictionary, adaptive Markov chain
+context modeling, and range coding. While dictionary matching handles
+macro-level redundancies across large blocks of data, the primary
+mathematical driver of LZMA’s exceptional density is its range coder, an
+implementation of arithmetic coding. By representing entire streams of
+data as a single fractional value within a narrowing probability
+interval, range coding allows LZMA to bypass the whole-bit constraints
+of traditional Huffman algorithms and compress data extremely close to
+its theoretical Shannon entropy limit.</p>
+<h3 id="sliding-dictionary-matching-lz77-variant">Sliding Dictionary
+Matching (LZ77 Variant)</h3>
+<p>LZMA begins by finding repeated sequences using an optimized variant
+of the LZ77 algorithm. Instead of storing repeated data verbatim, it
+replaces occurrences with a distance-length pair indicating where the
+sequence previously appeared and how long it lasts. 7-Zip enhances this
+step mathematically by supporting dictionary sizes up to several
+gigabytes and employing fast hash-chain or binary-tree search algorithms
+to identify matches across vast distances. Once parsed, the input data
+is divided into streams of literal bytes, match lengths, and match
+distances.</p>
+<h3 id="markov-chains-and-context-modeling">Markov Chains and Context
+Modeling</h3>
+<p>Rather than encoding literal bytes and match references directly,
+LZMA models the statistical likelihood of each incoming bit using Markov
+chains. A discrete-time Markov chain is a stochastic model where the
+probability of a state depends only on the state attained in the
+previous step. In LZMA, the algorithm maintains an array of dynamic
+state machines that track probabilities based on context:</p>
+<ul>
+<li><strong>Positional Context:</strong> The algorithm tracks the
+position of the byte within a word or block, accounting for structured
+data like 32-bit or 64-bit binaries.</li>
+<li><strong>Recency Context:</strong> Probabilities shift based on
+recent events—whether the previous token was a literal byte, a match, or
+a repeated match distance.</li>
+<li><strong>Bit-Level Context:</strong> Literal bytes are decoded bit by
+bit, with the probability of the current bit conditioned on the value of
+the most recently decoded bits of the same byte.</li>
+</ul>
+<p>As symbols pass through the compressor, these context states
+continuously update their internal probability tables, dynamically
+adjusting to localized shifts in data entropy.</p>
+<h3 id="range-coding-reaching-the-entropy-limit">Range Coding: Reaching
+the Entropy Limit</h3>
+<p>The mathematical core enabling LZMA's superior compression ratio is
+the range coder. According to Claude Shannon's source coding theorem,
+the optimal code length for a symbol with probability <span
+class="math inline">\(P\)</span> is <span
+class="math inline">\(-\log_2(P)\)</span> bits. Traditional entropy
+algorithms like Huffman coding round these values to integer numbers of
+bits, introducing unavoidable inefficiencies when symbol probabilities
+are high (for instance, if an event has a 90% probability, its optimal
+information content is roughly 0.15 bits, but Huffman must allocate at
+least 1 full bit).</p>
+<p>Range coding eliminates this inefficiency by operating on intervals
+rather than discrete bit boundaries:</p>
+<ol type="1">
+<li><strong>Interval Definition:</strong> The entire encoded message is
+represented as a range of real numbers between 0 and 1, mathematically
+defined by a lower bound (<span class="math inline">\(Low\)</span>) and
+a range width (<span class="math inline">\(Range\)</span>).</li>
+<li><strong>Subdivision:</strong> For each bit to be encoded, the
+current range is divided into sub-intervals proportional to the
+probabilities provided by the Markov context model (<span
+class="math inline">\(P_0\)</span> and <span
+class="math inline">\(P_1\)</span>).</li>
+<li><strong>Narrowing:</strong> The coder selects the sub-interval
+corresponding to the actual symbol that occurred, setting that
+sub-interval as the new active range: <span
+class="math display">\[\text{New Range} = \text{Current Range} \times
+P(\text{symbol})\]</span> <span class="math display">\[\text{New Low} =
+\text{Current Low} + \text{Offset}\]</span></li>
+<li><strong>Renormalization:</strong> As the range contracts, leading
+digits of <span class="math inline">\(Low\)</span> become fixed. These
+digits are shifted out and output as bytes, keeping the active
+calculations within fixed-precision integer registers without precision
+loss.</li>
+</ol>
+<p>By multiplying probabilities sequentially, the final range width is
+equal to the product of the probabilities of all symbols in the
+sequence. Expressing a very small interval requires a number of bits
+directly proportional to <span class="math inline">\(-\sum
+\log_2(P(x))\)</span>, matching the theoretical entropy of the modeled
+source.</p>
+<p>Through the synergy of long-range dictionary parsing, predictive
+Markov probability modeling, and fractional-bit range coding, LZMA
+minimizes wasted bit space and achieves the high compression density
+observed in 7-Zip archives.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decompress 7-Zip Archives Directly to Memory - 7-zip</title>
+    <meta name="description" content="Yes, the 7-Zip API can decompress archives directly into memory without writing data to the physical disk. Because the underlying 7-Zip architecture relies on abstract streaming interfaces rather than concrete filesystem paths, developers can implement cu">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/decompress-7-zip-archives-directly-to-memory">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Decompress 7-Zip Archives Directly to Memory - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/decompress-7-zip-archives-directly-to-memory" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Yes, the 7-Zip API can decompress archives directly into memory without writing data to the physical disk. Because the underlying 7-Zip architecture relies on abstract streaming interfaces rather than concrete filesystem paths, developers can implement cu" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="decompress-7-zip-archives-directly-to-memory">Decompress 7-Zip
+Archives Directly to Memory</h1>
+<p>Yes, the 7-Zip API can decompress archives directly into memory
+without writing data to the physical disk. Because the underlying 7-Zip
+architecture relies on abstract streaming interfaces rather than
+concrete filesystem paths, developers can implement custom in-memory
+input and output streams to handle both the archive reading and the
+extraction stages entirely within RAM.</p>
+<h3 id="stream-based-architecture-of-7-zip">Stream-Based Architecture of
+7-Zip</h3>
+<p>The core 7-Zip library (<code>7z.dll</code> on Windows, or ported
+equivalents like <code>p7zip</code> on POSIX systems) uses a COM-like
+interface designed entirely around streaming. It does not mandate disk
+I/O. The primary interface governing output is
+<code>ISequentialOutStream</code>, which features a single
+<code>Write</code> method:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>STDMETHOD<span class="op">(</span>Write<span class="op">)(</span><span class="at">const</span> <span class="dt">void</span> <span class="op">*</span>data<span class="op">,</span> UInt32 size<span class="op">,</span> UInt32 <span class="op">*</span>processedSize<span class="op">);</span></span></code></pre></div>
+<p>When 7-Zip extracts files, it calls this <code>Write</code> method
+continuously, passing chunks of decompressed data. By default, client
+utilities map this stream to a file handle on disk. However, you can
+provide an implementation of <code>ISequentialOutStream</code> that
+writes incoming chunks directly into a dynamically resizing memory
+buffer, such as an array, vector, or memory-mapped buffer.</p>
+<p>Similarly, reading the compressed archive from memory requires
+providing an implementation of <code>IInStream</code> and
+<code>IStreamGetSize</code>. These interfaces allow the 7-Zip engine to
+read, seek, and query the size of an archive residing in a memory
+buffer.</p>
+<h3 id="implementation-approaches">Implementation Approaches</h3>
+<p>Depending on your programming environment, you can achieve in-memory
+extraction using native APIs, official SDKs, or high-level language
+wrappers:</p>
+<h4 id="1-cc-using-7zdll">1. C/C++ Using 7z.dll</h4>
+<p>When loading <code>7z.dll</code> dynamically, you call
+<code>CreateObject</code> to instantiate the archive reader (e.g.,
+<code>CLSID_CFormat7z</code>). You then implement:</p>
+<ul>
+<li><strong><code>IInStream</code></strong>: Wraps a pointer to your
+in-memory compressed payload and handles <code>Seek</code> and
+<code>Read</code> operations.</li>
+<li><strong><code>IArchiveExtractCallback</code></strong>: Directs the
+engine during extraction. Inside its <code>GetStream</code> method, you
+return an instance of your custom <code>ISequentialOutStream</code>
+rather than a file stream.</li>
+</ul>
+<p>Once invoked via <code>IInArchive::Extract</code>, the decompressor
+executes entirely in memory.</p>
+<h4 id="2-the-lzma-sdk">2. The LZMA SDK</h4>
+<p>If you only need to decompress standalone <code>.7z</code> or
+<code>.lzma</code> streams rather than complex multi-file container
+formats through the full dynamic library, the official 7-Zip LZMA SDK
+provides standalone C and C++ decoders (such as <code>LzmaDec.h</code>
+and <code>Lzma2Dec.h</code>). These functions natively accept raw input
+and output pointers (<code>ISzAlloc</code>, buffer references), allowing
+purely memory-to-memory decoding with minimal overhead.</p>
+<h4 id="3-high-level-wrappers-net-python">3. High-Level Wrappers (.NET,
+Python)</h4>
+<p>Higher-level libraries expose the same stream-based concepts without
+requiring manual COM plumbing:</p>
+<ul>
+<li><strong>.NET (C#)</strong>: Libraries like SevenZipSharp expose
+methods such as <code>ExtractFile(int index, Stream stream)</code>. By
+passing a <code>System.IO.MemoryStream</code> as the target, files are
+extracted directly into RAM.</li>
+<li><strong>Python</strong>: Wrappers such as <code>py7zr</code> allow
+reading file payloads directly as <code>io.BytesIO</code> streams using
+methods like <code>readall()</code>.</li>
+</ul>
+<h3 id="technical-considerations">Technical Considerations</h3>
+<ul>
+<li><strong>RAM Constraints</strong>: Extracting multi-gigabyte files
+into RAM can lead to out-of-memory exceptions. Ensure the host
+environment has sufficient address space and physical memory to hold
+both the decompressed content and the decompressor's internal dictionary
+buffers.</li>
+<li><strong>Dictionary Size</strong>: 7z archives with high compression
+settings often require significant dictionary memory (e.g., 64 MB to 1
+GB) purely for decompression state tracking, separate from the size of
+the uncompressed data.</li>
+<li><strong>Solid Archives</strong>: If an archive is "solid,"
+extracting a single file in memory may still require the engine to
+decompress preceding files into a memory sink to advance the dictionary
+state to the target file.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

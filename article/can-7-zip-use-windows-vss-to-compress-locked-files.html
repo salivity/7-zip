@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can 7-Zip Use Windows VSS to Compress Locked Files? - 7-zip</title>
+    <meta name="description" content="7-Zip cannot natively interact with the Windows Volume Shadow Copy Service (VSS) to read or compress live, locked system files. If you attempt to archive an open database, system file, or active registry hive directly with 7-Zip, the process will fail wit">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/can-7-zip-use-windows-vss-to-compress-locked-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can 7-Zip Use Windows VSS to Compress Locked Files? - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/can-7-zip-use-windows-vss-to-compress-locked-files" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip cannot natively interact with the Windows Volume Shadow Copy Service (VSS) to read or compress live, locked system files. If you attempt to archive an open database, system file, or active registry hive directly with 7-Zip, the process will fail wit" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-7-zip-use-windows-vss-to-compress-locked-files">Can 7-Zip
+Use Windows VSS to Compress Locked Files?</h1>
+<p>7-Zip cannot natively interact with the Windows Volume Shadow Copy
+Service (VSS) to read or compress live, locked system files. If you
+attempt to archive an open database, system file, or active registry
+hive directly with 7-Zip, the process will fail with an access-denied
+error. However, you can achieve this by pairing 7-Zip with Windows
+command-line utilities to manually generate a shadow copy, mount it, and
+run the compression against the resulting snapshot.</p>
+<h2 id="the-native-limitation-of-7-zip">The Native Limitation of
+7-Zip</h2>
+<p>When a file is actively opened by Windows or an application with an
+exclusive lock—such as <code>NTUSER.DAT</code>, Hyper-V virtual hard
+disks, or SQL databases—the file system blocks other processes from
+reading it.</p>
+<p>Backup utilities handle this by calling the Volume Shadow Copy
+Service (VSS) API, which creates a point-in-time snapshot of the volume.
+7-Zip does not implement VSS APIs in its graphical user interface (GUI)
+or its standard command-line utility (<code>7z.exe</code>). As a result,
+attempting to compress locked files directly leads to the standard
+Windows error: <em>"The process cannot access the file because it is
+being used by another process."</em></p>
+<h2 id="how-to-compress-locked-files-with-7-zip-via-vss">How to Compress
+Locked Files with 7-Zip via VSS</h2>
+<p>To compress locked system files using 7-Zip, you must separate
+snapshot creation from compression. This requires creating a shadow copy
+first, exposing it to the file system, running 7-Zip, and then cleaning
+up the snapshot.</p>
+<h3 id="step-1-create-a-shadow-copy-using-diskshadow">Step 1: Create a
+Shadow Copy Using Diskshadow</h3>
+<p>On Windows Server (or Windows clients with appropriate administrative
+tools installed), you can use the built-in <code>diskshadow</code> tool
+or third-party utilities like <code>vshadow.exe</code>.</p>
+<p>Create a script file named <code>vss_script.txt</code> with the
+following commands:</p>
+<pre class="text"><code>set context persistent
+set metadata C:\vss_metadata.cab
+begin backup
+add volume C: alias ShadowVolume
+create
+expose %ShadowVolume% X:</code></pre>
+<p>Execute this script in an elevated Command Prompt:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>diskshadow <span class="at">-s</span> vss_script.txt</span></code></pre></div>
+<p>This captures a snapshot of the <code>C:</code> drive and exposes it
+as a temporary virtual drive <code>X:</code>.</p>
+<h3 id="step-2-compress-the-files-with-7-zip">Step 2: Compress the Files
+with 7-Zip</h3>
+<p>Because the files on drive <code>X:</code> are static read-only
+snapshots, none of them are locked by active system processes. You can
+now target the files using the 7-Zip command line:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;C:\Program Files\7-Zip\7z.exe&quot;</span> a <span class="at">-t7z</span> <span class="st">&quot;C:\Backups\SystemBackup.7z&quot;</span> <span class="st">&quot;X:\Windows\System32\config\*&quot;</span></span></code></pre></div>
+<h3 id="step-3-remove-the-shadow-copy">Step 3: Remove the Shadow
+Copy</h3>
+<p>After 7-Zip completes the archive, unmount and delete the shadow copy
+to free system storage:</p>
+<p>Create a cleanup script named <code>vss_cleanup.txt</code>:</p>
+<pre class="text"><code>unexpose X:
+delete shadows exposed X:
+end backup</code></pre>
+<p>Run the cleanup script:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>diskshadow <span class="at">-s</span> vss_cleanup.txt</span></code></pre></div>
+<h2 id="alternatives-for-scripting-and-automation">Alternatives for
+Scripting and Automation</h2>
+<p>If managing raw VSS scripts is too complex, consider these
+alternatives:</p>
+<ul>
+<li><strong>Hobocopy or ShadowSpawn:</strong> Lightweight open-source
+utilities designed to invoke VSS on the fly for a single command,
+allowing you to run
+<code>shadowspawn C:\LockedDir Q: "7z a backup.7z Q:\*"</code>
+directly.</li>
+<li><strong>PowerShell Scripts:</strong> PowerShell scripts utilizing
+WMI or the <code>VssAdmin</code> tool can automate the creation,
+symbolic linking (via <code>mklink /d</code>), and deletion of shadow
+copies before and after running 7-Zip.</li>
+<li><strong>Dedicated Backup Software:</strong> If you require
+continuous, seamless backups of locked files without custom scripting,
+utilities that include built-in VSS integration (such as Macrium
+Reflect, Veeam, or Duplicati) are recommended over standalone
+7-Zip.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

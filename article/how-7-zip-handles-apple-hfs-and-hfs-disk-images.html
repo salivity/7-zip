@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Handles Apple HFS and HFS+ Disk Images - 7-zip</title>
+    <meta name="description" content="7-Zip provides native, read-only support for Apple’s Hierarchical File System (HFS) and HFS+ (Mac OS Extended) disk images, allowing users on non-macOS platforms to inspect and unpack Mac-formatted archives. This article explains how the utility unwraps A">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-handles-apple-hfs-and-hfs-disk-images">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Handles Apple HFS and HFS+ Disk Images - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-handles-apple-hfs-and-hfs-disk-images" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip provides native, read-only support for Apple’s Hierarchical File System (HFS) and HFS+ (Mac OS Extended) disk images, allowing users on non-macOS platforms to inspect and unpack Mac-formatted archives. This article explains how the utility unwraps A" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-handles-apple-hfs-and-hfs-disk-images">How 7-Zip
+Handles Apple HFS and HFS+ Disk Images</h1>
+<p>7-Zip provides native, read-only support for Apple’s Hierarchical
+File System (HFS) and HFS+ (Mac OS Extended) disk images, allowing users
+on non-macOS platforms to inspect and unpack Mac-formatted archives.
+This article explains how the utility unwraps Apple disk image
+containers, traverses internal B-tree metadata structures, handles
+dual-fork architectures, and navigates file system limitations across
+different operating systems.</p>
+<h3 id="disk-image-container-unwrapping">Disk Image Container
+Unwrapping</h3>
+<p>Before interacting with an HFS or HFS+ filesystem, 7-Zip inspects the
+underlying container format. Apple disk images typically use the
+Universal Disk Image Format (UDIF), commonly distributed with a
+<code>.dmg</code> file extension, or raw sector copies
+(<code>.img</code>, <code>.iso</code>). For UDIF images, 7-Zip reads the
+embedded trailer (the <code>koly</code> block) located in the final 512
+bytes of the file. This block contains metadata pointing to partition
+maps and compressed data chunks. 7-Zip decompresses standard chunk
+algorithms—such as zlib, bzip2, and raw data runs—to present the
+underlying virtual block device containing the HFS/HFS+ partition.</p>
+<h3 id="volume-header-parsing">Volume Header Parsing</h3>
+<p>Once the raw partition boundaries are identified, 7-Zip accesses the
+filesystem metadata:</p>
+<ul>
+<li><strong>Offset Verification:</strong> In HFS+, the Volume Header is
+located at byte offset 1024 from the start of the partition.</li>
+<li><strong>Header Validation:</strong> 7-Zip checks the signature bytes
+(<code>H+</code> for standard HFS+, <code>HX</code> for case-sensitive
+HFSX) and verifies key parameters, including allocation block size,
+total block count, and the locations of special system files.</li>
+<li><strong>Special System Files:</strong> 7-Zip reads the extents
+records for the Catalog File, the Allocation File (bitmap), and the
+Extents Overflow File, which are necessary to map files that are
+fragmented or distributed across the volume.</li>
+</ul>
+<h3 id="b-tree-catalog-traversal">B-Tree Catalog Traversal</h3>
+<p>HFS and HFS+ organize directory hierarchies and file metadata using
+balanced B-trees. 7-Zip’s parsing engine reads the Catalog File’s B-tree
+to reconstruct directory trees:</p>
+<ol type="1">
+<li><strong>Node Processing:</strong> The utility reads the node
+descriptors, beginning at the root node and traversing downward through
+index nodes to leaf nodes.</li>
+<li><strong>Key Evaluation:</strong> Leaf nodes contain keyed records
+representing folder threads, directory entries, and file records. 7-Zip
+parses these keys, which include parent folder IDs and Unicode (UTF-16)
+file names.</li>
+<li><strong>Data Mapping:</strong> File records provide the exact block
+locations and extents (start block and block count) for the file's
+contents, enabling 7-Zip to extract file payloads directly without
+scanning the entire disk sequentially.</li>
+</ol>
+<h3 id="handling-data-and-resource-forks">Handling Data and Resource
+Forks</h3>
+<p>Classic Apple filesystems utilize dual-fork architecture, separating
+content into a "data fork" and a "resource fork":</p>
+<ul>
+<li><strong>Data Fork:</strong> Contains the primary payload of the
+file. 7-Zip extracts this fork as the standard file output.</li>
+<li><strong>Resource Fork:</strong> Contains legacy macOS metadata,
+icons, or interface elements. Because modern host operating systems like
+Windows do not natively use Apple resource forks, 7-Zip generally
+ignores them or may extract them as separate companion streams,
+depending on the image format and extraction settings, preventing data
+collisions on standard filesystems.</li>
+</ul>
+<h3 id="extraction-constraints-and-platform-considerations">Extraction
+Constraints and Platform Considerations</h3>
+<p>7-Zip operates strictly as a parser and unpacker for Apple
+filesystems; it cannot create, update, or write to HFS or HFS+ volumes.
+When extracting files onto Windows NTFS or FAT systems, 7-Zip sanitizes
+characters that are valid in HFS+ but reserved in Windows (such as
+<code>:</code>, <code>\</code>, <code>/</code>, and <code>*</code>).
+Additionally, while HFS+ is case-preserving and HFSX is case-sensitive,
+extracting to case-insensitive filesystems may cause file overwrites if
+two files share the same name with different casing.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

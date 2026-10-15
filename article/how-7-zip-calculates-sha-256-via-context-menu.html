@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Calculates SHA-256 via Context Menu - 7-zip</title>
+    <meta name="description" content="This article explains how 7-Zip calculates SHA-256 checksums directly from the Windows context menu. It covers how the Windows Shell extension initiates the request, how 7-Zip reads the targeted file in memory-efficient blocks, how the cryptographic hashi">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-calculates-sha-256-via-context-menu">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Calculates SHA-256 via Context Menu - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-calculates-sha-256-via-context-menu" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how 7-Zip calculates SHA-256 checksums directly from the Windows context menu. It covers how the Windows Shell extension initiates the request, how 7-Zip reads the targeted file in memory-efficient blocks, how the cryptographic hashi" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-calculates-sha-256-via-context-menu">How 7-Zip
+Calculates SHA-256 via Context Menu</h1>
+<p>This article explains how 7-Zip calculates SHA-256 checksums directly
+from the Windows context menu. It covers how the Windows Shell extension
+initiates the request, how 7-Zip reads the targeted file in
+memory-efficient blocks, how the cryptographic hashing algorithm
+processes the binary stream using hardware-accelerated instructions, and
+how the final hash is formatted and presented to the user.</p>
+<h2 id="windows-shell-extension-activation">Windows Shell Extension
+Activation</h2>
+<p>When you right-click a file in Windows Explorer, the operating system
+queries registered shell extensions to populate the context menu. 7-Zip
+implements this through a dedicated dynamic link library (such as
+<code>7-zip.dll</code>). When you hover over the "CRC SHA" submenu and
+select "SHA-256", Windows passes the handle and path of the selected
+file directly to 7-Zip's context menu handler.</p>
+<h2 id="streamed-file-reading-and-buffering">Streamed File Reading and
+Buffering</h2>
+<p>To maintain low memory usage and avoid system freezes, 7-Zip does not
+load the entire file into RAM at once. Instead, it accesses the file via
+standard OS read operations (<code>CreateFile</code> and
+<code>ReadFile</code> on Windows) and streams the data sequentially:</p>
+<ul>
+<li><strong>Buffer Allocation:</strong> 7-Zip allocates a dedicated
+memory buffer (typically between 64 KB and several megabytes).</li>
+<li><strong>Chunk Processing:</strong> The file is read chunk by chunk
+into this buffer. This allows 7-Zip to calculate hashes for
+multi-gigabyte or terabyte-sized files without exhausting system
+memory.</li>
+</ul>
+<h2 id="the-sha-256-algorithm-execution">The SHA-256 Algorithm
+Execution</h2>
+<p>As each block of data enters the buffer, 7-Zip passes it to its
+internal SHA-256 implementation, based on the FIPS 180-4 standard:</p>
+<ol type="1">
+<li><strong>Initialization:</strong> The algorithm initializes eight
+32-bit working variables with fixed, standard initial hash values.</li>
+<li><strong>Block Processing:</strong> The data is broken down into
+512-bit (64-byte) message blocks. For each block, 64 rounds of bitwise
+logical functions, modular additions, and cyclic shifts are performed to
+mutate the internal state.</li>
+<li><strong>Hardware Acceleration:</strong> 7-Zip includes
+assembly-level optimizations. On modern CPUs supporting the Intel SHA
+Extensions (or ARMv8 Crypto instructions), 7-Zip executes dedicated
+hardware instructions (<code>SHA256RNDS2</code>,
+<code>SHA256MSG1</code>, <code>SHA256MSG2</code>) rather than pure
+software calculations. This increases hashing speeds to multiple
+gigabytes per second.</li>
+<li><strong>Padding and Finalization:</strong> Once the end of the file
+is reached, standard cryptographic padding (a <code>1</code> bit
+followed by <code>0</code> bits and the 64-bit integer representation of
+the original file size) is applied to the final block, finalizing the
+internal state into the 256-bit digest.</li>
+</ol>
+<h2 id="presenting-the-result">Presenting the Result</h2>
+<p>After the final block is processed, 7-Zip converts the 256-bit binary
+digest into a 64-character hexadecimal string. It then spawns a
+lightweight GUI dialog box displaying the final SHA-256 hash, the total
+byte count of the processed file, and buttons allowing you to copy the
+hash directly to your clipboard.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

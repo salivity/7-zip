@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automate Daily Backups with 7-Zip and Task Scheduler - 7-zip</title>
+    <meta name="description" content="This article provides a step-by-step guide on how to automatically create daily, timestamped ZIP archives of your important files using the free 7-Zip utility and the built-in Windows Task Scheduler. By combining a lightweight batch script with scheduled">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/automate-daily-backups-with-7-zip-and-task-scheduler">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Automate Daily Backups with 7-Zip and Task Scheduler - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/automate-daily-backups-with-7-zip-and-task-scheduler" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article provides a step-by-step guide on how to automatically create daily, timestamped ZIP archives of your important files using the free 7-Zip utility and the built-in Windows Task Scheduler. By combining a lightweight batch script with scheduled" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="automate-daily-backups-with-7-zip-and-task-scheduler">Automate
+Daily Backups with 7-Zip and Task Scheduler</h1>
+<p>This article provides a step-by-step guide on how to automatically
+create daily, timestamped ZIP archives of your important files using the
+free 7-Zip utility and the built-in Windows Task Scheduler. By combining
+a lightweight batch script with scheduled automation, you can establish
+a reliable, zero-cost backup system that runs seamlessly in the
+background without requiring manual intervention.</p>
+<h2 id="step-1-verify-the-7-zip-installation-path">Step 1: Verify the
+7-Zip Installation Path</h2>
+<p>7-Zip includes a command-line executable named <code>7z.exe</code>.
+By default, it is installed in:
+<code>C:\Program Files\7-Zip\7z.exe</code></p>
+<p>Ensure 7-Zip is installed and verify that this path exists on your
+system.</p>
+<h2 id="step-2-create-the-backup-batch-script">Step 2: Create the Backup
+Batch Script</h2>
+<p>A Windows batch file will define what files to back up, create a
+unique filename based on the current date, and instruct 7-Zip to
+generate the archive.</p>
+<ol type="1">
+<li>Open <strong>Notepad</strong>.</li>
+<li>Paste the following script:</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">@</span><span class="bu">echo off</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">:: Define source directory and backup destination</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">SOURCE</span>=<span class="st">C:\Users\YourUsername\Documents\MyData&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">DEST</span>=<span class="st">D:\Backups&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">:: Generate a reliable YYYY-MM-DD timestamp</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="at">/f</span> <span class="st">&quot;tokens=2 delims==&quot;</span> <span class="sc">%%</span><span class="va">I</span> in (&#39;wmic os get localdatetime /value&#39;) do set <span class="st">&quot;DT=</span><span class="sc">%%</span><span class="va">I</span><span class="st">&quot;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">DATESTAMP</span>=<span class="pp">%</span><span class="va">DT</span><span class="pp">:~</span><span class="dv">0</span><span class="pp">,</span><span class="dv">4</span><span class="pp">%</span><span class="st">-</span><span class="pp">%</span><span class="va">DT</span><span class="pp">:~</span><span class="dv">4</span><span class="pp">,</span><span class="dv">2</span><span class="pp">%</span><span class="st">-</span><span class="pp">%</span><span class="va">DT</span><span class="pp">:~</span><span class="dv">6</span><span class="pp">,</span><span class="dv">2</span><span class="pp">%</span><span class="st">&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">:: Create the archive name</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">ZIPNAME</span>=<span class="st">Backup_</span><span class="pp">%</span><span class="va">DATESTAMP</span><span class="pp">%</span><span class="st">.zip&quot;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">:: Run 7-Zip command to compress files</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;C:\Program Files\7-Zip\7z.exe&quot;</span> a <span class="at">-tzip</span> <span class="st">&quot;</span><span class="pp">%</span><span class="va">DEST</span><span class="pp">%</span><span class="st">\</span><span class="pp">%</span><span class="va">ZIPNAME</span><span class="pp">%</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="pp">%</span><span class="va">SOURCE</span><span class="pp">%</span><span class="st">\*&quot;</span> <span class="at">-r</span> <span class="at">-mx</span>=5</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span> <span class="at">/b</span></span></code></pre></div>
+<h3 id="script-breakdown">Script Breakdown:</h3>
+<ul>
+<li><code>SOURCE</code>: The folder you want to back up. Update this
+path to match your target folder.</li>
+<li><code>DEST</code>: The folder where the backup file should be
+saved.</li>
+<li><code>a</code>: Tells 7-Zip to add files to an archive.</li>
+<li><code>-tzip</code>: Specifies the ZIP format (change to
+<code>-t7z</code> if 7z format is preferred).</li>
+<li><code>-r</code>: Recurses subdirectories.</li>
+<li><code>-mx=5</code>: Sets standard compression level (ranges from 0
+for none to 9 for ultra).</li>
+</ul>
+<ol start="3" type="1">
+<li>Save the file with the <code>.bat</code> extension, for example:
+<code>C:\Scripts\daily_backup.bat</code>.</li>
+</ol>
+<h2 id="step-3-test-the-script">Step 3: Test the Script</h2>
+<p>Before scheduling, verify the script functions properly:</p>
+<ol type="1">
+<li>Double-click <code>daily_backup.bat</code>.</li>
+<li>Check your destination folder to ensure the new <code>.zip</code>
+file is created with today's date in the title and contains your
+files.</li>
+</ol>
+<h2 id="step-4-schedule-the-script-in-windows-task-scheduler">Step 4:
+Schedule the Script in Windows Task Scheduler</h2>
+<ol type="1">
+<li>Press <code>Windows Key + R</code>, type <code>taskschd.msc</code>,
+and press <strong>Enter</strong>.</li>
+<li>In the right-hand <strong>Actions</strong> panel, click
+<strong>Create Basic Task</strong>.</li>
+<li><strong>Name</strong>: Enter <code>Daily 7-Zip Backup</code> and
+click <strong>Next</strong>.</li>
+<li><strong>Trigger</strong>: Select <strong>Daily</strong> and click
+<strong>Next</strong>.</li>
+<li><strong>Time</strong>: Choose your desired daily execution time
+(e.g., <code>11:00:00 PM</code>) and click <strong>Next</strong>.</li>
+<li><strong>Action</strong>: Select <strong>Start a program</strong> and
+click <strong>Next</strong>.</li>
+<li><strong>Program/script</strong>: Click <strong>Browse</strong> and
+select your <code>C:\Scripts\daily_backup.bat</code> file.</li>
+<li><strong>Start in (optional)</strong>: Enter the folder path where
+the script is located (e.g., <code>C:\Scripts\</code>).</li>
+<li>Click <strong>Next</strong>, review the summary, and click
+<strong>Finish</strong>.</li>
+</ol>
+<h2 id="step-5-configure-permissions-optional-but-recommended">Step 5:
+Configure Permissions (Optional but Recommended)</h2>
+<p>To ensure the backup runs even if you are not actively logged into
+the computer:</p>
+<ol type="1">
+<li>Locate <strong>Daily 7-Zip Backup</strong> in the Task Scheduler
+Library.</li>
+<li>Right-click the task and select <strong>Properties</strong>.</li>
+<li>Under the <strong>General</strong> tab, select <strong>Run whether
+user is logged on or not</strong>.</li>
+<li>Check the box labeled <strong>Run with highest
+privileges</strong>.</li>
+<li>Click <strong>OK</strong> and enter your Windows account password
+when prompted.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

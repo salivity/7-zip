@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Causes 7-Zip Data Error During Extraction - 7-zip</title>
+    <meta name="description" content="The &quot;Data Error&quot; alert in 7-Zip typically indicates that the utility cannot properly read, decompress, or verify the integrity of an archive during the extraction process. This issue usually stems from damaged archive files, incorrect decryption passwords">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/what-causes-7-zip-data-error-during-extraction">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Causes 7-Zip Data Error During Extraction - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/what-causes-7-zip-data-error-during-extraction" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The &quot;Data Error&quot; alert in 7-Zip typically indicates that the utility cannot properly read, decompress, or verify the integrity of an archive during the extraction process. This issue usually stems from damaged archive files, incorrect decryption passwords" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="what-causes-7-zip-data-error-during-extraction">What Causes
+7-Zip Data Error During Extraction</h1>
+<p>The "Data Error" alert in 7-Zip typically indicates that the utility
+cannot properly read, decompress, or verify the integrity of an archive
+during the extraction process. This issue usually stems from damaged
+archive files, incorrect decryption passwords, incomplete downloads, or
+underlying hardware instability. Understanding the specific root causes
+helps determine whether the file can be recovered or if it must be
+reacquired.</p>
+<h3 id="incomplete-or-interrupted-downloads">Incomplete or Interrupted
+Downloads</h3>
+<p>The most common cause of a 7-Zip data error is a broken download. If
+an internet connection drops, pauses, or switches networks while
+downloading a compressed file, fragments of the archive may fail to
+save. Even a discrepancy of a single missing byte will cause the file's
+final checksum (CRC or SHA-256) to mismatch, triggering a data error
+during extraction.</p>
+<h3 id="incorrect-password-on-encrypted-files">Incorrect Password on
+Encrypted Files</h3>
+<p>When extracting a password-protected archive, entering the wrong
+password frequently produces a "Data Error: Wrong password?" or simply a
+generic "Data Error" message. Because 7-Zip uses the provided password
+as a decryption key, applying an incorrect key turns the compressed data
+into unreadable garbage that fails decompression checks.</p>
+<h3 id="missing-segments-in-multi-part-archives">Missing Segments in
+Multi-Part Archives</h3>
+<p>Multi-volume archives (such as files ending in <code>.7z.001</code>,
+<code>.part1.rar</code>, or <code>.z01</code>) require all associated
+segments to be present in the same directory. If one part is missing,
+improperly named, or corrupted, 7-Zip will throw a data error as soon as
+it attempts to bridge the extraction process across the damaged or
+absent volume.</p>
+<h3 id="storage-media-and-bad-disk-sectors">Storage Media and Bad Disk
+Sectors</h3>
+<p>Physical or logical faults on the storage medium can corrupt stored
+archive data. If a hard drive or solid-state drive develops bad sectors,
+or if an archive is stored on a failing USB flash drive, the operating
+system may fail to read the file blocks correctly. When 7-Zip receives
+corrupted data blocks from the drive, decompression fails.</p>
+<h3 id="faulty-system-memory-ram">Faulty System Memory (RAM)</h3>
+<p>Decompression algorithms require intensive read and write operations
+inside the system's random access memory (RAM). If a computer has
+failing or unstable RAM, bits can flip while 7-Zip loads and
+reconstructs the data in memory. This produces an extraction error even
+if the original archive file on the disk is completely healthy.</p>
+<h3 id="outdated-7-zip-version">Outdated 7-Zip Version</h3>
+<p>Attempting to extract an archive compressed with newer algorithms
+(such as recent LZMA2 revisions, Zstandard, or proprietary compression
+tools) using an outdated version of 7-Zip can trigger data errors. The
+older software may misinterpret the compression headers, leading to
+extraction failure. Updating 7-Zip to the latest stable release resolves
+compatibility-related errors.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

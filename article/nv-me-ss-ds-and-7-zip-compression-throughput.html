@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVMe SSDs and 7-Zip Compression Throughput - 7-zip</title>
+    <meta name="description" content="Fast NVMe SSD storage significantly improves system responsiveness, but its impact on 7-Zip compression throughput depends heavily on the chosen compression level, the dataset, and CPU capabilities. While 7-Zip is traditionally limited by processor perfor">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/nv-me-ss-ds-and-7-zip-compression-throughput">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="NVMe SSDs and 7-Zip Compression Throughput - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/nv-me-ss-ds-and-7-zip-compression-throughput" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Fast NVMe SSD storage significantly improves system responsiveness, but its impact on 7-Zip compression throughput depends heavily on the chosen compression level, the dataset, and CPU capabilities. While 7-Zip is traditionally limited by processor perfor" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="nvme-ssds-and-7-zip-compression-throughput">NVMe SSDs and 7-Zip
+Compression Throughput</h1>
+<p>Fast NVMe SSD storage significantly improves system responsiveness,
+but its impact on 7-Zip compression throughput depends heavily on the
+chosen compression level, the dataset, and CPU capabilities. While 7-Zip
+is traditionally limited by processor performance, high-speed storage
+eliminates data transfer bottlenecks, ensuring that modern multi-core
+CPUs are fed without delay. This guide breaks down how NVMe drives
+influence compression and decompression rates, where the actual
+performance boundaries lie, and when high-speed storage makes a
+noticeable difference.</p>
+<h3 id="the-dynamic-between-storage-and-the-cpu">The Dynamic Between
+Storage and the CPU</h3>
+<p>7-Zip primarily uses algorithms like LZMA and LZMA2, which are
+computationally expensive. During standard to ultra compression
+workloads, a modern CPU spends billions of clock cycles analyzing
+patterns, matching dictionaries, and calculating checksums.</p>
+<p>Because maximum compression algorithms output data far slower than
+even a standard SATA drive can write, the storage drive spends most of
+its time idling. In these heavy CPU-bound scenarios, switching from a
+standard SSD to an ultra-fast Gen 4 or Gen 5 NVMe drive yields
+negligible improvements to compression throughput.</p>
+<h3 id="scenarios-where-nvme-drives-boost-compression-speeds">Scenarios
+Where NVMe Drives Boost Compression Speeds</h3>
+<p>NVMe drives become a critical performance factor under specific
+conditions:</p>
+<ul>
+<li><strong>Fast and Low-Level Compression:</strong> When using
+compression levels like "Store" (copying with no compression) or
+"Fastest" (low dictionary size), data throughput increases dramatically.
+At these settings, a multi-threaded CPU can process hundreds of
+megabytes per second, quickly saturating traditional hard drives and
+standard SATA SSDs. Fast NVMe drives ensure the data pipeline does not
+stall.</li>
+<li><strong>Massive Multi-Core Processors:</strong> High-core-count
+processors (such as AMD Threadripper or high-end Ryzen 9 and Intel Core
+i9 chips) can compress data across dozens of threads simultaneously. As
+CPU throughput approaches multiple gigabytes per second, fast read and
+write speeds from an NVMe drive prevent I/O queuing.</li>
+<li><strong>High-Volume Small File Archives:</strong> Compressing
+directories containing hundreds of thousands of small files forces the
+storage drive to perform heavy random read operations. NVMe drives
+feature superior random 4K read speeds and high queue depth handling
+compared to mechanical drives or SATA SSDs, significantly reducing the
+file discovery and opening phase.</li>
+</ul>
+<h3 id="nvme-impact-on-decompression">NVMe Impact on Decompression</h3>
+<p>Decompression is computationally much lighter than compression.
+Modern CPUs can decompress LZMA and Deflate streams at gigabytes per
+second.</p>
+<p>When extracting large archives, the bottleneck quickly shifts from
+the processor to the storage destination. Writing extracted files back
+to disk at peak speed requires high sustained sequential write
+throughput. An NVMe SSD drastically cuts extraction times compared to
+slower drives, which often throttle when write buffers fill up.</p>
+<h3 id="sustained-write-performance-considerations">Sustained Write
+Performance Considerations</h3>
+<p>Not all NVMe SSDs deliver consistent performance during extended
+7-Zip tasks. When compressing or decompressing multi-gigabyte
+archives:</p>
+<ul>
+<li><strong>SLC Cache Exhaustion:</strong> Budget NVMe drives often use
+dynamic SLC caches. Once this cache is filled during a large archive
+write, write speeds can drop significantly (especially on QLC-based NAND
+drives), creating an unexpected bottleneck.</li>
+<li><strong>Thermal Throttling:</strong> Sustained high-speed data
+transfers can heat up high-performance Gen 4 and Gen 5 drives. Adequate
+heatsinks prevent the drive from reducing its transfer rate
+mid-task.</li>
+</ul>
+<h3 id="summary">Summary</h3>
+<p>For standard, high-ratio 7-Zip compression, a fast CPU and sufficient
+RAM remain the top priorities. However, an NVMe SSD ensures that fast
+compression levels, archive decompression, and small-file indexing
+operate at peak efficiency without storage-induced latency.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

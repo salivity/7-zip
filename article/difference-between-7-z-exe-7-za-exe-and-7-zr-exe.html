@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Difference Between 7z.exe, 7za.exe, and 7zr.exe - 7-zip</title>
+    <meta name="description" content="The popular file archiver 7-Zip includes three distinct command-line executables: 7z.exe, 7za.exe, and 7zr.exe. While all three allow you to manipulate archives via the command line, they differ significantly in format support, external file dependencies,">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/difference-between-7-z-exe-7-za-exe-and-7-zr-exe">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Difference Between 7z.exe, 7za.exe, and 7zr.exe - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/difference-between-7-z-exe-7-za-exe-and-7-zr-exe" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The popular file archiver 7-Zip includes three distinct command-line executables: 7z.exe, 7za.exe, and 7zr.exe. While all three allow you to manipulate archives via the command line, they differ significantly in format support, external file dependencies," />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="difference-between-7zexe-7zaexe-and-7zrexe">Difference Between
+7z.exe, 7za.exe, and 7zr.exe</h1>
+<p>The popular file archiver 7-Zip includes three distinct command-line
+executables: <code>7z.exe</code>, <code>7za.exe</code>, and
+<code>7zr.exe</code>. While all three allow you to manipulate archives
+via the command line, they differ significantly in format support,
+external file dependencies, and file size. This guide explains the core
+differences between these utilities so you can choose the right one for
+your automation, scripting, or deployment needs.</p>
+<h2 id="7zexe-full-console-version">7z.exe (Full Console Version)</h2>
+<p><code>7z.exe</code> is the standard command-line version included
+with the official 7-Zip installation.</p>
+<ul>
+<li><strong>Dependencies:</strong> It requires external dynamic link
+libraries (specifically <code>7z.dll</code> and other companion files)
+to operate.</li>
+<li><strong>Format Support:</strong> It provides complete format
+support. It can compress to 7z, ZIP, GZIP, BZIP2, TAR, WIM, and XZ. It
+can decompress almost every format supported by 7-Zip, including RAR,
+ISO, CAB, DMG, MSI, VHD, and many others.</li>
+<li><strong>Best Used For:</strong> General desktop use, power users,
+and systems where the full 7-Zip suite is already installed.</li>
+</ul>
+<h2 id="7zaexe-standalone-extra-version">7za.exe (Standalone Extra
+Version)</h2>
+<p><code>7za.exe</code> is a standalone console application distributed
+as part of the "7-Zip Extra" package.</p>
+<ul>
+<li><strong>Dependencies:</strong> It is completely self-contained and
+operates independently without requiring <code>7z.dll</code> or any
+other external files.</li>
+<li><strong>Format Support:</strong> It supports a restricted set of
+archive formats. It can pack and unpack 7z, ZIP, GZIP, BZIP2, and TAR,
+and can unpack CAB and Z files. It lacks support for complex or
+proprietary formats such as RAR, ISO, and MSI.</li>
+<li><strong>Best Used For:</strong> Automated deployment scripts, batch
+tasks, and portable environments where you need multi-format support
+(such as ZIP and 7z) without installing full software or shipping
+multiple DLLs.</li>
+</ul>
+<h2 id="7zrexe-reduced-standalone-version">7zr.exe (Reduced Standalone
+Version)</h2>
+<p><code>7zr.exe</code> is a lightweight, reduced standalone console
+version, also found in the "7-Zip Extra" archive.</p>
+<ul>
+<li><strong>Dependencies:</strong> Like <code>7za.exe</code>, it is
+completely self-contained and does not require <code>7z.dll</code>.</li>
+<li><strong>Format Support:</strong> It only supports the native 7z
+format (including LZMA and LZMA2 compression). It cannot create or
+extract ZIP, TAR, GZIP, RAR, or any other file format.</li>
+<li><strong>Best Used For:</strong> Minimalist build pipelines,
+microservices, or embedded environments where disk space is at a premium
+and operations are strictly limited to <code>.7z</code> archives.</li>
+</ul>
+<h2 id="summary-comparison">Summary Comparison</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;"><code>7z.exe</code></th>
+<th style="text-align: left;"><code>7za.exe</code></th>
+<th style="text-align: left;"><code>7zr.exe</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Requires
+<code>7z.dll</code></strong></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>7z Format Support</strong></td>
+<td style="text-align: left;">Full</td>
+<td style="text-align: left;">Full</td>
+<td style="text-align: left;">Full</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ZIP / TAR / GZIP /
+BZIP2</strong></td>
+<td style="text-align: left;">Full</td>
+<td style="text-align: left;">Full</td>
+<td style="text-align: left;">None</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RAR / ISO / MSI /
+Others</strong></td>
+<td style="text-align: left;">Full</td>
+<td style="text-align: left;">None</td>
+<td style="text-align: left;">None</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Primary Advantage</strong></td>
+<td style="text-align: left;">Maximum format coverage</td>
+<td style="text-align: left;">Portable, multi-format</td>
+<td style="text-align: left;">Minimal footprint, portable</td>
+</tr>
+</tbody>
+</table></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

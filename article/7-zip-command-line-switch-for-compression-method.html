@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Command Line Switch for Compression Method - 7-zip</title>
+    <meta name="description" content="This article explains how to specify and configure compression methods in the 7-Zip command-line utility, focusing on the -m switch. You will learn the exact command syntax required to switch algorithms to formats like PPMd, adjust algorithm-specific para">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-command-line-switch-for-compression-method">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Command Line Switch for Compression Method - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-command-line-switch-for-compression-method" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how to specify and configure compression methods in the 7-Zip command-line utility, focusing on the -m switch. You will learn the exact command syntax required to switch algorithms to formats like PPMd, adjust algorithm-specific para" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-command-line-switch-for-compression-method">7-Zip Command
+Line Switch for Compression Method</h1>
+<p>This article explains how to specify and configure compression
+methods in the 7-Zip command-line utility, focusing on the
+<code>-m</code> switch. You will learn the exact command syntax required
+to switch algorithms to formats like PPMd, adjust algorithm-specific
+parameters, and run practical examples to optimize your file
+archives.</p>
+<h2 id="the-compression-method-switch--m">The Compression Method Switch:
+<code>-m</code></h2>
+<p>In the 7-Zip command line (<code>7z</code>), the switch used to
+specify the compression method is <code>-m</code> (Method).</p>
+<p>To define a specific algorithm, use the <code>-m0=</code> parameter
+followed by the algorithm name. The <code>0</code> indicates the first
+filter in the compression pipeline.</p>
+<p>The basic syntax is:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="op">&lt;</span>archive_name<span class="op">&gt;</span> <span class="op">&lt;</span>files_to_compress<span class="op">&gt;</span> -m0=<span class="op">&lt;</span>MethodName<span class="op">&gt;</span></span></code></pre></div>
+<h3 id="supported-compression-methods">Supported Compression
+Methods</h3>
+<p>7-Zip supports several algorithms depending on the archive format
+(primarily <code>.7z</code>):</p>
+<ul>
+<li><strong>PPMd</strong>: Highly efficient for plain text, source code,
+and log files.</li>
+<li><strong>LZMA / LZMA2</strong>: The default general-purpose
+algorithms offering high compression ratios.</li>
+<li><strong>BZip2</strong>: Standard block-sorting algorithm.</li>
+<li><strong>Deflate</strong>: Standard algorithm used primarily for
+<code>.zip</code> compatibility.</li>
+<li><strong>Copy</strong>: Stores files without any compression.</li>
+</ul>
+<hr />
+<h2 id="using-the-ppmd-method">Using the PPMd Method</h2>
+<p>PPMd is an implementation of Dmitry Shkarin's PPMII algorithm. It is
+particularly effective for compressing text-based data where
+dictionary-based algorithms like LZMA may be less efficient.</p>
+<h3 id="basic-ppmd-command">Basic PPMd Command</h3>
+<p>To create an archive using PPMd compression:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a archive.7z <span class="pp">*</span>.txt <span class="at">-m0</span><span class="op">=</span>PPMd</span></code></pre></div>
+<h3 id="advanced-ppmd-parameters">Advanced PPMd Parameters</h3>
+<p>PPMd allows you to fine-tune memory usage and model order using
+sub-parameters separated by colons (<code>:</code>):</p>
+<ul>
+<li><strong><code>mem</code> (Memory Size)</strong>: Specifies the
+amount of RAM allocated for the model (e.g., <code>mem128m</code> or
+<code>mem1g</code>). The default is typically <code>24m</code>.</li>
+<li><strong><code>o</code> (Model Order)</strong>: Controls the context
+depth used for prediction, ranging from 2 to 32. The default is 6.
+Higher orders can increase compression ratios on large text files but
+require more processing time.</li>
+</ul>
+<h4 id="example-with-custom-parameters">Example with Custom
+Parameters</h4>
+<p>To compress a directory of log files using PPMd with 256 MB of memory
+and a model order of 16:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a logs.7z /var/log/ <span class="at">-m0</span><span class="op">=</span>PPMd:mem256m:o16</span></code></pre></div>
+<hr />
+<h2 id="combining--m-with-other-compression-settings">Combining
+<code>-m</code> with Other Compression Settings</h2>
+<p>The <code>-m</code> switch also controls broader archive properties
+when configured without the method index <code>0</code>:</p>
+<ul>
+<li><strong>Compression Level (<code>-mx</code>)</strong>: Sets overall
+compression effort from store to ultra (<code>-mx0</code> to
+<code>-mx9</code>).</li>
+<li><strong>Multithreading (<code>-mmt</code>)</strong>: Sets the number
+of CPU threads (e.g., <code>-mmt=4</code> or <code>-mmt=on</code>). Note
+that PPMd natively supports single-threaded operation per data
+stream.</li>
+</ul>
+<h3 id="full-example">Full Example</h3>
+<p>To create a maximum-compression archive using PPMd:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a output.7z documents/ <span class="at">-mx9</span> <span class="at">-m0</span><span class="op">=</span>PPMd:mem512m:o12</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Does 7-Zip Support Multi-Volume Solid Archives? - 7-zip</title>
+    <meta name="description" content="7-Zip does not natively support creating multi-volume solid archives in a single step through its standard compression menu. When you configure an archive to split into volumes within 7-Zip, the software automatically disables solid compression and switch">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/does-7-zip-support-multi-volume-solid-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Does 7-Zip Support Multi-Volume Solid Archives? - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/does-7-zip-support-multi-volume-solid-archives" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip does not natively support creating multi-volume solid archives in a single step through its standard compression menu. When you configure an archive to split into volumes within 7-Zip, the software automatically disables solid compression and switch" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="does-7-zip-support-multi-volume-solid-archives">Does 7-Zip
+Support Multi-Volume Solid Archives?</h1>
+<p>7-Zip does not natively support creating multi-volume solid archives
+in a single step through its standard compression menu. When you
+configure an archive to split into volumes within 7-Zip, the software
+automatically disables solid compression and switches to non-solid mode.
+However, users can still achieve a multi-volume solid archive by
+utilizing a simple two-step workaround using 7-Zip's built-in file
+splitting tools.</p>
+<h2 id="the-native-behavior-of-7-zip">The Native Behavior of 7-Zip</h2>
+<p>When creating an archive in the <code>.7z</code> format, solid
+compression combines multiple files into a single continuous data stream
+before applying the compression algorithm. This significantly improves
+compression ratios, especially when archiving large numbers of similar
+files.</p>
+<p>If you specify a volume size in the <strong>Split to volumes,
+bytes</strong> field inside the "Add to Archive" dialog, 7-Zip
+automatically turns off solid compression. Each file is compressed
+independently within the boundaries of each volume.</p>
+<p>The developer designed it this way for practical reliability
+reasons:</p>
+<ul>
+<li><strong>Error Recovery:</strong> In a true solid archive, damage to
+one volume corrupts the entire continuous data stream, making it
+impossible to extract files located after the damaged block.</li>
+<li><strong>Extraction Performance:</strong> Extracting a single file
+from a middle or late volume of a solid archive requires decompressing
+all preceding volumes from the beginning.</li>
+</ul>
+<h2
+id="workaround-how-to-create-a-multi-volume-solid-archive">Workaround:
+How to Create a Multi-Volume Solid Archive</h2>
+<p>If maximizing compression is your priority and you still require
+split files (for example, to fit specific storage media or bypass file
+upload limits), you can create a multi-volume solid archive using a
+two-step process:</p>
+<h3 id="step-1-create-a-single-solid-archive">Step 1: Create a Single
+Solid Archive</h3>
+<ol type="1">
+<li>Select the files or folders you want to compress.</li>
+<li>Right-click the selection and choose <strong>7-Zip</strong> &gt;
+<strong>Add to archive...</strong>.</li>
+<li>Choose the <strong>7z</strong> archive format.</li>
+<li>Set the <strong>Solid Block size</strong> to your preferred setting
+(such as <strong>Solid</strong>).</li>
+<li>Leave the <strong>Split to volumes, bytes</strong> field completely
+empty.</li>
+<li>Click <strong>OK</strong> to generate the solid <code>.7z</code>
+file.</li>
+</ol>
+<h3 id="step-2-split-the-solid-archive">Step 2: Split the Solid
+Archive</h3>
+<ol type="1">
+<li>Locate the newly created <code>.7z</code> file.</li>
+<li>Right-click the file and select <strong>7-Zip</strong> &gt;
+<strong>Split file...</strong>.</li>
+<li>In the dialog, select or type your desired volume size.</li>
+<li>Click <strong>OK</strong>.</li>
+</ol>
+<p>7-Zip will split the single solid archive into raw segments with
+extensions like <code>.7z.001</code>, <code>.7z.002</code>, and
+<code>.7z.003</code>.</p>
+<h2 id="how-to-extract-split-solid-archives">How to Extract Split Solid
+Archives</h2>
+<p>To extract the files later:</p>
+<ol type="1">
+<li>Ensure all split parts (<code>.7z.001</code>, <code>.7z.002</code>,
+etc.) reside in the exact same directory.</li>
+<li>Right-click only the first file (<code>.7z.001</code>).</li>
+<li>Select <strong>7-Zip</strong> &gt; <strong>Extract Here</strong> or
+<strong>Extract to...</strong>.</li>
+</ol>
+<p>7-Zip automatically detects all subsequent volumes, reconstructs the
+solid stream in memory, and extracts the contents.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

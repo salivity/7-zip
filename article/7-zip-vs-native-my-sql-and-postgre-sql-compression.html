@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip vs Native MySQL and PostgreSQL Compression - 7-zip</title>
+    <meta name="description" content="This article compares using 7-Zip (LZMA/LZMA2) against native compression options in PostgreSQL and MySQL for database dump files. While native database dump utilities prioritize fast execution, low memory overhead, and direct restoration capabilities, 7-">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-vs-native-my-sql-and-postgre-sql-compression">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip vs Native MySQL and PostgreSQL Compression - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-vs-native-my-sql-and-postgre-sql-compression" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article compares using 7-Zip (LZMA/LZMA2) against native compression options in PostgreSQL and MySQL for database dump files. While native database dump utilities prioritize fast execution, low memory overhead, and direct restoration capabilities, 7-" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-vs-native-mysql-and-postgresql-compression">7-Zip vs
+Native MySQL and PostgreSQL Compression</h1>
+<p>This article compares using 7-Zip (LZMA/LZMA2) against native
+compression options in PostgreSQL and MySQL for database dump files.
+While native database dump utilities prioritize fast execution, low
+memory overhead, and direct restoration capabilities, 7-Zip focuses on
+maximizing storage reduction through advanced compression algorithms and
+large dictionary sizes. Understanding the differences in compression
+ratio, resource utilization, and operational workflows helps determine
+the best approach for database backups and long-term archiving.</p>
+<h3 id="compression-algorithms-used">Compression Algorithms Used</h3>
+<ul>
+<li><strong>7-Zip:</strong> Primarily uses LZMA and LZMA2 algorithms
+within the <code>.7z</code> container. LZMA2 allows very large
+dictionary sizes (ranging from 16 MB to 1 GB or more) and sliding
+look-ahead buffers, making it exceptionally effective at finding
+recurring patterns across massive text-based files.</li>
+<li><strong>PostgreSQL (<code>pg_dump</code>):</strong> Uses zlib
+(DEFLATE) by default when using the custom directory or tar archive
+formats (<code>-Fc</code>). Modern versions (PostgreSQL 16+) also
+support native LZ4 and Zstandard (<code>zstd</code>) algorithms.</li>
+<li><strong>MySQL (<code>mysqldump</code> / utilities):</strong> Outputs
+raw SQL text by default, which is typically piped through gzip
+(DEFLATE). Advanced tools like Percona XtraBackup or MySQL Shell
+(<code>util.dumpInstance</code>) natively support Zstandard and
+LZ4.</li>
+</ul>
+<h3 id="compression-ratio-comparison">Compression Ratio Comparison</h3>
+<p>Database dumps consist predominantly of plain-text SQL statements,
+repetitive schema definitions, structured data, and recurring NULL or
+boolean values.</p>
+<ul>
+<li><strong>7-Zip (LZMA2):</strong> Consistently produces the smallest
+file sizes. Because it can maintain large dictionary windows, it detects
+repeated data patterns across distant tables in the dump. For typical
+text dumps, 7-Zip can achieve an 80% to 90% reduction from the raw text
+size.</li>
+<li><strong>PostgreSQL Native (zlib/DEFLATE):</strong> Reaches an
+approximate 60% to 75% reduction. It uses a sliding window limited to 32
+KB, meaning it cannot detect repetitive patterns that occur far apart in
+the file.</li>
+<li><strong>MySQL + Gzip:</strong> Similar to PostgreSQL's zlib
+implementation, achieving a 60% to 75% reduction. While Zstandard
+matches DEFLATE with better speed, it generally remains slightly behind
+7-Zip's highest compression levels.</li>
+</ul>
+<h3 id="speed-and-system-resource-usage">Speed and System Resource
+Usage</h3>
+<ul>
+<li><strong>PostgreSQL and MySQL Native Tools:</strong> Optimized to
+minimize backup windows and production server impact. Zstandard and LZ4,
+in particular, provide high throughput with negligible CPU overhead,
+allowing backups to complete at near-disk write speeds. Memory
+consumption is predictable and kept low.</li>
+<li><strong>7-Zip:</strong> Prioritizes density over raw speed.
+Compressing a dump file with 7-Zip at "Ultra" settings requires
+significant CPU time and hundreds of megabytes—or even gigabytes—of RAM
+per thread. Running 7-Zip directly on a production database host can
+cause CPU starvation and memory contention.</li>
+</ul>
+<h3 id="workflow-streaming-and-restoration">Workflow, Streaming, and
+Restoration</h3>
+<ul>
+<li><strong>Selective and Parallel Restore:</strong> PostgreSQL's custom
+format (<code>pg_dump -Fc</code>) contains an internal table of
+contents. This allows <code>pg_restore</code> to run multithreaded
+restores using the <code>-j</code> flag, reorder objects, or selectively
+restore specific tables without decompressing the whole backup. If a
+dump is compressed as a monolithic <code>.7z</code> archive, selective
+restore requires fully unpacking the file or processing it
+sequentially.</li>
+<li><strong>Pipeline Streaming:</strong> Native database utilities
+stream data directly from the database engine to the compressed output
+file without creating an uncompressed intermediate file on disk:
+<ul>
+<li>PostgreSQL: <code>pg_dump -Fc dbname &gt; backup.dump</code></li>
+<li>MySQL: <code>mysqldump dbname | gzip &gt; backup.sql.gz</code></li>
+<li>7-Zip can accept piped standard input
+(<code>mysqldump dbname | 7z a -si backup.7z</code>), but writing via
+standard input restricts multithreading in certain 7-Zip formats and
+prevents creating random-access indexes inside the archive.</li>
+</ul></li>
+</ul>
+<h3 id="recommended-use-cases">Recommended Use Cases</h3>
+<ul>
+<li><strong>Use Native Database Compression (or Zstandard) for:</strong>
+<ul>
+<li>Routine daily or hourly operational backups.</li>
+<li>Environments where recovery time objective (RTO) is critical.</li>
+<li>Backups run directly on the database server to preserve CPU and RAM
+for transactions.</li>
+<li>PostgreSQL backups requiring parallel or selective table restores
+via <code>pg_restore</code>.</li>
+</ul></li>
+<li><strong>Use 7-Zip for:</strong>
+<ul>
+<li>Cold storage, archival backups, and data retained for long-term
+compliance.</li>
+<li>Transferring large database dumps over slow or metered network
+connections.</li>
+<li>Secondary processing workflows where a raw dump is compressed on an
+off-host backup server to save cloud storage costs.</li>
+</ul></li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

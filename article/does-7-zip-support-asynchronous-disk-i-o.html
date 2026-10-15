@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Does 7-Zip Support Asynchronous Disk I/O? - 7-zip</title>
+    <meta name="description" content="7-Zip does not use native asynchronous operating system I/O system calls, but it achieves asynchronous disk reading and writing through a multi-threaded pipeline architecture during archive creation. By separating file reading, data compression, and archi">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/does-7-zip-support-asynchronous-disk-i-o">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Does 7-Zip Support Asynchronous Disk I/O? - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/does-7-zip-support-asynchronous-disk-i-o" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip does not use native asynchronous operating system I/O system calls, but it achieves asynchronous disk reading and writing through a multi-threaded pipeline architecture during archive creation. By separating file reading, data compression, and archi" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="does-7-zip-support-asynchronous-disk-io">Does 7-Zip Support
+Asynchronous Disk I/O?</h1>
+<p>7-Zip does not use native asynchronous operating system I/O system
+calls, but it achieves asynchronous disk reading and writing through a
+multi-threaded pipeline architecture during archive creation. By
+separating file reading, data compression, and archive writing into
+distinct worker threads, 7-Zip prevents disk access from blocking
+compression routines. This article explains how 7-Zip processes disk
+operations during archive creation, the technical distinction between
+its threading model and native asynchronous I/O, and how this impacts
+real-world performance.</p>
+<h3
+id="thread-level-concurrency-vs-native-asynchronous-apis">Thread-Level
+Concurrency vs. Native Asynchronous APIs</h3>
+<p>In operating systems like Windows, native asynchronous I/O relies on
+non-blocking calls (such as <code>ReadFile</code> and
+<code>WriteFile</code> paired with <code>OVERLAPPED</code> structures or
+I/O Completion Ports). Under this model, a single thread can initiate
+multiple disk operations simultaneously without waiting for the storage
+controller to respond.</p>
+<p>7-Zip does not implement this native non-blocking model. Instead, it
+uses standard synchronous file system APIs executed across multiple
+parallel threads. At an architectural level, 7-Zip creates dedicated
+threads to handle different stages of the archiving process:</p>
+<ul>
+<li><strong>Reader Threads:</strong> Read raw uncompressed files from
+the source drive into memory buffers.</li>
+<li><strong>Compression Threads:</strong> Process the buffered data
+using algorithms like LZMA or LZMA2 across available CPU cores.</li>
+<li><strong>Writer Threads:</strong> Write the compressed streams and
+metadata sequentially to the destination storage drive.</li>
+</ul>
+<p>Because the reader, compression, and writer stages execute
+simultaneously in their own threads, the I/O operations are functionally
+asynchronous from the user's perspective. Disk reads do not wait for
+disk writes to complete, and neither blocks the CPU from compressing
+previously read blocks.</p>
+<h3 id="the-role-of-memory-buffering">The Role of Memory Buffering</h3>
+<p>To maintain continuous data flow between the disk and CPU, 7-Zip
+relies heavily on dynamic memory buffers. The input thread reads data
+ahead of time and stores it in RAM. The compression threads pull
+directly from this memory pool rather than querying the disk. Once
+compressed, data blocks are buffered again before the output thread
+writes them sequentially to the destination archive.</p>
+<p>This buffering decouples drive speed from CPU performance. If reading
+from a fast NVMe drive while compressing with a heavy algorithm like
+LZMA2, the read thread quickly fills the buffer and sleeps until CPU
+workers free up space. Conversely, if disk access is the bottleneck, the
+CPU waits on the input buffer rather than stalling on direct I/O
+requests.</p>
+<h3 id="operating-system-cache-and-storage-behavior">Operating System
+Cache and Storage Behavior</h3>
+<p>Because 7-Zip uses standard synchronous read and write streams, it
+relies on the operating system’s file system cache for optimization:</p>
+<ul>
+<li><strong>Read-Ahead Caching:</strong> The OS anticipates sequential
+reads and prefetches data into the system cache before 7-Zip explicitly
+requests it.</li>
+<li><strong>Write-Back Caching:</strong> Outgoing archive data is
+written to the OS cache first, allowing 7-Zip to complete write calls
+immediately while the OS flushes dirty pages to the physical disk in the
+background.</li>
+</ul>
+<h3 id="summary">Summary</h3>
+<p>7-Zip achieves asynchronous behavior through multi-threaded
+pipelining rather than native asynchronous I/O APIs. By isolating
+reading, compression, and writing into independent threads connected by
+memory buffers, 7-Zip ensures that disk reads and writes occur
+concurrently without interrupting the archiving process.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

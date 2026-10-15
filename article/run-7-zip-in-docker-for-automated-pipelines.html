@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run 7-Zip in Docker for Automated Pipelines - 7-zip</title>
+    <meta name="description" content="Running 7-Zip inside Docker provides a standardized, isolated, and cross-platform way to handle archive compression and extraction in continuous integration and deployment (CI/CD) pipelines. This guide covers selecting the appropriate 7-Zip package for Li">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/run-7-zip-in-docker-for-automated-pipelines">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Run 7-Zip in Docker for Automated Pipelines - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/run-7-zip-in-docker-for-automated-pipelines" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Running 7-Zip inside Docker provides a standardized, isolated, and cross-platform way to handle archive compression and extraction in continuous integration and deployment (CI/CD) pipelines. This guide covers selecting the appropriate 7-Zip package for Li" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="run-7-zip-in-docker-for-automated-pipelines">Run 7-Zip in Docker
+for Automated Pipelines</h1>
+<p>Running 7-Zip inside Docker provides a standardized, isolated, and
+cross-platform way to handle archive compression and extraction in
+continuous integration and deployment (CI/CD) pipelines. This guide
+covers selecting the appropriate 7-Zip package for Linux containers,
+building a minimal Docker image, executing compression commands via
+mounted volumes, and embedding the container into automated workflow
+pipelines.</p>
+<h2 id="1-choosing-the-7-zip-linux-binary">1. Choosing the 7-Zip Linux
+Binary</h2>
+<p>On Linux-based containers, you have two primary options:</p>
+<ul>
+<li><strong><code>7zip</code> (Official CLI /
+<code>7zz</code>):</strong> The modern, officially supported
+command-line version developed by Igor Pavlov.</li>
+<li><strong><code>p7zip</code>:</strong> A legacy POSIX port of 7-Zip
+commonly found in older package managers.</li>
+</ul>
+<p>For modern pipelines, using the official package via Alpine or Debian
+ensures the best performance, security, and compatibility with modern
+archive formats.</p>
+<h2 id="2-creating-a-lightweight-dockerfile">2. Creating a Lightweight
+Dockerfile</h2>
+<p>Alpine Linux is ideal for CI/CD environments because it produces an
+image smaller than 20 MB, reducing download and startup times during
+pipeline runs.</p>
+<p>Create a <code>Dockerfile</code>:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> alpine:3.20</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Install the official 7-Zip package</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apk</span> add <span class="at">--no-cache</span> 7zip</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Set the working directory for file operations</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /workspace</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Set 7zz as the default entry point</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">ENTRYPOINT</span> [<span class="st">&quot;7zz&quot;</span>]</span></code></pre></div>
+<p>Build the Docker image locally or in your container registry:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> pipeline-7zip:latest .</span></code></pre></div>
+<h2 id="3-running-7-zip-commands-via-docker">3. Running 7-Zip Commands
+via Docker</h2>
+<p>To compress or extract files from the host system, mount your target
+directory into the container's working directory
+(<code>/workspace</code>) using Docker volumes.</p>
+<h3 id="compressing-files">Compressing Files</h3>
+<p>To compress files into an ultra-compressed <code>.7z</code>
+archive:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="dt">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">&quot;</span>:/workspace <span class="dt">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  pipeline-7zip:latest <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  a <span class="at">-t7z</span> <span class="at">-mx</span><span class="op">=</span>9 archive.7z ./artifacts/</span></code></pre></div>
+<ul>
+<li><code>a</code>: Adds files to an archive.</li>
+<li><code>-t7z</code>: Specifies the archive format as 7z.</li>
+<li><code>-mx=9</code>: Applies ultra-level compression.</li>
+</ul>
+<h3 id="extracting-files">Extracting Files</h3>
+<p>To extract an archive with preserved directory structures:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="dt">\</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">&quot;</span>:/workspace <span class="dt">\</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  pipeline-7zip:latest <span class="dt">\</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  x archive.7z <span class="at">-o.</span>/extracted/</span></code></pre></div>
+<ul>
+<li><code>x</code>: Extracts files with full paths.</li>
+<li><code>-o./extracted/</code>: Specifies the output directory.</li>
+</ul>
+<h2 id="4-integrating-into-automated-pipelines">4. Integrating into
+Automated Pipelines</h2>
+<p>Containerized 7-Zip can be run natively in modern pipeline systems
+without requiring 7-Zip to be pre-installed on the host agent.</p>
+<h3 id="github-actions-example">GitHub Actions Example</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">compress-artifacts</span><span class="kw">:</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Checkout Code</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Archive Files with 7-Zip</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>          docker run --rm \</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>            -v &quot;${{ github.workspace }}&quot;:/workspace \</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>            alpine:3.20 sh -c &quot;apk add --no-cache 7zip &amp;&amp; 7zz a -mx=9 release.7z ./build/&quot;</span></code></pre></div>
+<h3 id="gitlab-ci-example">GitLab CI Example</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">package-job</span><span class="kw">:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">image</span><span class="kw">:</span><span class="at"> alpine:3.20</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> build</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">before_script</span><span class="kw">:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> apk add --no-cache 7zip</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> 7zz a -mx=9 build-artifacts.7z ./bin/</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">artifacts</span><span class="kw">:</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">paths</span><span class="kw">:</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> build-artifacts.7z</span></span></code></pre></div>
+<h2 id="5-pipeline-best-practices">5. Pipeline Best Practices</h2>
+<ul>
+<li><strong>Prebuild and Cache the Image:</strong> Avoid running
+<code>apk add</code> inside every pipeline run. Build
+<code>pipeline-7zip:latest</code> once, push it to your private
+container registry, and reference that image directly to save execution
+time.</li>
+<li><strong>Set Container Permissions:</strong> When running in
+environments where root privileges cause file ownership issues on the
+host, pass <code>--user "$(id -u):$(id -g)"</code> to the
+<code>docker run</code> command.</li>
+<li><strong>Limit Resource Usage:</strong> High compression levels (like
+<code>-mx=9</code>) can consume significant RAM and CPU. Set CPU and
+memory limits on your container (<code>--memory="2g" --cpus="2"</code>)
+to prevent pipeline runners from crashing out-of-memory.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

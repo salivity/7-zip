@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert ZIP to a Smaller 7z Archive Using 7-Zip - 7-zip</title>
+    <meta name="description" content="7-Zip can significantly reduce the file size of an existing ZIP archive by recompressing its contents into the proprietary .7z format. While the software does not provide an automated &quot;one-click&quot; conversion button, unpacking the original ZIP file and repa">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/convert-zip-to-a-smaller-7-z-archive-using-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Convert ZIP to a Smaller 7z Archive Using 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/convert-zip-to-a-smaller-7-z-archive-using-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip can significantly reduce the file size of an existing ZIP archive by recompressing its contents into the proprietary .7z format. While the software does not provide an automated &quot;one-click&quot; conversion button, unpacking the original ZIP file and repa" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="convert-zip-to-a-smaller-7z-archive-using-7-zip">Convert ZIP to
+a Smaller 7z Archive Using 7-Zip</h1>
+<p>7-Zip can significantly reduce the file size of an existing ZIP
+archive by recompressing its contents into the proprietary
+<code>.7z</code> format. While the software does not provide an
+automated "one-click" conversion button, unpacking the original ZIP file
+and repacking the raw data with 7-Zip’s advanced compression algorithms
+typically produces an archive that is 30% to 70% smaller than the
+original.</p>
+<h3 id="why-7z-archives-are-smaller-than-zip-files">Why 7z Archives Are
+Smaller Than ZIP Files</h3>
+<p>Standard ZIP archives rely predominantly on the older Deflate
+compression algorithm, which compresses each file individually using a
+relatively small dictionary size (usually 32 KB).</p>
+<p>In contrast, the <code>.7z</code> format uses the
+<strong>LZMA</strong> and <strong>LZMA2</strong> algorithms, which offer
+several distinct advantages:</p>
+<ul>
+<li><strong>Larger Dictionary Sizes:</strong> 7-Zip can use dictionaries
+spanning from several megabytes up to multiple gigabytes, allowing the
+algorithm to find repeating patterns across large files.</li>
+<li><strong>Solid Compression:</strong> Unlike standard ZIP files, 7-Zip
+can group multiple similar files into a single, continuous data block
+(solid archive). This allows it to identify shared data patterns between
+different files, dramatically reducing redundant data across entire
+folders.</li>
+</ul>
+<h3 id="how-to-recompress-a-zip-to-7z-in-7-zip">How to Recompress a ZIP
+to 7z in 7-Zip</h3>
+<p>To achieve maximum compression, follow these steps using the 7-Zip
+graphical interface:</p>
+<ol type="1">
+<li><strong>Extract the ZIP Archive:</strong> Open the <code>.zip</code>
+file in 7-Zip or your system file manager and extract all contents to a
+temporary folder. Simply placing the <code>.zip</code> file inside a
+<code>.7z</code> container will not save space; the raw files must be
+extracted first.</li>
+<li><strong>Open the Compression Menu:</strong> Select all the extracted
+files, right-click, choose <strong>7-Zip</strong>, and click <strong>Add
+to archive...</strong>.</li>
+<li><strong>Configure Archive Settings:</strong>
+<ul>
+<li><strong>Archive format:</strong> Select <code>7z</code>.</li>
+<li><strong>Compression level:</strong> Set to <code>Ultra</code> for
+the highest compression ratio.</li>
+<li><strong>Compression method:</strong> Choose <code>LZMA2</code>.</li>
+<li><strong>Dictionary size:</strong> Set to <code>64 MB</code> or
+higher (depending on your available system RAM).</li>
+<li><strong>Solid Block size:</strong> Set to <code>Solid</code> to
+allow cross-file pattern matching.</li>
+</ul></li>
+<li><strong>Create the Archive:</strong> Click <strong>OK</strong> to
+begin the process.</li>
+</ol>
+<h3 id="what-kind-of-size-reduction-to-expect">What Kind of Size
+Reduction to Expect</h3>
+<p>The final archive size depends entirely on the type of files
+contained inside the archive:</p>
+<ul>
+<li><strong>Text files, source code, and executables:</strong> These
+yield the highest compression gains. Recompressing these from ZIP to 7z
+frequently cuts the archive size in half.</li>
+<li><strong>Redundant datasets:</strong> If the archive contains
+multiple versions or backups of the same files, solid compression will
+drastically shrink the overall footprint.</li>
+<li><strong>Pre-compressed media:</strong> Formats like JPEG, MP3, MP4,
+and modern Office documents (<code>.docx</code>, <code>.xlsx</code>) are
+already compressed. Recompressing them into 7z will produce minimal to
+no size difference.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

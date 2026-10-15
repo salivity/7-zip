@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Handles Temp Files When Creating Archives - 7-zip</title>
+    <meta name="description" content="When creating or modifying compressed archives, 7-Zip relies on temporary files to preserve data integrity, optimize processing speed, and interface with the Windows file system. This article explains where 7-Zip creates temporary files, the operational d">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-handles-temp-files-when-creating-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Handles Temp Files When Creating Archives - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-handles-temp-files-when-creating-archives" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When creating or modifying compressed archives, 7-Zip relies on temporary files to preserve data integrity, optimize processing speed, and interface with the Windows file system. This article explains where 7-Zip creates temporary files, the operational d" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-handles-temp-files-when-creating-archives">How 7-Zip
+Handles Temp Files When Creating Archives</h1>
+<p>When creating or modifying compressed archives, 7-Zip relies on
+temporary files to preserve data integrity, optimize processing speed,
+and interface with the Windows file system. This article explains where
+7-Zip creates temporary files, the operational difference between direct
+compression and updating existing archives, how drag-and-drop operations
+trigger temporary storage, and how users can configure these behaviors
+within the application settings.</p>
+<h3 id="direct-creation-vs-updating-existing-archives">Direct Creation
+vs. Updating Existing Archives</h3>
+<p>When creating a brand-new archive using the 7-Zip File Manager or the
+standard context menu ("Add to archive..."), 7-Zip typically bypasses
+the system's global temporary directory. Instead, it streams the
+compressed data directly to the specified target destination under a
+temporary filename (such as <code>filename.7z.tmp</code>). Once the
+compression process completes and integrity checks pass, 7-Zip renames
+the temporary file to the final target name (<code>filename.7z</code>).
+This atomic write process ensures that if an operation is canceled or
+fails, the target destination is not left with a corrupted, partially
+written file bearing the final archive name.</p>
+<p>When modifying or adding files to an existing archive, 7-Zip cannot
+simply insert data in place due to how solid compression blocks
+function. It creates a new temporary archive in the same directory as
+the original file, copies the unmodified content along with the newly
+compressed files into the new container, and then deletes the original
+archive before renaming the temporary archive.</p>
+<h3 id="the-drag-and-drop-exception">The Drag-and-Drop Exception</h3>
+<p>Drag-and-drop interactions in Windows handle data through the
+standard Windows Shell (OLE/COM interfaces), which introduces a
+constraint: Windows Explorer cannot receive a stream of compressed data
+dynamically before knowing the target file path.</p>
+<p>When you drag files directly into or out of the 7-Zip File Manager
+window:</p>
+<ol type="1">
+<li>7-Zip is forced to extract or compress the contents into the
+operating system's temporary directory first (typically
+<code>%USERPROFILE%\AppData\Local\Temp</code>).</li>
+<li>Once the operation finishes in the temporary directory, Windows
+Explorer moves the generated files to the actual drop destination.</li>
+</ol>
+<p>This workflow can lead to disk space bottlenecks and slow transfer
+speeds when handling large archives, as data must be written twice
+across disk sectors.</p>
+<h3 id="temporary-file-cleanup-and-failure-handling">Temporary File
+Cleanup and Failure Handling</h3>
+<p>7-Zip automatically deletes its temporary files upon the successful
+completion of an operation or when the process is cleanly canceled by
+the user. However, temporary files may remain on the disk under specific
+failure conditions:</p>
+<ul>
+<li>Sudden system crashes, power loss, or forced termination via Task
+Manager prevent 7-Zip from executing its cleanup routines.</li>
+<li>Prematurely closing the 7-Zip interface before the Windows Shell
+finishes transferring drag-and-drop files out of the <code>%TEMP%</code>
+directory can leave stranded folders (often named starting with
+<code>7zE</code> or similar prefixes).</li>
+</ul>
+<h3 id="configuring-temporary-folder-locations">Configuring Temporary
+Folder Locations</h3>
+<p>Users can control where 7-Zip stores its temporary data to prevent
+filling up system drives or to boost performance using faster storage
+drives. Within the 7-Zip File Manager, navigate to <strong>Tools &gt;
+Options &gt; Folders</strong> to select from three settings:</p>
+<ul>
+<li><strong>System temp folder:</strong> The default configuration,
+utilizing the standard Windows <code>%TEMP%</code> path.</li>
+<li><strong>Current folder:</strong> Forces 7-Zip to generate temporary
+operational files in the working directory of the source data or active
+archive, avoiding system drive usage.</li>
+<li><strong>Specified folder:</strong> Allows the user to define a
+static path on a high-capacity drive or a high-speed NVMe SSD dedicated
+to compression workloads.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maximum Dictionary Size Configurable in 7-Zip - 7-zip</title>
+    <meta name="description" content="In 7-Zip, the maximum configurable dictionary size reaches up to 4096 MB (4 GB) when using the 64-bit version and the LZMA or LZMA2 compression algorithms. While the graphical user interface typically presents predefined options capping out at 1024 MB or">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/maximum-dictionary-size-configurable-in-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Maximum Dictionary Size Configurable in 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/maximum-dictionary-size-configurable-in-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="In 7-Zip, the maximum configurable dictionary size reaches up to 4096 MB (4 GB) when using the 64-bit version and the LZMA or LZMA2 compression algorithms. While the graphical user interface typically presents predefined options capping out at 1024 MB or" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="maximum-dictionary-size-configurable-in-7-zip">Maximum
+Dictionary Size Configurable in 7-Zip</h1>
+<p>In 7-Zip, the maximum configurable dictionary size reaches up to 4096
+MB (4 GB) when using the 64-bit version and the LZMA or LZMA2
+compression algorithms. While the graphical user interface typically
+presents predefined options capping out at 1024 MB or 1536 MB based on
+available system memory, advanced parameters and command-line switches
+allow users to push the dictionary size to the absolute 4 GB limit
+supported by the format.</p>
+<h3 id="architectural-limits-32-bit-vs-64-bit">Architectural Limits:
+32-Bit vs. 64-Bit</h3>
+<p>The bit architecture of your 7-Zip installation dictates the usable
+dictionary ceiling:</p>
+<ul>
+<li><strong>32-Bit 7-Zip:</strong> Severely restricted by the 2 GB (or 4
+GB with large-address awareness) virtual address space per process.
+Practical dictionary limits generally top out between 64 MB and 128 MB
+to avoid running out of process memory during compression.</li>
+<li><strong>64-Bit 7-Zip:</strong> Removes 32-bit memory boundaries,
+allowing the full theoretical and practical limit of 4096 MB (4 GB) for
+LZMA and LZMA2 compression.</li>
+</ul>
+<h3 id="memory-overhead-and-system-requirements">Memory Overhead and
+System Requirements</h3>
+<p>Dictionary size directly impacts RAM consumption. For compression,
+7-Zip generally requires roughly 10 to 12 times the dictionary size for
+a single thread:</p>
+<ul>
+<li>A <strong>1024 MB (1 GB)</strong> dictionary requires roughly 10 GB
+to 12 GB of RAM per compression thread.</li>
+<li>A <strong>4096 MB (4 GB)</strong> dictionary requires over 40 GB to
+48 GB of available physical RAM for a single thread.</li>
+</ul>
+<p>If multiple compression threads are utilized with large dictionary
+sizes, the total memory consumption multiplies, which can lead to system
+instability, excessive paging, or out-of-memory errors. Decompression,
+however, only requires roughly the exact size of the dictionary plus a
+small buffer, making extraction far less resource-intensive.</p>
+<h3 id="how-to-configure-the-maximum-size">How to Configure the Maximum
+Size</h3>
+<p>If the desired size is not visible in the dropdown menu inside the
+7-Zip GUI:</p>
+<ol type="1">
+<li>Open the <strong>Add to Archive</strong> window.</li>
+<li>Ensure the archive format is set to <strong>7z</strong> and the
+compression method is <strong>LZMA</strong> or
+<strong>LZMA2</strong>.</li>
+<li>In the <strong>Parameters</strong> field, manually specify the size
+using the <code>d</code> switch (e.g., <code>d=4096m</code> or
+<code>d=4g</code>).</li>
+</ol>
+<p>When using the command-line interface, apply the <code>-md</code>
+switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-m0</span><span class="op">=</span>lzma2 <span class="at">-md</span><span class="op">=</span>4096m archive.7z files/</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Integrates with Windows Context Menu - 7-zip</title>
+    <meta name="description" content="7-Zip integrates with the Windows File Explorer context menu using lightweight shell extension handlers that insert file management actions directly into the operating system&#39;s right-click interface. This integration allows users to quickly compress, extr">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-integrates-with-windows-context-menu">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Integrates with Windows Context Menu - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-integrates-with-windows-context-menu" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip integrates with the Windows File Explorer context menu using lightweight shell extension handlers that insert file management actions directly into the operating system&#39;s right-click interface. This integration allows users to quickly compress, extr" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-integrates-with-windows-context-menu">How 7-Zip
+Integrates with Windows Context Menu</h1>
+<p>7-Zip integrates with the Windows File Explorer context menu using
+lightweight shell extension handlers that insert file management actions
+directly into the operating system's right-click interface. This
+integration allows users to quickly compress, extract, test, and hash
+files without opening the standalone 7-Zip file manager. Below is a
+breakdown of how this integration functions under the hood, how it is
+managed through the Windows Registry, how to customize it, and how it
+behaves across different versions of Windows.</p>
+<h3 id="the-technical-mechanism-shell-extensions">The Technical
+Mechanism: Shell Extensions</h3>
+<p>7-Zip communicates with Windows File Explorer through the Component
+Object Model (COM). During installation, 7-Zip registers a dynamic-link
+library file—typically <code>7-zip.dll</code> (located in the program's
+root directory)—as an in-process COM server.</p>
+<p>This DLL implements specific Windows shell interfaces, notably:</p>
+<ul>
+<li><strong>IShellExtInit:</strong> Initializes the shell extension when
+a user selects one or more items.</li>
+<li><strong>IContextMenu:</strong> Dynamically queries the selected
+items, builds the context menu options (such as "Add to archive..." or
+"Extract here"), and executes the requested 7-Zip routine when a command
+is clicked.</li>
+</ul>
+<p>Because the library evaluates the selected file types in real time,
+it dynamically adjusts the context menu: clicking an archive (e.g.,
+<code>.zip</code>, <code>.7z</code>, <code>.rar</code>) displays
+extraction and testing options, while selecting standard files or
+folders displays compression options.</p>
+<h3 id="windows-registry-registration">Windows Registry
+Registration</h3>
+<p>The connection between File Explorer and 7-Zip is maintained through
+key entries in the Windows Registry under
+<code>HKEY_CLASSES_ROOT</code>.</p>
+<p>To attach to different targets, 7-Zip registers its CLSID (Class
+Identifier) under several shell extension handlers:</p>
+<ul>
+<li><strong><code>HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\7-Zip</code></strong>
+enables right-click menus on any generic file.</li>
+<li><strong><code>HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\7-Zip</code></strong>
+enables menus for standard folders.</li>
+<li><strong><code>HKEY_CLASSES_ROOT\Folder\shellex\ContextMenuHandlers\7-Zip</code></strong>
+covers general directory structures and virtual folders.</li>
+<li><strong><code>HKEY_CLASSES_ROOT\Drive\shellex\ContextMenuHandlers\7-Zip</code></strong>
+handles full disk drive selections.</li>
+</ul>
+<p>When File Explorer generates a context menu for a selected object, it
+inspects these registry locations, loads <code>7-zip.dll</code> into
+memory, and populates the menu.</p>
+<h3 id="customization-via-7-zip-settings">Customization via 7-Zip
+Settings</h3>
+<p>Users can control the footprint of 7-Zip within File Explorer to
+prevent menu clutter:</p>
+<ol type="1">
+<li>Open 7-Zip File Manager as an administrator.</li>
+<li>Navigate to <strong>Tools &gt; Options</strong>.</li>
+<li>Select the <strong>7-Zip</strong> tab.</li>
+</ol>
+<p>From this window, users can:</p>
+<ul>
+<li><strong>Integrate 7-Zip to shell context menu:</strong> Toggle the
+master switch that registers or unregisters the COM handler.</li>
+<li><strong>Cascaded context menu:</strong> Group all 7-Zip commands
+into a single "7-Zip" submenu rather than listing commands directly on
+the primary root context menu.</li>
+<li><strong>Context menu items:</strong> Enable or disable specific
+operations such as <em>Extract to folder</em>, <em>Test archive</em>,
+<em>Add to [name].zip</em>, or <em>CRC SHA</em> checksum
+calculations.</li>
+</ul>
+<h3 id="behavior-in-windows-10-vs-windows-11">Behavior in Windows 10 vs.
+Windows 11</h3>
+<p>In Windows 10 and earlier versions, 7-Zip attaches directly to the
+primary right-click context menu.</p>
+<p>In Windows 11, Microsoft introduced a streamlined, modern context
+menu requiring application extensions to use identity-packaged, modern
+sparse packages to appear at the top level. Because 7-Zip historically
+relies on classic Win32 <code>IContextMenu</code> interfaces, its
+commands are initially nested under the <strong>Show more
+options</strong> menu (accessible via <code>Shift + F10</code>).
+However, newer builds and third-party registration tools allow 7-Zip to
+function alongside Windows 11's updated context menu framework.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

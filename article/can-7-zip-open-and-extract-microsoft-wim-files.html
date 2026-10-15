@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can 7-Zip Open and Extract Microsoft WIM Files? - 7-zip</title>
+    <meta name="description" content="Yes, 7-Zip natively supports opening, reading, and extracting contents from Microsoft Windows Imaging Format (.wim) files without requiring specialized deployment tools like DISM. This article explains how 7-Zip interacts with WIM archives, how to extract">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/can-7-zip-open-and-extract-microsoft-wim-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can 7-Zip Open and Extract Microsoft WIM Files? - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/can-7-zip-open-and-extract-microsoft-wim-files" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Yes, 7-Zip natively supports opening, reading, and extracting contents from Microsoft Windows Imaging Format (.wim) files without requiring specialized deployment tools like DISM. This article explains how 7-Zip interacts with WIM archives, how to extract" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-7-zip-open-and-extract-microsoft-wim-files">Can 7-Zip Open
+and Extract Microsoft WIM Files?</h1>
+<p>Yes, 7-Zip natively supports opening, reading, and extracting
+contents from Microsoft Windows Imaging Format (.wim) files without
+requiring specialized deployment tools like DISM. This article explains
+how 7-Zip interacts with WIM archives, how to extract files using the
+application, and the limitations to keep in mind when working with these
+images.</p>
+<h3 id="native-wim-support-in-7-zip">Native WIM Support in 7-Zip</h3>
+<p>Microsoft developed the WIM format to deploy Windows operating
+systems via file-based disk images. 7-Zip includes built-in unpacking
+support for WIM containers. It treats the <code>.wim</code> file like
+any standard compressed archive (such as <code>.zip</code> or
+<code>.7z</code>), allowing you to inspect the contents and retrieve
+individual files or entire folders.</p>
+<h3 id="how-to-extract-files-from-a-wim-using-7-zip">How to Extract
+Files from a WIM Using 7-Zip</h3>
+<p>You can extract files from a WIM image using either the 7-Zip
+graphical interface or the context menu in Windows Explorer.</p>
+<h4 id="method-1-using-the-7-zip-file-manager">Method 1: Using the 7-Zip
+File Manager</h4>
+<ol type="1">
+<li>Launch <strong>7-Zip File Manager</strong>.</li>
+<li>Navigate to the location of the <code>.wim</code> file (such as
+<code>install.wim</code> or <code>boot.wim</code>).</li>
+<li>Double-click the <code>.wim</code> file to open it.</li>
+<li>If the WIM contains multiple image indexes (different Windows
+editions), you will see numbered folders (e.g., <code>1</code>,
+<code>2</code>, <code>3</code>). Open the numbered folder corresponding
+to the specific image you want to access.</li>
+<li>Browse to the desired files or folders, select them, and click the
+<strong>Extract</strong> button on the toolbar.</li>
+<li>Choose a destination path and click <strong>OK</strong>.</li>
+</ol>
+<h4 id="method-2-using-the-right-click-context-menu">Method 2: Using the
+Right-Click Context Menu</h4>
+<ol type="1">
+<li>Right-click the <code>.wim</code> file in Windows Explorer.</li>
+<li>Hover over the <strong>7-Zip</strong> submenu.</li>
+<li>Select <strong>Extract to "[Filename]"</strong> to unpack the entire
+archive, or select <strong>Open archive</strong> to view and extract
+specific components.</li>
+</ol>
+<h3 id="handling-multi-index-and-split-wim-files">Handling Multi-Index
+and Split WIM Files</h3>
+<ul>
+<li><strong>Multi-Index Images:</strong> A single WIM file often
+packages multiple editions of Windows within one file to save space
+through deduplication. 7-Zip exposes these editions as numbered
+subdirectories. To know which number corresponds to which edition, you
+can run <code>dism /Get-WimInfo /WimFile:path\to\image.wim</code> in
+PowerShell or Command Prompt beforehand.</li>
+<li><strong>Split WIM Files (.swm):</strong> 7-Zip can also read split
+WIM files. As long as all parts (e.g., <code>install.swm</code>,
+<code>install2.swm</code>) are located in the same directory, opening
+the first <code>.swm</code> file allows you to browse and extract the
+combined filesystem.</li>
+</ul>
+<h3 id="limitations">Limitations</h3>
+<p>While 7-Zip is an efficient tool for reading and extracting files
+from WIM images, it has notable functional limits:</p>
+<ul>
+<li><strong>Read and Extract Only:</strong> 7-Zip cannot capture new WIM
+images, inject drivers, or modify existing WIM metadata.</li>
+<li><strong>No File System Mounting:</strong> 7-Zip unpacks files rather
+than mounting them as a virtual drive. If you need to service an image
+or modify its packages, use Microsoft's native <strong>DISM</strong>
+(Deployment Image Servicing and Management) command-line utility.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

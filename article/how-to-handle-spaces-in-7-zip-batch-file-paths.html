@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Handle Spaces in 7-Zip Batch File Paths - 7-zip</title>
+    <meta name="description" content="When automating 7-Zip through Windows batch scripts, file or folder paths containing spaces are frequently misinterpreted as multiple distinct arguments, causing command failures. This guide explains how to resolve this issue using proper double-quote enc">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-handle-spaces-in-7-zip-batch-file-paths">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Handle Spaces in 7-Zip Batch File Paths - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-handle-spaces-in-7-zip-batch-file-paths" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When automating 7-Zip through Windows batch scripts, file or folder paths containing spaces are frequently misinterpreted as multiple distinct arguments, causing command failures. This guide explains how to resolve this issue using proper double-quote enc" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-handle-spaces-in-7-zip-batch-file-paths">How to Handle
+Spaces in 7-Zip Batch File Paths</h1>
+<p>When automating 7-Zip through Windows batch scripts, file or folder
+paths containing spaces are frequently misinterpreted as multiple
+distinct arguments, causing command failures. This guide explains how to
+resolve this issue using proper double-quote encapsulation, command-line
+parameter stripping, and trailing backslash adjustments.</p>
+<h2 id="the-standard-rule-enclose-paths-in-double-quotes">The Standard
+Rule: Enclose Paths in Double Quotes</h2>
+<p>The command processor (CMD) and 7-Zip use spaces as argument
+delimiters. To treat a path with spaces as a single string, wrap the
+entire path in double quotation marks (<code>"</code>).</p>
+<h3 id="basic-command-example">Basic Command Example</h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;C:\Program Files\7-Zip\7z.exe&quot;</span> a <span class="at">-tzip</span> <span class="st">&quot;C:\My Archives\Backup.zip&quot;</span> <span class="st">&quot;C:\Source Data\Files to Compress\*&quot;</span></span></code></pre></div>
+<p>In this example, three separate paths contain spaces:</p>
+<ol type="1">
+<li>The path to the <code>7z.exe</code> executable itself.</li>
+<li>The destination archive path
+(<code>"C:\My Archives\Backup.zip"</code>).</li>
+<li>The source folder path
+(<code>"C:\Source Data\Files to Compress\*"</code>).</li>
+</ol>
+<p>All three must be enclosed in quotes.</p>
+<hr />
+<h2 id="handling-variables-in-batch-files">Handling Variables in Batch
+Files</h2>
+<p>When working with variables, define them either with or without
+quotes, but ensure the resulting command evaluates with exactly one set
+of surrounding quotes.</p>
+<h3 id="recommended-method-quoting-the-expansion">Recommended Method:
+Quoting the Expansion</h3>
+<p>Define the variables without quotes, then wrap the variables in
+quotes when calling 7-Zip:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">@</span><span class="bu">echo off</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">SEVENZIP</span>=<span class="st">C:\Program Files\7-Zip\7z.exe&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">DEST</span>=<span class="st">D:\My Backups\Archive.7z&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">SRC</span>=<span class="st">C:\Users\John Doe\Documents&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;</span><span class="pp">%</span><span class="va">SEVENZIP</span><span class="pp">%</span><span class="st">&quot;</span> a <span class="st">&quot;</span><span class="pp">%</span><span class="va">DEST</span><span class="pp">%</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="pp">%</span><span class="va">SRC</span><span class="pp">%</span><span class="st">&quot;</span></span></code></pre></div>
+<p>Using <code>set "VAR=value"</code> prevents accidental trailing
+whitespace from being included in the variable value.</p>
+<hr />
+<h2 id="working-with-command-line-arguments-1-2">Working with
+Command-Line Arguments (<code>%1</code>, <code>%2</code>)</h2>
+<p>If your script accepts paths as arguments (such as via drag-and-drop
+or command-line parameters), arguments may already include surrounding
+quotes.</p>
+<p>To prevent errors caused by nested or double quotes (e.g.,
+<code>""C:\My Folder""</code>), use the <code>%~1</code> syntax to strip
+existing quotes before re-applying them:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">@</span><span class="bu">echo off</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">SEVENZIP</span>=<span class="st">C:\Program Files\7-Zip\7z.exe&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">INPUT_FILE</span>=<span class="pp">%~</span><span class="va">1</span><span class="st">&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">OUTPUT_DIR</span>=<span class="pp">%~dp</span><span class="va">1</span><span class="st">&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;</span><span class="pp">%</span><span class="va">SEVENZIP</span><span class="pp">%</span><span class="st">&quot;</span> x <span class="st">&quot;</span><span class="pp">%</span><span class="va">INPUT_FILE</span><span class="pp">%</span><span class="st">&quot;</span> <span class="at">-o</span><span class="st">&quot;</span><span class="pp">%</span><span class="va">OUTPUT_DIR</span><span class="pp">%</span><span class="st">&quot;</span></span></code></pre></div>
+<ul>
+<li><code>%~1</code>: Strips existing quotes from the first
+argument.</li>
+<li><code>"%INPUT_FILE%"</code>: Safely reapplies quotes for the 7-Zip
+command.</li>
+</ul>
+<hr />
+<h2 id="the-trailing-backslash-trap">The Trailing Backslash Trap</h2>
+<p>A common issue in Windows batch scripting occurs when a folder path
+ends with a backslash inside quotes:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">:: INCORRECT - Causes an error</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;C:\Program Files\7-Zip\7z.exe&quot;</span> a <span class="st">&quot;D:\Backups\archive.zip&quot;</span> <span class="st">&quot;C:\My Data</span><span class="sc">\&quot;</span></span></code></pre></div>
+<p>In many command-line utilities, including 7-Zip, the sequence
+<code>\"</code> is parsed as an escaped quotation mark rather than a
+path delimiter followed by a closing quote. This causes 7-Zip to read
+past the closing quote and fail.</p>
+<h3 id="solutions">Solutions:</h3>
+<ul>
+<li><p><strong>Remove the trailing backslash:</strong></p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;</span><span class="pp">%</span><span class="va">SEVENZIP</span><span class="pp">%</span><span class="st">&quot;</span> a <span class="st">&quot;D:\Backups\archive.zip&quot;</span> <span class="st">&quot;C:\My Data&quot;</span></span></code></pre></div></li>
+<li><p><strong>Use a wildcard:</strong></p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;</span><span class="pp">%</span><span class="va">SEVENZIP</span><span class="pp">%</span><span class="st">&quot;</span> a <span class="st">&quot;D:\Backups\archive.zip&quot;</span> <span class="st">&quot;C:\My Data\*&quot;</span></span></code></pre></div></li>
+<li><p><strong>Double the trailing backslash:</strong></p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;</span><span class="pp">%</span><span class="va">SEVENZIP</span><span class="pp">%</span><span class="st">&quot;</span> a <span class="st">&quot;D:\Backups\archive.zip&quot;</span> <span class="st">&quot;C:\My Data</span><span class="sc">\\</span><span class="st">&quot;</span></span></code></pre></div></li>
+</ul>
+<hr />
+<h2 id="using-list-files-for-multiple-paths-with-spaces">Using List
+Files for Multiple Paths with Spaces</h2>
+<p>If you need to compress multiple paths containing spaces, write them
+to a text file (one path per line) and reference it with the
+<code>@</code> parameter.</p>
+<p>When listed inside a list file, paths with spaces do not require
+quotation marks:</p>
+<p><strong>files.txt:</strong></p>
+<pre class="text"><code>C:\Project Files\Report 2024.docx
+D:\Photos\Family Vacation
+C:\Financial Data\Spreadsheets</code></pre>
+<p><strong>Batch command:</strong></p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;C:\Program Files\7-Zip\7z.exe&quot;</span> a <span class="st">&quot;C:\Backups\Projects.7z&quot;</span> @<span class="st">&quot;C:\Scripts\files.txt&quot;</span></span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

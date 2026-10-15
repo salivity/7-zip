@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why BZip2 and LZMA2 Scale Differently in 7-Zip - 7-zip</title>
+    <meta name="description" content="When compressing files using 7-Zip, BZip2 and LZMA2 exhibit starkly different multi-threading behaviors across modern multi-core processors. This article explores the architectural differences between BZip2&#39;s block-sorting design and LZMA2&#39;s dictionary-ba">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/why-b-zip-2-and-lzma-2-scale-differently-in-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why BZip2 and LZMA2 Scale Differently in 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/why-b-zip-2-and-lzma-2-scale-differently-in-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When compressing files using 7-Zip, BZip2 and LZMA2 exhibit starkly different multi-threading behaviors across modern multi-core processors. This article explores the architectural differences between BZip2&#39;s block-sorting design and LZMA2&#39;s dictionary-ba" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="why-bzip2-and-lzma2-scale-differently-in-7-zip">Why BZip2 and
+LZMA2 Scale Differently in 7-Zip</h1>
+<p>When compressing files using 7-Zip, BZip2 and LZMA2 exhibit starkly
+different multi-threading behaviors across modern multi-core processors.
+This article explores the architectural differences between BZip2's
+block-sorting design and LZMA2's dictionary-based approach, explaining
+how block independence, per-thread memory footprints, and CPU cache
+saturation determine why BZip2 scales near-linearly across high thread
+counts while LZMA2 faces diminishing returns.</p>
+<h3
+id="algorithmic-foundations-block-sorting-vs-sliding-dictionaries">Algorithmic
+Foundations: Block-Sorting vs. Sliding Dictionaries</h3>
+<p>The primary reason for the difference in scaling lies in how each
+algorithm handles input data:</p>
+<ul>
+<li><strong>BZip2 (Burrows-Wheeler Transform):</strong> BZip2 partitions
+incoming data into small, completely independent blocks (typically 900
+KB). Because each block is self-contained and requires no awareness of
+preceding or subsequent blocks, 7-Zip can assign each block to an
+isolated CPU thread without synchronization or shared memory
+states.</li>
+<li><strong>LZMA2 (Lempel-Ziv-Markov chain Algorithm):</strong> LZMA
+relies on a sliding dictionary to locate repeated byte sequences across
+large spans of data. Because standard LZMA is inherently sequential,
+LZMA2 achieves parallelism by splitting the data stream into larger
+chunks (often several megabytes to match the dictionary size) and
+compressing them as separate streams. However, these chunks must
+frequently reset or manage dictionary states, introducing coordination
+overhead and limiting fine-grained distribution.</li>
+</ul>
+<h3 id="memory-footprint-and-memory-bandwidth">Memory Footprint and
+Memory Bandwidth</h3>
+<p>Thread scaling is rarely limited by raw CPU compute alone; memory
+subsystem throughput plays a critical role.</p>
+<p>BZip2 uses a fixed, lightweight memory footprint—roughly 8 MB of RAM
+per compression thread at the maximum 900 KB block size. Because the
+working set for each thread is small enough to fit comfortably within
+the processor's L2 and L3 caches, dozens of BZip2 threads can execute
+concurrently without saturating the system's central memory bus.</p>
+<p>In contrast, LZMA2 requires a substantial amount of RAM per thread.
+With common dictionary sizes ranging from 16 MB to 64 MB (or higher), a
+single thread can consume several hundred megabytes of RAM. When 16, 32,
+or 64 threads run simultaneously:</p>
+<ol type="1">
+<li>The combined working set far exceeds the CPU cache capacity.</li>
+<li>Threads begin competing aggressively for access to the system
+RAM.</li>
+<li>Memory bus bottlenecks stall CPU execution pipelines, causing
+performance scaling to plateau even if CPU utilization metrics report
+100%.</li>
+</ol>
+<h3 id="workload-granularity-and-thread-allocation">Workload Granularity
+and Thread Allocation</h3>
+<p>BZip2's fixed 900 KB block size allows 7-Zip to saturate
+high-core-count CPUs regardless of the total file size, provided the
+input exceeds a few megabytes. Work distribution is uniform, meaning
+thread starvation is virtually nonexistent.</p>
+<p>LZMA2's chunk size is tied to dictionary size and specific internal
+chunk thresholds. When compressing smaller datasets or operating with
+very large dictionaries on high-core processors, 7-Zip may not be able
+to subdivide the input into enough distinct chunks to feed every
+available thread. Consequently, some CPU cores remain idle or finish
+their workloads long before others, reducing overall multi-threaded
+efficiency.</p>
+<h3 id="summary-of-differences">Summary of Differences</h3>
+<ul>
+<li><strong>Scaling Linearity:</strong> BZip2 maintains near-linear
+scaling up to high thread counts (32–64+ threads) due to tiny,
+independent blocks. LZMA2 scales well at low to moderate core counts
+(4–16 threads) but plateaus as thread counts increase.</li>
+<li><strong>Cache Efficiency:</strong> BZip2 operates largely within CPU
+cache hierarchies; LZMA2 heavily stresses the external memory
+controller.</li>
+<li><strong>Compression Efficiency Trade-off:</strong> While BZip2
+scales better across many CPU cores, LZMA2 achieves significantly higher
+compression ratios, making LZMA2 computationally heavier per byte but
+far more space-efficient.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

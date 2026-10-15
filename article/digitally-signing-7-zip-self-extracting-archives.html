@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digitally Signing 7-Zip Self-Extracting Archives - 7-zip</title>
+    <meta name="description" content="7-Zip does not natively apply digital signatures when creating self-extracting (SFX) archive executables, nor does it include a built-in feature to manage code signing certificates. While the stock SFX modules distributed with 7-Zip carry a digital signat">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/digitally-signing-7-zip-self-extracting-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Digitally Signing 7-Zip Self-Extracting Archives - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/digitally-signing-7-zip-self-extracting-archives" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip does not natively apply digital signatures when creating self-extracting (SFX) archive executables, nor does it include a built-in feature to manage code signing certificates. While the stock SFX modules distributed with 7-Zip carry a digital signat" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="digitally-signing-7-zip-self-extracting-archives">Digitally
+Signing 7-Zip Self-Extracting Archives</h1>
+<p>7-Zip does not natively apply digital signatures when creating
+self-extracting (SFX) archive executables, nor does it include a
+built-in feature to manage code signing certificates. While the stock
+SFX modules distributed with 7-Zip carry a digital signature from the
+developer, the process of appending archive data to the executable
+invalidates that original signature. However, the resulting
+<code>.exe</code> file fully supports post-creation digital signing
+using standard third-party tools like Microsoft's SignTool, allowing
+administrators and developers to distribute verified, trusted
+packages.</p>
+<h2 id="the-limitation-of-native-7-zip-sfx-creation">The Limitation of
+Native 7-Zip SFX Creation</h2>
+<p>When you create an SFX archive using 7-Zip (either via the graphical
+interface or the command-line utility), the program takes a precompiled
+executable module (such as <code>7z.sfx</code> or
+<code>7zCon.sfx</code>) and appends the compressed archive payload
+directly to the end of the file.</p>
+<p>Because digital signatures depend on cryptographic hashes that verify
+file integrity:</p>
+<ul>
+<li><strong>Signature Invalidation:</strong> Any original signature
+present on the base SFX module becomes invalid the moment 7-Zip appends
+the archive data. Windows will treat the resulting binary as unsigned or
+tampered with.</li>
+<li><strong>No Built-in Signing Mechanism:</strong> 7-Zip does not
+contain code to hook into the Windows Certificate Store or apply a
+private key during the archive creation process.</li>
+</ul>
+<h2 id="how-to-digitally-sign-a-7-zip-sfx-executable">How to Digitally
+Sign a 7-Zip SFX Executable</h2>
+<p>Even though 7-Zip cannot sign the file directly, the resulting SFX
+executable structure is compatible with standard Windows Authenticode
+signing. You can sign the <code>.exe</code> file immediately after 7-Zip
+creates it.</p>
+<h3 id="step-1-create-the-sfx-archive">Step 1: Create the SFX
+Archive</h3>
+<p>Generate the executable archive normally using 7-Zip:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-sfx7z.sfx</span> package.exe .<span class="dt">\S</span>ourceFiles<span class="dt">\*</span></span></code></pre></div>
+<h3 id="step-2-apply-a-digital-signature">Step 2: Apply a Digital
+Signature</h3>
+<p>Use Microsoft's official <code>SignTool</code> utility (included with
+the Windows SDK) to apply your standard or Extended Validation (EV) code
+signing certificate to the generated executable:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>signtool sign <span class="at">/f</span> <span class="st">&quot;YourCertificate.pfx&quot;</span> <span class="at">/p</span> <span class="st">&quot;YourPassword&quot;</span> <span class="at">/fd</span> SHA256 <span class="at">/tr</span> <span class="st">&quot;http://timestamp.digicert.com&quot;</span> <span class="at">/td</span> SHA256 <span class="st">&quot;package.exe&quot;</span></span></code></pre></div>
+<p>If you are using a hardware token or an EV certificate stored in the
+Windows Certificate Store, run:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>signtool sign <span class="at">/a</span> <span class="at">/fd</span> SHA256 <span class="at">/tr</span> <span class="st">&quot;http://timestamp.digicert.com&quot;</span> <span class="at">/td</span> SHA256 <span class="st">&quot;package.exe&quot;</span></span></code></pre></div>
+<h2 id="compatibility-and-integrity-considerations">Compatibility and
+Integrity Considerations</h2>
+<ul>
+<li><strong>Archive Functionality Remains Intact:</strong> Standard
+Authenticode signatures append the digital signature data directly into
+a dedicated attribute certificate table defined by the Portable
+Executable (PE) specification. 7-Zip’s SFX stub reads the archive
+payload offset from the PE header structure, meaning the addition of an
+Authenticode signature does not corrupt or interfere with the archive
+extraction process.</li>
+<li><strong>SmartScreen and Antivirus Trust:</strong> Signing the
+finalized SFX archive with a trusted certificate prevents Windows
+Defender SmartScreen warnings, confirms publisher identity, and lowers
+the likelihood of false-positive detections by antivirus software.</li>
+<li><strong>Timestamping:</strong> Always include a timestamp server
+parameter (<code>/tr</code> and <code>/td SHA256</code>) when signing
+the executable. This ensures the digital signature remains valid even
+after your code signing certificate expires.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

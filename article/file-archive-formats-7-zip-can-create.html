@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Archive Formats 7-Zip Can Create - 7-zip</title>
+    <meta name="description" content="7-Zip is a widely used open-source file compression utility known for its high compression ratios and broad compatibility. While the software can open and extract dozens of different file formats, its ability to generate new archives is limited to a speci">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/file-archive-formats-7-zip-can-create">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="File Archive Formats 7-Zip Can Create - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/file-archive-formats-7-zip-can-create" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip is a widely used open-source file compression utility known for its high compression ratios and broad compatibility. While the software can open and extract dozens of different file formats, its ability to generate new archives is limited to a speci" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="file-archive-formats-7-zip-can-create">File Archive Formats
+7-Zip Can Create</h1>
+<p>7-Zip is a widely used open-source file compression utility known for
+its high compression ratios and broad compatibility. While the software
+can open and extract dozens of different file formats, its ability to
+generate new archives is limited to a specific set of containers. This
+article provides a clear, comprehensive breakdown of the file archive
+formats that 7-Zip can create natively without the need for third-party
+plugins.</p>
+<h3 id="supported-creation-formats">Supported Creation Formats</h3>
+<p>Natively, 7-Zip can pack and compress files into the following seven
+formats:</p>
+<ul>
+<li><strong>7z:</strong> The native archive format of 7-Zip. It uses an
+open architecture with support for the LZMA and LZMA2 compression
+algorithms. The format offers extremely high compression ratios, strong
+AES-256 encryption for both data and file names, and support for file
+sizes up to 16,000,000,000 GB.</li>
+<li><strong>ZIP:</strong> The industry-standard archive format. 7-Zip
+can create standard ZIP files compatible with Windows File Explorer,
+macOS, and virtually all third-party archiving tools. It supports
+various compression algorithms within the format (including Deflate,
+Deflate64, and LZMA) as well as AES-256 and ZipCrypto encryption.</li>
+<li><strong>TAR:</strong> A standard Unix and Linux file packaging
+format. TAR groups multiple files into a single continuous stream
+without compressing them by default. It preserves file permissions and
+directory structures, making it useful for system backups and script
+packaging.</li>
+<li><strong>GZIP (.gz):</strong> A traditional Unix compression format.
+GZIP compresses only a single file at a time rather than an entire
+directory. It is frequently paired with TAR to produce
+<code>.tar.gz</code> archives.</li>
+<li><strong>BZIP2 (.bz2):</strong> Another single-file compression
+algorithm widely used in Linux and Unix environments. It generally
+provides higher compression ratios than GZIP at the cost of slower
+processing speeds.</li>
+<li><strong>XZ (.xz):</strong> A modern single-file compression
+container that utilizes the LZMA2 compression algorithm. It serves as a
+direct, higher-efficiency alternative to GZIP and BZIP2 for Unix-like
+systems.</li>
+<li><strong>WIM:</strong> The Windows Imaging Format, developed by
+Microsoft. 7-Zip can create WIM images to package file-based disk
+images, often utilized in Windows installation and deployment
+workflows.</li>
+</ul>
+<h3 id="creation-vs-extraction-limitations">Creation vs. Extraction
+Limitations</h3>
+<p>Although 7-Zip can unpack proprietary or read-only formats such as
+RAR, CAB, ISO, DMG, and VHD, it cannot create them natively. For formats
+like RAR, the compression algorithm is proprietary, preventing
+third-party software from generating archives without a licensed
+creation engine. For general storage and file transfer, the
+<strong>7z</strong> and <strong>ZIP</strong> formats remain the primary
+choices available within the 7-Zip interface.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

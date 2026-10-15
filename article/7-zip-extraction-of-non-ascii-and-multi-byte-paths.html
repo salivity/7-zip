@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Extraction of Non-ASCII and Multi-Byte Paths - 7-zip</title>
+    <meta name="description" content="7-Zip manages the extraction of files with non-ASCII and multi-byte language paths primarily through native Unicode support and format-specific encoding fallbacks. When extracting archives containing characters from languages such as Japanese, Chinese, Ar">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-extraction-of-non-ascii-and-multi-byte-paths">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Extraction of Non-ASCII and Multi-Byte Paths - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-extraction-of-non-ascii-and-multi-byte-paths" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip manages the extraction of files with non-ASCII and multi-byte language paths primarily through native Unicode support and format-specific encoding fallbacks. When extracting archives containing characters from languages such as Japanese, Chinese, Ar" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-extraction-of-non-ascii-and-multi-byte-paths">7-Zip
+Extraction of Non-ASCII and Multi-Byte Paths</h1>
+<p>7-Zip manages the extraction of files with non-ASCII and multi-byte
+language paths primarily through native Unicode support and
+format-specific encoding fallbacks. When extracting archives containing
+characters from languages such as Japanese, Chinese, Arabic, or
+Cyrillic, 7-Zip relies on UTF-8 and UTF-16 standards to prevent file
+name corruption, commonly known as mojibake. However, its exact behavior
+depends on the archive format being extracted, how the archive was
+originally encoded, and the underlying operating system.</p>
+<h3 id="native-unicode-handling-in-7z-archives">Native Unicode Handling
+in .7z Archives</h3>
+<p>The proprietary <code>.7z</code> format uses UTF-16 encoding by
+default to store all file names and directory paths. Because UTF-16
+natively supports the full range of Unicode characters, multi-byte and
+non-ASCII paths are stored without relying on localized system code
+pages.</p>
+<p>During extraction, 7-Zip reads these UTF-16 strings directly and uses
+wide-character Windows APIs (such as <code>CreateFileW</code>) or UTF-8
+equivalents on POSIX systems. This ensures that the destination
+filesystem (such as NTFS, APFS, or ext4) receives the exact character
+values, allowing seamless extraction regardless of the system's active
+language or regional settings.</p>
+<h3 id="extraction-behavior-with-legacy-zip-archives">Extraction
+Behavior with Legacy ZIP Archives</h3>
+<p>Unlike <code>.7z</code>, the standard <code>.ZIP</code> format
+historically lacked a unified character encoding standard, leading to
+widespread compatibility issues. 7-Zip resolves non-ASCII paths in ZIP
+archives using two main methods:</p>
+<ol type="1">
+<li><strong>UTF-8 Flag Detection:</strong> If an archive was created
+with the standard ZIP UTF-8 flag (General Purpose Bit 11 set), 7-Zip
+reads the path directly as UTF-8, ensuring correct path generation
+during extraction.</li>
+<li><strong>Code Page Fallback:</strong> If the UTF-8 flag is
+missing—common in older ZIP files or archives created on
+non-Unicode-aware systems—7-Zip falls back to the host operating
+system's default ANSI/OEM code page. If the archive was created on a
+system with a different code page (for example, Shift-JIS on a Japanese
+system) and extracted on a system using a Western code page (such as
+Windows-1252), character corruption may occur.</li>
+</ol>
+<p>To fix mismatched code pages during ZIP extraction, 7-Zip provides a
+command-line parameter: <code>-mcp=&lt;CodePage&gt;</code> (for example,
+<code>-mcp=932</code> for Shift-JIS or <code>-mcp=utf-8</code> to force
+UTF-8 decoding).</p>
+<h3 id="operating-system-and-filesystem-integration">Operating System
+and Filesystem Integration</h3>
+<p>On modern Windows platforms, 7-Zip bypasses standard ANSI limitations
+by utilizing the <code>\\?\</code> prefix for extended path lengths and
+wide-character functions. This integration allows 7-Zip to write
+multi-byte path names up to approximately 32,767 characters, preventing
+extraction failures caused by path length limits or invalid multi-byte
+sequence translations.</p>
+<p>On Linux and macOS (via the <code>p7zip</code> port or official 7-Zip
+Linux builds), 7-Zip translates archive paths into UTF-8, which is
+standard for modern Unix-like environments, ensuring that multi-byte
+paths extract accurately as long as the shell environment's locale
+(<code>LANG</code> or <code>LC_ALL</code>) is set to a UTF-8
+variant.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

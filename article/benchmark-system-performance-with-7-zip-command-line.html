@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmark System Performance with 7-Zip Command Line - 7-zip</title>
+    <meta name="description" content="The 7-Zip command line tool features a built-in benchmarking utility that measures CPU performance and memory stability by running LZMA compression and decompression algorithms. This guide explains how to execute the 7-Zip benchmark from your terminal, cu">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/benchmark-system-performance-with-7-zip-command-line">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Benchmark System Performance with 7-Zip Command Line - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/benchmark-system-performance-with-7-zip-command-line" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The 7-Zip command line tool features a built-in benchmarking utility that measures CPU performance and memory stability by running LZMA compression and decompression algorithms. This guide explains how to execute the 7-Zip benchmark from your terminal, cu" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="benchmark-system-performance-with-7-zip-command-line">Benchmark
+System Performance with 7-Zip Command Line</h1>
+<p>The 7-Zip command line tool features a built-in benchmarking utility
+that measures CPU performance and memory stability by running LZMA
+compression and decompression algorithms. This guide explains how to
+execute the 7-Zip benchmark from your terminal, customize parameters
+such as CPU threads and dictionary sizes, and interpret the resulting
+MIPS (Million Instructions Per Second) scores to evaluate your system's
+processing capabilities.</p>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>Ensure you have 7-Zip installed and accessible from your terminal or
+command prompt:</p>
+<ul>
+<li><strong>Windows:</strong> Use <code>7z.exe</code> located in the
+installation folder (e.g., <code>C:\Program Files\7-Zip</code>), or add
+the folder to your system's PATH.</li>
+<li><strong>Linux / macOS:</strong> Install the package using your
+distribution's package manager (e.g.,
+<code>sudo apt install p7zip-full</code> or
+<code>brew install sevenzip</code>) and run the <code>7z</code> or
+<code>7za</code> command.</li>
+</ul>
+<h3 id="running-the-default-benchmark">Running the Default
+Benchmark</h3>
+<p>To run a standard benchmark across all detected CPU threads using the
+default 32 MB dictionary size, open your command-line interface and
+enter:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> b</span></code></pre></div>
+<p>The tool will execute multiple passes of compression and
+decompression, updating the console in real time until it completes the
+default number of iterations. To cancel the test at any time, press
+<code>Ctrl + C</code>.</p>
+<h3 id="understanding-the-results">Understanding the Results</h3>
+<p>When the test finishes, 7-Zip displays a summary table with the
+following key metrics:</p>
+<ul>
+<li><strong>Speed:</strong> The throughput of data processed, measured
+in kilobytes per second (KB/s).</li>
+<li><strong>Usage:</strong> The percentage of CPU resources utilized
+during the test (e.g., 800% indicates 8 CPU threads running at full
+capacity).</li>
+<li><strong>R / U (Rating / Usage):</strong> The efficiency rating
+normalized per single core/thread.</li>
+<li><strong>Rating:</strong> The overall performance score expressed in
+<strong>MIPS</strong> (Million Instructions Per Second). Higher ratings
+indicate faster CPU performance.</li>
+</ul>
+<p>The output distinguishes between two stages:</p>
+<ol type="1">
+<li><strong>Compressing:</strong> Highly dependent on CPU cache, memory
+latency, and RAM speed.</li>
+<li><strong>Decompressing:</strong> Highly dependent on pure integer
+processing power and branch prediction within the CPU.</li>
+</ol>
+<h3 id="customizing-benchmark-parameters">Customizing Benchmark
+Parameters</h3>
+<p>You can modify how the benchmark runs by appending specific arguments
+to the <code>7z b</code> command.</p>
+<h4 id="1-adjusting-cpu-threads--mmt">1. Adjusting CPU Threads
+(<code>-mmt</code>)</h4>
+<p>By default, 7-Zip utilizes all available CPU cores and threads. To
+test single-core performance or limit thread usage, use the
+<code>-mmt</code> switch:</p>
+<ul>
+<li><p><strong>Single-core test:</strong></p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> b <span class="at">-mmt</span><span class="op">=</span>1</span></code></pre></div></li>
+<li><p><strong>Specific thread count (e.g., 4 threads):</strong></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> b <span class="at">-mmt</span><span class="op">=</span>4</span></code></pre></div></li>
+</ul>
+<h4 id="2-changing-the-dictionary-size--md">2. Changing the Dictionary
+Size (<code>-md</code>)</h4>
+<p>Changing the dictionary size tests different amounts of RAM and cache
+hierarchy. The format is <code>-md={Size}[m|g]</code>:</p>
+<ul>
+<li><p><strong>Test with a 64 MB dictionary:</strong></p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> b <span class="at">-md</span><span class="op">=</span>64m</span></code></pre></div></li>
+<li><p><strong>Test with a 256 MB dictionary (requires more
+RAM):</strong></p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> b <span class="at">-md</span><span class="op">=</span>256m</span></code></pre></div></li>
+</ul>
+<h4 id="3-setting-the-number-of-iterations">3. Setting the Number of
+Iterations</h4>
+<p>You can specify the number of benchmark passes by providing an
+integer after the <code>b</code> command. This is useful for short tests
+or sustained stress testing:</p>
+<ul>
+<li><p><strong>Run exactly 10 passes:</strong></p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> b 10</span></code></pre></div></li>
+<li><p><strong>Run a stress test with 50 passes across 8
+threads:</strong></p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> b 50 <span class="at">-mmt</span><span class="op">=</span>8</span></code></pre></div></li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

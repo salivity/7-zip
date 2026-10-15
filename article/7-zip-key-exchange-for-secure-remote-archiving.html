@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Key Exchange for Secure Remote Archiving - 7-zip</title>
+    <meta name="description" content="7-Zip is a standard tool for file compression and local data protection, but it does not support asymmetric key exchange mechanisms or native remote archiving capabilities. This article details 7-Zip’s encryption architecture, explains the absence of remo">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-key-exchange-for-secure-remote-archiving">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Key Exchange for Secure Remote Archiving - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-key-exchange-for-secure-remote-archiving" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip is a standard tool for file compression and local data protection, but it does not support asymmetric key exchange mechanisms or native remote archiving capabilities. This article details 7-Zip’s encryption architecture, explains the absence of remo" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-key-exchange-for-secure-remote-archiving">7-Zip Key
+Exchange for Secure Remote Archiving</h1>
+<p>7-Zip is a standard tool for file compression and local data
+protection, but it does not support asymmetric key exchange mechanisms
+or native remote archiving capabilities. This article details 7-Zip’s
+encryption architecture, explains the absence of remote key management
+protocols, and highlights how users can securely achieve remote
+archiving by integrating 7-Zip with modern transport security tools.</p>
+<h2 id="7-zip-encryption-architecture">7-Zip Encryption
+Architecture</h2>
+<p>7-Zip exclusively uses symmetric encryption. When a user encrypts a
+<code>.7z</code> or <code>.zip</code> archive, the application employs
+the AES-256 algorithm. The encryption key is derived directly from a
+user-supplied passphrase using a key derivation function based on
+SHA-256 with thousands of iterations (PBKDF2-style derivation).</p>
+<p>Because 7-Zip operates strictly on a symmetric model, both the
+archiver and the extractor must share the exact same passphrase. The
+software does not include asymmetric cryptography engines (such as RSA,
+ECC, or OpenPGP implementations) that would allow public/private key
+pairs or cryptographic key exchange protocols like Diffie-Hellman.</p>
+<h2 id="absence-of-network-and-remote-protocols">Absence of Network and
+Remote Protocols</h2>
+<p>7-Zip is fundamentally an offline, file-system-level utility. It has
+no built-in network stack, client-server architecture, or remote
+execution engine. Consequently, features necessary for secure remote
+archiving—such as TLS, SSH, or automated key negotiation—are entirely
+outside the application's scope.</p>
+<p>The software cannot independently establish a session with a remote
+server, exchange session keys, or stream compressed data over an
+authenticated network socket without external utilities.</p>
+<h2 id="how-to-implement-secure-remote-archiving-with-7-zip">How to
+Implement Secure Remote Archiving with 7-Zip</h2>
+<p>To achieve secure remote archiving while utilizing 7-Zip for
+compression and data packaging, administrators typically rely on layered
+security architectures:</p>
+<h3 id="1-secure-transport-layer-integration">1. Secure Transport Layer
+Integration</h3>
+<p>Instead of relying on the archiver for key exchange, users delegate
+transport security to network protocols designed for that purpose.</p>
+<ul>
+<li><strong>SFTP / SSH:</strong> Automate 7-Zip via command line
+(<code>7z.exe</code> or <code>p7zip</code>) to compress files locally,
+followed by an SFTP or SCP command to transmit the archive. The SSH
+handshake manages the key exchange (typically via ECDH or Curve25519)
+transparently.</li>
+<li><strong>TLS-Protected Storage:</strong> Upload 7-Zip files to remote
+buckets (e.g., AWS S3, Azure Blob) over HTTPS, where TLS handles session
+key exchanges.</li>
+</ul>
+<h3 id="2-pgpgpg-for-asymmetric-encryption">2. PGP/GPG for Asymmetric
+Encryption</h3>
+<p>If the objective is to eliminate shared passphrases:</p>
+<ol type="1">
+<li>Use 7-Zip to package and compress the target directory without
+encryption.</li>
+<li>Encrypt the resulting archive using GnuPG (GPG) directed at the
+recipient's public key.</li>
+<li>Transmit the encrypted file across the network.</li>
+</ol>
+<p>This separates the compression workload (handled efficiently by
+7-Zip) from the key management and exchange infrastructure (handled by
+asymmetric cryptographic standards).</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

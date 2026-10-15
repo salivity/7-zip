@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Duplicate Filename Prompts During Mass Extraction - 7-zip</title>
+    <meta name="description" content="Duplicate filename collisions during mass extraction in 7-Zip occur when the extraction process attempts to write two or more identical filenames into the same destination directory. This typically happens when extracting multiple archives containing gene">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-duplicate-filename-prompts-during-mass-extraction">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Duplicate Filename Prompts During Mass Extraction - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-duplicate-filename-prompts-during-mass-extraction" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Duplicate filename collisions during mass extraction in 7-Zip occur when the extraction process attempts to write two or more identical filenames into the same destination directory. This typically happens when extracting multiple archives containing gene" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-duplicate-filename-prompts-during-mass-extraction">7-Zip
+Duplicate Filename Prompts During Mass Extraction</h1>
+<p>Duplicate filename collisions during mass extraction in 7-Zip occur
+when the extraction process attempts to write two or more identical
+filenames into the same destination directory. This typically happens
+when extracting multiple archives containing generic file names into a
+single folder, stripping subfolder directory paths, handling multi-part
+archives incorrectly, or encountering filesystem incompatibilities such
+as case sensitivity differences between operating systems.</p>
+<h3 id="1-extracting-multiple-archives-into-a-single-directory">1.
+Extracting Multiple Archives into a Single Directory</h3>
+<p>When selecting multiple archives and choosing "Extract Here" or
+specifying a single destination folder without subfolders, 7-Zip
+extracts the contents of every archive into that shared space. If
+independent archives contain commonly used filenames—such as
+<code>readme.txt</code>, <code>index.html</code>,
+<code>setup.exe</code>, or metadata files like <code>Thumbs.db</code>
+and <code>.DS_Store</code>—the extraction of the second archive will
+immediately collide with the files written by the first.</p>
+<h3 id="2-full-paths-vs-flat-extraction-the-e-vs-x-command">2. Full
+Paths vs. Flat Extraction (The <code>e</code> vs. <code>x</code>
+Command)</h3>
+<p>In 7-Zip, extraction can either preserve the internal folder
+hierarchy or flatten it:</p>
+<ul>
+<li><strong>Flattened Extraction (<code>e</code> command in
+CLI):</strong> Strips all directory structures stored inside the archive
+and dumps every file directly into the target root directory. If an
+archive contains <code>images/logo.png</code> and
+<code>assets/logo.png</code>, flattening forces them into the same root
+folder, triggering a duplicate prompt.</li>
+<li><strong>Preserved Path Extraction (<code>x</code> command in
+CLI):</strong> Recreates the original folder paths. Using flat
+extraction commands or disabling directory restoration in the GUI is a
+primary cause of collisions within even a single archive.</li>
+</ul>
+<h3 id="3-selecting-all-parts-of-a-multi-volume-split-archive">3.
+Selecting All Parts of a Multi-Volume Split Archive</h3>
+<p>When an archive is split across multiple volumes (such as
+<code>.zip.001</code>, <code>.zip.002</code>, or
+<code>.part1.rar</code>, <code>.part2.rar</code>), the archive
+extraction engine only requires the user to extract the first volume. If
+a user highlights every split file in the GUI and triggers a mass
+extraction, 7-Zip may attempt to process the subsequent parts
+independently or repeatedly sequentially, causing collisions as
+overlapping operations attempt to write the exact same target files.</p>
+<h3 id="4-case-sensitivity-conflicts-between-filesystems">4.
+Case-Sensitivity Conflicts Between Filesystems</h3>
+<p>Archives created on Unix-like operating systems (such as Linux or
+macOS) can contain files in the same directory whose names differ only
+by letter case (for example, <code>data.txt</code> and
+<code>DATA.txt</code>). Because the standard Windows filesystem (NTFS)
+is case-insensitive for standard user operations, Windows treats both
+names as the same file. When 7-Zip attempts to extract the second file
+on Windows, the operating system flags it as an overwrite collision.</p>
+<h3 id="5-duplicate-entries-inside-the-archive-itself">5. Duplicate
+Entries Inside the Archive Itself</h3>
+<p>Certain archive formats, particularly uncompressed or concatenated
+TAR archives (<code>.tar</code>), allow identical paths and filenames to
+exist within the same file stream. While modern ZIP and 7z formats
+generally enforce unique paths, malformed, concatenated, or legacy
+archives can store duplicate records, causing 7-Zip to encounter
+multiple instances of the same file during a single unpack
+operation.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

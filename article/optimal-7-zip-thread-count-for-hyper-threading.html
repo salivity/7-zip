@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimal 7-Zip Thread Count for Hyper-Threading - 7-zip</title>
+    <meta name="description" content="When compressing archives in 7-Zip on a system with a hyper-threaded (or SMT-enabled) processor, setting the thread count to match your CPU&#39;s physical core count rather than its total logical thread count generally yields the fastest and most efficient pe">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/optimal-7-zip-thread-count-for-hyper-threading">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Optimal 7-Zip Thread Count for Hyper-Threading - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/optimal-7-zip-thread-count-for-hyper-threading" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When compressing archives in 7-Zip on a system with a hyper-threaded (or SMT-enabled) processor, setting the thread count to match your CPU&#39;s physical core count rather than its total logical thread count generally yields the fastest and most efficient pe" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="optimal-7-zip-thread-count-for-hyper-threading">Optimal 7-Zip
+Thread Count for Hyper-Threading</h1>
+<p>When compressing archives in 7-Zip on a system with a hyper-threaded
+(or SMT-enabled) processor, setting the thread count to match your CPU's
+physical core count rather than its total logical thread count generally
+yields the fastest and most efficient performance. While hyper-threading
+improves multi-tasking in many workloads, heavy compression algorithms
+like LZMA and LZMA2 quickly saturate CPU caches and memory bandwidth,
+causing logical threads to compete for resources and introduce
+performance penalties.</p>
+<h3 id="the-recommendation-match-physical-cores">The Recommendation:
+Match Physical Cores</h3>
+<p>For the majority of compression tasks using LZMA or LZMA2, set the
+<strong>CPU threads</strong> parameter in 7-Zip to the number of
+<strong>physical cores</strong> your processor possesses (for example, 8
+threads on an 8-core / 16-thread CPU).</p>
+<p>Although 7-Zip defaults to using all available logical threads,
+running full hyper-threading often results in diminishing returns or
+slower overall compression times.</p>
+<h3 id="why-hyper-threading-degrades-heavy-compression">Why
+Hyper-Threading Degrades Heavy Compression</h3>
+<ol type="1">
+<li><strong>Shared Execution Resources:</strong> Hyper-Threading (Intel)
+and Simultaneous Multi-Threading (AMD) do not double physical processing
+power; they duplicate architectural state registers to keep an execution
+pipeline full. LZMA compression relies heavily on integer math and
+continuous pipeline utilization, leaving very few idle execution cycles
+for a second logical thread on the same physical core to exploit.</li>
+<li><strong>Cache Contention:</strong> Each compression thread requires
+substantial L2 and L3 CPU cache. Running two threads per physical core
+forces both to share the same cache capacity, causing severe cache
+thrashing and memory latency spikes.</li>
+<li><strong>Memory Bandwidth Bottlenecks:</strong> LZMA/LZMA2 is
+extremely memory-intensive. Doubling the active threads to match logical
+counts saturates the system memory controller, meaning cores spend more
+time waiting for RAM access rather than crunching data.</li>
+</ol>
+<h3 id="impact-on-ram-consumption">Impact on RAM Consumption</h3>
+<p>Every active compression thread in 7-Zip requires a dedicated memory
+buffer proportional to the selected dictionary size:</p>
+<ul>
+<li><strong>Memory Usage Formula:</strong> Approximately
+<code>Threads × (Dictionary Size × 10)</code> for standard LZMA2
+compression.</li>
+</ul>
+<p>If you have a 16-thread CPU and choose a 64 MB dictionary, setting
+threads to 16 requires roughly 10 GB of RAM. Limiting the setting to 8
+physical cores cuts that footprint in half (roughly 5 GB) without
+sacrificing speed, preventing the operating system from swapping data to
+the pagefile on systems with limited memory.</p>
+<h3 id="when-can-you-use-more-threads">When Can You Use More
+Threads?</h3>
+<p>Using all logical threads can be viable under specific
+conditions:</p>
+<ul>
+<li><strong>Light Compression Levels:</strong> If you use "Store,"
+"Fastest," or "Fast," CPU utilization is lower, and threads finish jobs
+quickly without exhausting cache limits.</li>
+<li><strong>Alternative Algorithms:</strong> Lighter algorithms like
+Deflate or BZip2 experience less cache contention than LZMA2 and may see
+minor improvements from logical threading.</li>
+</ul>
+<h3 id="how-to-apply-the-setting-in-7-zip">How to Apply the Setting in
+7-Zip</h3>
+<ol type="1">
+<li>Open 7-Zip and select the files you want to compress.</li>
+<li>Click <strong>Add</strong> to open the <em>Add to Archive</em>
+window.</li>
+<li>Locate the <strong>CPU threads</strong> dropdown on the right
+side.</li>
+<li>Select the number corresponding to your processor's physical core
+count instead of the default maximum value.</li>
+<li>Click <strong>OK</strong> to begin compression.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/7-zip'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            utterancesScript.setAttribute('theme', currentTheme === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>
