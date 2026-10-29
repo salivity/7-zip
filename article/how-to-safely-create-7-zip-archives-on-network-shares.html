@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Safely Create 7-Zip Archives on Network Shares - 7-zip</title>
+    <meta name="description" content="Creating compressed archives across network shared drives can introduce risks like file corruption, incomplete transfers, and system timeouts due to network instability. This guide explains why direct network archiving can fail, details the safest methods">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-safely-create-7-zip-archives-on-network-shares">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Safely Create 7-Zip Archives on Network Shares - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-safely-create-7-zip-archives-on-network-shares" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Creating compressed archives across network shared drives can introduce risks like file corruption, incomplete transfers, and system timeouts due to network instability. This guide explains why direct network archiving can fail, details the safest methods" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-safely-create-7-zip-archives-on-network-shares">How to
+Safely Create 7-Zip Archives on Network Shares</h1>
+<p>Creating compressed archives across network shared drives can
+introduce risks like file corruption, incomplete transfers, and system
+timeouts due to network instability. This guide explains why direct
+network archiving can fail, details the safest methods to compress files
+using both the 7-Zip graphical interface and command-line tool, and
+outlines verification steps to ensure complete data integrity.</p>
+<hr />
+<h3 id="the-risks-of-compressing-directly-over-a-network">The Risks of
+Compressing Directly Over a Network</h3>
+<p>When 7-Zip creates an archive, it frequently reads source data,
+processes compression in memory, and writes continuous chunks to the
+destination file. Doing this directly over a Local Area Network (LAN),
+SMB share, or VPN introduces specific vulnerabilities:</p>
+<ul>
+<li><strong>Header Corruption:</strong> If the network connection drops
+for even a fraction of a second while 7-Zip writes the central directory
+or archive header, the entire archive can become unusable.</li>
+<li><strong>Temporary File Bottlenecks:</strong> By default, 7-Zip may
+generate temporary files on the network target, dramatically slowing
+down performance due to high read/write network I/O.</li>
+<li><strong>Locked Files:</strong> Multiple users accessing files on a
+shared drive can cause 7-Zip to fail mid-process if a file becomes
+locked.</li>
+</ul>
+<hr />
+<h3 id="method-1-the-local-staging-method-safest-approach">Method 1: The
+Local Staging Method (Safest Approach)</h3>
+<p>The industry best practice for handling network archives is to
+process the data locally and transfer the finished container.</p>
+<ol type="1">
+<li><strong>Copy the Source Files to a Local Drive:</strong> Copy the
+target folders from the network drive to a local directory (e.g.,
+<code>C:\Staging\Source</code>).</li>
+<li><strong>Compress Locally:</strong>
+<ul>
+<li>Right-click the folder and choose <strong>7-Zip</strong> &gt;
+<strong>Add to archive...</strong>.</li>
+<li>Select your format (7z or ZIP) and compression level.</li>
+<li>Save the resulting archive on the local drive (e.g.,
+<code>C:\Staging\Archive.7z</code>).</li>
+</ul></li>
+<li><strong>Test the Archive:</strong>
+<ul>
+<li>Right-click the created <code>.7z</code> file and select
+<strong>7-Zip</strong> &gt; <strong>Test archive</strong>.</li>
+</ul></li>
+<li><strong>Copy the Archive to the Network Share:</strong> Move the
+verified archive back to the target shared network folder.</li>
+</ol>
+<hr />
+<h3 id="method-2-direct-archiving-via-7-zip-gui">Method 2: Direct
+Archiving via 7-Zip GUI</h3>
+<p>If storage constraints prevent local staging, you can compress
+directly to or from a network share by following these safety
+configurations:</p>
+<h4 id="1-map-the-network-share-to-a-drive-letter">1. Map the Network
+Share to a Drive Letter</h4>
+<p>Direct UNC paths (such as <code>\\server\share\</code>) can
+occasionally cause issues with path resolution during lengthy
+operations.</p>
+<ul>
+<li>Open <strong>File Explorer</strong> &gt; <strong>This
+PC</strong>.</li>
+<li>Click the three dots menu (or Computer tab) and choose <strong>Map
+network drive</strong>.</li>
+<li>Assign a letter (e.g., <code>Z:</code>) and point it to your network
+share.</li>
+</ul>
+<h4 id="2-configure-7-zip-to-use-a-local-working-directory">2. Configure
+7-Zip to Use a Local Working Directory</h4>
+<p>By default, 7-Zip may write temporary files to the destination drive.
+Force it to write temp files locally instead:</p>
+<ol type="1">
+<li>Open the <strong>7-Zip File Manager</strong>.</li>
+<li>Go to <strong>Tools</strong> &gt; <strong>Options</strong> &gt;
+<strong>Folders</strong> tab.</li>
+<li>Select <strong>Specified</strong> and choose a local folder on your
+fast drive (e.g., <code>C:\Temp</code>).</li>
+<li>Check <strong>For removable drives only</strong> or leave it as the
+primary temp path.</li>
+</ol>
+<h4 id="3-create-the-archive">3. Create the Archive</h4>
+<ol type="1">
+<li>Select the files on the mapped drive.</li>
+<li>Click <strong>Add</strong>.</li>
+<li>Set the destination path to the mapped network drive.</li>
+<li>Keep the <strong>Compression level</strong> moderate (Normal or
+Fast) to prevent CPU bottlenecks from exacerbating network latency.</li>
+<li>Click <strong>OK</strong>.</li>
+</ol>
+<hr />
+<h3 id="method-3-command-line-cli-with-local-working-directory">Method
+3: Command-Line (CLI) with Local Working Directory</h3>
+<p>The 7-Zip command-line tool (<code>7z.exe</code>) provides direct
+control over temporary file locations and automated integrity
+testing.</p>
+<p>Use the <code>-w</code> switch to force 7-Zip to use a local temp
+directory while outputting directly to the network share:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>7z a <span class="at">-t7z</span> <span class="st">&quot;Z:\Backups\archive.7z&quot;</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">server\share\data\*&quot;</span> <span class="at">-w</span><span class="st">&quot;C:\Temp&quot;</span></span></code></pre></div>
+<ul>
+<li><code>a</code>: Adds files to the archive.</li>
+<li><code>-t7z</code>: Sets the format to 7z.</li>
+<li><code>"Z:\Backups\archive.7z"</code>: Destination network path.</li>
+<li><code>"-w\"C:\Temp\""</code>: Directs temporary file generation to
+the local drive, avoiding network overhead.</li>
+</ul>
+<hr />
+<h3 id="essential-step-always-verify-the-archive">Essential Step: Always
+Verify the Archive</h3>
+<p>Never delete original source files until the network archive has
+passed an integrity test.</p>
+<ul>
+<li><strong>GUI:</strong> Right-click the remote archive, hover over
+<strong>7-Zip</strong>, and select <strong>Test archive</strong>.</li>
+<li><strong>Command Line:</strong> Run
+<code>7z t "Z:\Backups\archive.7z"</code> to perform a checksum test
+across all contained files.</li>
+</ul>
+<p>If the test returns "Everything is Ok", the archive structure and
+checksums are intact.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-to-safely-create-7-zip-archives-on-network-shares';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

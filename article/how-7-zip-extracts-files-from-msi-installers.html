@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Extracts Files from MSI Installers - 7-zip</title>
+    <meta name="description" content="This article explains the technical process 7-Zip uses to unpack and extract payload files directly from Windows Installer (MSI) packages. It covers how the utility navigates the Compound File Binary Format, locates internal Cabinet (CAB) storage streams,">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-extracts-files-from-msi-installers">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Extracts Files from MSI Installers - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-extracts-files-from-msi-installers" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains the technical process 7-Zip uses to unpack and extract payload files directly from Windows Installer (MSI) packages. It covers how the utility navigates the Compound File Binary Format, locates internal Cabinet (CAB) storage streams," />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-extracts-files-from-msi-installers">How 7-Zip Extracts
+Files from MSI Installers</h1>
+<p>This article explains the technical process 7-Zip uses to unpack and
+extract payload files directly from Windows Installer (MSI) packages. It
+covers how the utility navigates the Compound File Binary Format,
+locates internal Cabinet (CAB) storage streams, interprets database
+tables to resolve file structures, and unpacks the compressed data
+without executing the installer itself.</p>
+<h2 id="the-structure-of-an-msi-package">The Structure of an MSI
+Package</h2>
+<p>To understand how 7-Zip extracts files, it helps to understand what
+an MSI file actually is. An MSI package is not a simple archive like a
+ZIP or RAR file; it is an OLE (Object Linking and Embedding) Compound
+File Binary Format (CFBF) document, effectively acting as a structured,
+filesystem-within-a-file. Inside this container resides a relational
+database consisting of dozens of tables that define installation logic,
+registry modifications, UI dialogs, and references to binary payload
+data.</p>
+<p>The actual files intended for installation are generally stored
+within this container as embedded or external Microsoft Cabinet
+(<code>.cab</code>) streams.</p>
+<h2 id="parsing-the-compound-file-container">Parsing the Compound File
+Container</h2>
+<p>When you open an MSI package in 7-Zip, the application uses its
+built-in compound file parser rather than running the Windows Installer
+engine (<code>msiexec.exe</code>).</p>
+<ol type="1">
+<li><strong>Header Identification:</strong> 7-Zip reads the signature at
+the start of the file (<code>D0 CF 11 E0 A1 B1 1A E1</code>) to confirm
+it is an OLE structured storage container.</li>
+<li><strong>Directory Stream Traversal:</strong> It parses the Sector
+Allocation Tables (SAT) and Directory entries inside the file. This
+reveals the virtual streams and substorages stored within the MSI
+database.</li>
+</ol>
+<h2 id="locating-the-embedded-payload">Locating the Embedded
+Payload</h2>
+<p>Once inside the compound structure, 7-Zip searches for the streams
+containing the actual compressed program files.</p>
+<ul>
+<li><strong>Embedded Streams:</strong> In most self-contained MSI files,
+payloads are packed into embedded cabinet streams typically named with a
+leading exclamation mark (e.g., <code>!_Streams/Data1.cab</code> or
+simply <code>Data1.cab</code>).</li>
+<li><strong>Binary Streams:</strong> Some smaller files, custom actions,
+or icons are stored directly inside the <code>Binary</code> stream
+table.</li>
+</ul>
+<p>7-Zip recognizes standard Cabinet format signatures
+(<code>MSCF</code>) within these embedded streams and treats them as
+sub-archives.</p>
+<h2 id="resolving-names-via-database-tables">Resolving Names via
+Database Tables</h2>
+<p>Extracting raw CAB files often results in generic identifiers instead
+of real filenames. To address this, 7-Zip reads the MSI relational
+database tables stored in the package:</p>
+<ul>
+<li><strong>The File Table:</strong> Maps internal file identifiers
+(keys) to their real target filenames and versions.</li>
+<li><strong>The Directory Table:</strong> Defines the relative
+installation paths and reconstructed folder hierarchies.</li>
+<li><strong>The Media Table:</strong> Details which cabinet stream holds
+which set of files (determined by sequence numbers).</li>
+</ul>
+<p>By cross-referencing these tables, 7-Zip correlates the arbitrary
+internal stream entries with their true human-readable directory
+structures and filenames.</p>
+<h2 id="decompressing-the-cabinet-streams">Decompressing the Cabinet
+Streams</h2>
+<p>After mapping the target layout, 7-Zip invokes its native CAB
+decompression engine:</p>
+<ol type="1">
+<li><strong>Algorithm Detection:</strong> 7-Zip inspects the compression
+flags inside the cabinet header. Microsoft Cabinet files typically use
+either <strong>MSZIP</strong> (a variant of Deflate) or
+<strong>LZX</strong> compression.</li>
+<li><strong>Block Decompression:</strong> 7-Zip decodes the sequential
+data blocks using its internal implementations of MSZIP or LZX
+decoders.</li>
+<li><strong>Payload Output:</strong> The uncompressed bytes are written
+directly to the user-specified destination folder, formatted according
+to the paths resolved from the database tables.</li>
+</ol>
+<p>Through this sequence—reading the OLE container, parsing internal
+database mappings, and directly decompressing the underlying CAB
+streams—7-Zip safely extracts installation contents without triggering
+scripts, executing code, or modifying the Windows Registry.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-extracts-files-from-msi-installers';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

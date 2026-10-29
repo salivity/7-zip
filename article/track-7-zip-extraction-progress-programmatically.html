@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track 7-Zip Extraction Progress Programmatically - 7-zip</title>
+    <meta name="description" content="Tracking the extraction progress programmatically using the 7-Zip SDK is accomplished by implementing the IArchiveExtractCallback interface, which inherits from IProgress. By providing a custom implementation of this callback to the IInArchive::Extract me">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/track-7-zip-extraction-progress-programmatically">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Track 7-Zip Extraction Progress Programmatically - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/track-7-zip-extraction-progress-programmatically" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Tracking the extraction progress programmatically using the 7-Zip SDK is accomplished by implementing the IArchiveExtractCallback interface, which inherits from IProgress. By providing a custom implementation of this callback to the IInArchive::Extract me" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="track-7-zip-extraction-progress-programmatically">Track 7-Zip
+Extraction Progress Programmatically</h1>
+<p>Tracking the extraction progress programmatically using the 7-Zip SDK
+is accomplished by implementing the <code>IArchiveExtractCallback</code>
+interface, which inherits from <code>IProgress</code>. By providing a
+custom implementation of this callback to the
+<code>IInArchive::Extract</code> method, developers receive real-time
+notifications regarding the total byte size, the number of bytes
+currently processed, and the status of individual files during the
+decompression process.</p>
+<h2 id="the-core-progress-tracking-methods">The Core Progress Tracking
+Methods</h2>
+<p>The primary mechanism for byte-level progress reporting resides
+within the <code>IProgress</code> base interface:</p>
+<ul>
+<li><strong><code>SetTotal(UInt64 total)</code></strong>: The extraction
+engine calls this method once it calculates the total uncompressed or
+compressed size of the files being extracted. This value serves as the
+denominator for percentage calculations.</li>
+<li><strong><code>SetCompleted(const UInt64 *completeValue)</code></strong>:
+The engine invokes this method periodically throughout the extraction
+process. The pointer <code>completeValue</code> provides the current
+number of bytes processed so far. If <code>completeValue</code> is null,
+the total progress state is indeterminate.</li>
+</ul>
+<p>Calculating the percentage completed is done using the standard
+formula:</p>
+<p><span class="math display">\[\text{Percentage} = \left(
+\frac{\text{completeValue}}{\text{total}} \right) \times
+100\]</span></p>
+<h2 id="file-level-status-callbacks">File-Level Status Callbacks</h2>
+<p>In addition to byte counters, the
+<code>IArchiveExtractCallback</code> interface provides granular hooks
+for individual archive entries:</p>
+<ul>
+<li><strong><code>GetStream(UInt32 index, ISequentialOutStream **outStream, Int32 askExtractMode)</code></strong>:
+Called before extracting an item. It supplies the archive item's index
+and requests an output stream where decompressed data should be
+written.</li>
+<li><strong><code>PrepareOperation(Int32 askExtractMode)</code></strong>:
+Notifies the application about the planned action (e.g., extract, test,
+or skip).</li>
+<li><strong><code>SetOperationResult(Int32 resultOperationOK)</code></strong>:
+Signals the completion of an individual file's extraction and reports
+whether it succeeded, failed with a CRC error, or encountered data
+corruption.</li>
+</ul>
+<h2 id="implementation-workflow">Implementation Workflow</h2>
+<p>To track extraction progress, follow these sequential steps:</p>
+<ol type="1">
+<li><strong>Define a Custom Callback Class</strong>: Create a class
+(e.g., <code>CExtractCallback</code>) that inherits from
+<code>IArchiveExtractCallback</code> (and internally
+<code>IProgress</code>).</li>
+<li><strong>Implement <code>SetTotal</code> and
+<code>SetCompleted</code></strong>: Store the total size and update your
+user interface or progress log whenever <code>SetCompleted</code> passes
+a new value.</li>
+<li><strong>Instantiate the Callback</strong>: Create an instance of
+your custom class.</li>
+<li><strong>Call <code>Extract</code></strong>: Pass a pointer to your
+callback instance into the archive object's extraction function:</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>CMyExtractCallback <span class="op">*</span>extractCallbackSpec <span class="op">=</span> <span class="kw">new</span> CMyExtractCallback<span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>CMyComPtr<span class="op">&lt;</span>IArchiveExtractCallback<span class="op">&gt;</span> extractCallback <span class="op">=</span> extractCallbackSpec<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">// indices: array of item indices to extract, NULL for all items</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">// numItems: count of items to extract, -1 for all items</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">// testMode: 0 for extract, 1 for test</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>archive<span class="op">-&gt;</span>Extract<span class="op">(</span>NULL<span class="op">,</span> <span class="op">(</span>UInt32<span class="op">)(</span>Int32<span class="op">)-</span><span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> extractCallback<span class="op">);</span></span></code></pre></div>
+<p>By returning <code>S_OK</code> from each callback invocation,
+extraction proceeds normally. Returning <code>E_ABORT</code> from
+<code>SetCompleted</code> or any other callback method instructs the
+7-Zip engine to halt extraction immediately, providing built-in
+cancellation support.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/track-7-zip-extraction-progress-programmatically';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

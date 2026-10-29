@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Extracts Payloads from ELF Files - 7-zip</title>
+    <meta name="description" content="7-Zip can open Linux Executable and Linkable Format (ELF) binaries by treating them as structured containers rather than compiled black boxes. By parsing the file&#39;s native internal tables, 7-Zip maps individual execution sections, detects embedded archive">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-extracts-payloads-from-elf-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Extracts Payloads from ELF Files - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-extracts-payloads-from-elf-files" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip can open Linux Executable and Linkable Format (ELF) binaries by treating them as structured containers rather than compiled black boxes. By parsing the file&#39;s native internal tables, 7-Zip maps individual execution sections, detects embedded archive" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-extracts-payloads-from-elf-files">How 7-Zip Extracts
+Payloads from ELF Files</h1>
+<p>7-Zip can open Linux Executable and Linkable Format (ELF) binaries by
+treating them as structured containers rather than compiled black boxes.
+By parsing the file's native internal tables, 7-Zip maps individual
+execution sections, detects embedded archives, and identifies trailing
+overlay data, allowing users to browse and extract internal payloads
+without executing the binary.</p>
+<h3 id="elf-header-and-structure-detection">ELF Header and Structure
+Detection</h3>
+<p>When a file is loaded into 7-Zip, the application reads the first few
+bytes to match known format signatures. For ELF binaries, 7-Zip searches
+for the four-byte magic number: <code>0x7F</code>, followed by the ASCII
+characters <code>E</code>, <code>L</code>, and <code>F</code>
+(<code>\x7fELF</code>).</p>
+<p>Once validated, 7-Zip's dedicated ELF parser reads the initial ELF
+header. This header provides essential structural metadata:</p>
+<ul>
+<li><strong>Architecture and Bitness:</strong> Indicates whether the
+binary is 32-bit (<code>Elf32_Ehdr</code>) or 64-bit
+(<code>Elf64_Ehdr</code>).</li>
+<li><strong>Endianness:</strong> Determines whether data is read in
+little-endian or big-endian order.</li>
+<li><strong>Header Offsets:</strong> Locates the Section Header Table
+(<code>e_shoff</code>) and Program Header Table (<code>e_phoff</code>),
+along with the number of entries and entry sizes.</li>
+</ul>
+<h3 id="reading-the-section-header-table">Reading the Section Header
+Table</h3>
+<p>7-Zip accesses the file's Section Header Table to enumerate the
+binary's contents. Each section entry defines a distinct part of the
+executable, including its name offset, file offset, and physical
+size.</p>
+<p>7-Zip resolves the names of these sections (such as
+<code>.text</code>, <code>.rodata</code>, <code>.data</code>, and
+<code>.bss</code>) by reading the section header string table
+(<code>.shstrtab</code>). It then translates each identified section
+into a distinct virtual file within the 7-Zip interface, displaying the
+raw binary data contained within that segment.</p>
+<h3 id="extracting-embedded-payloads-and-installers">Extracting Embedded
+Payloads and Installers</h3>
+<p>Linux installers, self-extracting scripts (like
+<code>makeself</code>), and portable formats (like
+<code>AppImage</code>) often embed compressed payloads inside or
+directly alongside an ELF runner. 7-Zip extracts these payloads through
+two primary mechanisms:</p>
+<ol type="1">
+<li><strong>Embedded Sections:</strong> If an ELF file contains a
+dedicated section holding an embedded archive (such as a compressed
+SquashFS image, CPIO archive, or Tarball), 7-Zip exposes that section.
+If 7-Zip recognizes the signature of a nested compression format (e.g.,
+Gzip, XZ, or Zstandard) inside that section, it allows recursive
+navigation directly into the archive.</li>
+<li><strong>Overlay/Trailing Data Detection:</strong> In many
+self-extracting formats, payload data is simply appended to the end of
+the compiled ELF executable. 7-Zip calculates the total official size of
+the ELF binary by checking the maximum offset and size defined by the
+section and program headers. Any data located past the end of the
+legitimate ELF boundaries is flagged as an overlay. 7-Zip scans this
+appended region for common archive signatures and exposes the trailing
+archive as extractable content.</li>
+</ol>
+<p>Through direct parsing of headers and signature scanning of arbitrary
+binary streams, 7-Zip bypasses the execution layer entirely, isolating
+and unpacking raw payloads directly from the ELF container.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-extracts-payloads-from-elf-files';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

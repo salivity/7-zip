@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Performance on Virtual Machine Disks - 7-zip</title>
+    <meta name="description" content="Compressing virtual machine (VM) disk images with 7-Zip yields some of the highest space-saving ratios among standard archiving tools, but performance depends heavily on the disk&#39;s internal layout and selected compression parameters. Because VM disks (suc">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-performance-on-virtual-machine-disks">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Performance on Virtual Machine Disks - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-performance-on-virtual-machine-disks" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Compressing virtual machine (VM) disk images with 7-Zip yields some of the highest space-saving ratios among standard archiving tools, but performance depends heavily on the disk&#39;s internal layout and selected compression parameters. Because VM disks (suc" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-performance-on-virtual-machine-disks">7-Zip Performance on
+Virtual Machine Disks</h1>
+<p>Compressing virtual machine (VM) disk images with 7-Zip yields some
+of the highest space-saving ratios among standard archiving tools, but
+performance depends heavily on the disk's internal layout and selected
+compression parameters. Because VM disks (such as VMDK, VHDX, and QCOW2)
+contain vast amounts of zeroed blocks, unallocated space, and repetitive
+operating system files, 7-Zip's native 7z format and LZMA/LZMA2
+algorithms routinely achieve compression rates between 50% and 80%.
+However, processing these multi-gigabyte files demands significant CPU
+and memory resources, requiring a balance between compression depth and
+archive creation speed.</p>
+<h3 id="compression-ratio-and-data-deduplication">Compression Ratio and
+Data Deduplication</h3>
+<p>The primary strength of 7-Zip when handling VM disks is its ability
+to eliminate redundant data. Virtual disks, especially fixed-size
+(thick-provisioned) disks, contain gigabytes of unwritten sectors filled
+entirely with zeros. 7-Zip compresses these sequences down to virtually
+nothing.</p>
+<p>Even on dynamically expanding (thin-provisioned) disks, guest
+operating systems retain repetitive system binaries, log files, and
+cached libraries. The LZMA2 algorithm features large dictionary sizes
+(ranging from 16 MB to over 1 GB) that allow the engine to identify
+duplicate patterns across distant sectors in the disk image. As a
+result, a standard 60 GB Windows VM image can frequently be reduced to
+under 15 GB, significantly outperforming standard ZIP or GZIP
+algorithms.</p>
+<h3 id="processing-speed-and-hardware-impact">Processing Speed and
+Hardware Impact</h3>
+<p>While the compression ratio is high, the speed of 7-Zip is directly
+constrained by the sheer size of VM disks:</p>
+<ul>
+<li><strong>CPU Utilization:</strong> LZMA2 supports multi-threading by
+splitting data into chunks. On modern multi-core processors, 7-Zip
+scales efficiently, but higher compression levels (Maximum or Ultra)
+place sustained 100% loads on all allocated cores.</li>
+<li><strong>RAM Consumption:</strong> Compressing large files using
+aggressive dictionary sizes requires substantial memory. For example,
+using an "Ultra" setting with multiple threads can easily demand 16 GB
+to 32 GB of RAM just for the compression process. Insufficient RAM
+forces paging to disk, drastically reducing speed.</li>
+<li><strong>Storage I/O Bottlenecks:</strong> Reading a 100 GB source
+image and writing a compressed output requires fast storage. Compressing
+across high-speed NVMe drives reduces total processing time
+significantly compared to mechanical hard drives or network-attached
+storage (NAS).</li>
+</ul>
+<h3 id="maximizing-7-zip-performance-for-vm-disks">Maximizing 7-Zip
+Performance for VM Disks</h3>
+<p>To achieve the best balance of speed and archive size, use the
+following configurations:</p>
+<ol type="1">
+<li><strong>Zero-Out Free Space Before Archiving:</strong> Run tools
+like <code>sdelete -z</code> on Windows guests or <code>fstrim</code> /
+<code>dd if=/dev/zero</code> on Linux guests before shutting down the
+VM. This converts deleted file sectors back into zeros, enabling 7-Zip
+to process unallocated space faster and achieve maximum
+compression.</li>
+<li><strong>Use LZMA2 with Moderate Dictionary Sizes:</strong> Select
+the <code>.7z</code> archive format with LZMA2. Set the dictionary size
+between 32 MB and 64 MB. Increasing the dictionary beyond 64 MB offers
+diminishing returns on VM images while dramatically increasing memory
+consumption and duration.</li>
+<li><strong>Opt for "Normal" or "Fast" Levels:</strong> For routine
+backups, the "Fast" or "Normal" compression levels complete in a
+fraction of the time required by "Ultra," while still capturing 85% to
+90% of the potential size reduction. Reserve "Ultra" exclusively for
+cold storage or network transfers where bandwidth is severely
+constrained.</li>
+</ol></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-performance-on-virtual-machine-disks';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

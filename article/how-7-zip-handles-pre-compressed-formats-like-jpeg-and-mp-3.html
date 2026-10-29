@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Handles Pre-Compressed Formats Like JPEG and MP3 - 7-zip</title>
+    <meta name="description" content="This article explains how the popular archiving tool 7-Zip interacts with already compressed media formats like JPEG and MP3. It explores why conventional compression algorithms struggle to reduce the size of these files, how 7-Zip&#39;s default LZMA and LZMA">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-handles-pre-compressed-formats-like-jpeg-and-mp-3">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Handles Pre-Compressed Formats Like JPEG and MP3 - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-handles-pre-compressed-formats-like-jpeg-and-mp-3" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how the popular archiving tool 7-Zip interacts with already compressed media formats like JPEG and MP3. It explores why conventional compression algorithms struggle to reduce the size of these files, how 7-Zip&#39;s default LZMA and LZMA" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-handles-pre-compressed-formats-like-jpeg-and-mp3">How
+7-Zip Handles Pre-Compressed Formats Like JPEG and MP3</h1>
+<p>This article explains how the popular archiving tool 7-Zip interacts
+with already compressed media formats like JPEG and MP3. It explores why
+conventional compression algorithms struggle to reduce the size of these
+files, how 7-Zip's default LZMA and LZMA2 engines process this
+high-entropy data, and the recommended settings to optimize archiving
+speed and resource usage when dealing with multimedia files.</p>
+<h2 id="the-challenge-of-pre-compressed-data">The Challenge of
+Pre-Compressed Data</h2>
+<p>Formats like JPEG (images) and MP3 (audio) have already undergone
+significant compression. During their initial creation, specialized
+algorithms remove both perceptual redundancies (lossy compression) and
+statistical redundancies (lossless entropy encoding, such as Huffman
+coding).</p>
+<p>Because the redundant data has already been stripped away, the
+resulting file consists of high-entropy data that closely resembles
+random noise to general-purpose compression algorithms.</p>
+<h2 id="how-7-zip-processes-jpeg-and-mp3-files">How 7-Zip Processes JPEG
+and MP3 Files</h2>
+<p>When you add JPEG or MP3 files to a <code>.7z</code> or
+<code>.zip</code> archive, 7-Zip treats them as generic binary data:</p>
+<ul>
+<li><strong>Pattern Matching Attempts:</strong> By default, 7-Zip uses
+the LZMA or LZMA2 algorithms. These algorithms scan for repeating
+sequences of bytes. Because pre-compressed files lack predictable
+repetitions, the algorithm finds very few matches.</li>
+<li><strong>Minimal to Zero Size Reduction:</strong> 7-Zip will
+typically achieve a compression ratio between 0% and 1% on these files.
+In some rare cases, the resulting archive may even be slightly larger
+than the original files due to the overhead of archive headers and
+metadata.</li>
+<li><strong>No Specialized Re-Compression:</strong> Unlike niche
+archival tools (such as Precomp or packJPG), standard 7-Zip does not
+unpack JPEG or MP3 structures to re-compress their internal streams. It
+processes the stream strictly at the container level.</li>
+</ul>
+<h2 id="the-cost-of-attempting-to-compress-media-files">The Cost of
+Attempting to Compress Media Files</h2>
+<p>Applying high compression levels (such as "Maximum" or "Ultra") to
+large collections of JPEGs or MP3s produces virtually no space savings
+while consuming substantial system resources:</p>
+<ul>
+<li><strong>High CPU and Memory Usage:</strong> The LZMA algorithm will
+exhaustively search its dictionary for patterns that do not exist.</li>
+<li><strong>Wasted Time:</strong> The archiving process takes
+significantly longer to complete compared to standard, uncompressed file
+types like text, raw logs, or BMP images.</li>
+</ul>
+<h2
+id="recommended-settings-for-archiving-pre-compressed-files">Recommended
+Settings for Archiving Pre-Compressed Files</h2>
+<p>When bundling collections of JPEGs, MP3s, or modern video files (such
+as MP4 or MKV), the most efficient approach in 7-Zip is to bypass the
+compression stage entirely:</p>
+<ol type="1">
+<li><strong>Set Compression Level to "Store":</strong> Change the
+compression level from "Normal" to "Store" (Level 0).</li>
+<li><strong>Benefits of "Store" Mode:</strong>
+<ul>
+<li><strong>Instant Archiving:</strong> Files are packaged as fast as
+your storage drive can read and write data.</li>
+<li><strong>Consolidation:</strong> You retain the organizational
+benefit of combining thousands of files into a single archive file.</li>
+<li><strong>Security and Utility:</strong> You can still take advantage
+of 7-Zip's AES-256 encryption and volume-splitting features without
+wasting CPU cycles trying to compress incompressible data.</li>
+</ul></li>
+</ol></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-handles-pre-compressed-formats-like-jpeg-and-mp-3';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Port 7-Zip to a New CPU Architecture - 7-zip</title>
+    <meta name="description" content="Porting 7-Zip to a new CPU architecture requires adapting its core C and C++ source code, addressing platform-specific constraints like data alignment and endianness, and handling architecture-specific assembly optimizations. This guide outlines the essen">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-port-7-zip-to-a-new-cpu-architecture">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Port 7-Zip to a New CPU Architecture - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-port-7-zip-to-a-new-cpu-architecture" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Porting 7-Zip to a new CPU architecture requires adapting its core C and C++ source code, addressing platform-specific constraints like data alignment and endianness, and handling architecture-specific assembly optimizations. This guide outlines the essen" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-port-7-zip-to-a-new-cpu-architecture">How to Port 7-Zip
+to a New CPU Architecture</h1>
+<p>Porting 7-Zip to a new CPU architecture requires adapting its core C
+and C++ source code, addressing platform-specific constraints like data
+alignment and endianness, and handling architecture-specific assembly
+optimizations. This guide outlines the essential steps to prepare the
+codebase, configure the build toolchain, transition platform-dependent
+code, and validate the resulting binaries for stability and
+performance.</p>
+<h3 id="1-obtain-and-analyze-the-codebase">1. Obtain and Analyze the
+Codebase</h3>
+<p>Acquire the latest 7-Zip source code or the LZMA SDK from the
+official distribution. Identify the core components:</p>
+<ul>
+<li><strong>C Core:</strong> Contains compression and decompression
+algorithms such as LZMA, LZMA2, Deflate, and basic cryptographic
+primitives.</li>
+<li><strong>C++ Wrappers and UI:</strong> Implements archive management,
+archive formats (7z, ZIP, TAR), and file system abstractions.</li>
+<li><strong>Assembly Routines:</strong> Highly optimized ASM
+implementations for CRC calculation, AES encryption, SHA hashing, and
+LZMA state transitions.</li>
+</ul>
+<h3 id="2-configure-the-toolchain-and-build-system">2. Configure the
+Toolchain and Build System</h3>
+<p>Set up a cross-compiler or native compiler (such as GCC, Clang, or a
+vendor-specific toolchain) targeting the new architecture. 7-Zip
+typically uses customized makefiles (<code>nmake</code> on Windows or
+GNU <code>make</code> for POSIX/p7zip-derived builds).</p>
+<ul>
+<li>Define the target architecture flags in the makefiles (e.g.,
+<code>-march</code>, <code>-mcpu</code>, <code>-mabi</code>).</li>
+<li>Establish appropriate macro definitions (such as
+<code>_7ZIP_ST</code> for single-thread builds or custom architecture
+macros) to control conditional compilation.</li>
+</ul>
+<h3 id="3-handle-architectural-characteristics">3. Handle Architectural
+Characteristics</h3>
+<p>Ensure the core algorithms respect the hardware specifications of the
+new architecture:</p>
+<ul>
+<li><strong>Endianness:</strong> The standard LZMA format is inherently
+little-endian. If porting to a big-endian architecture, ensure endian
+conversion macros (such as <code>SetUi32</code> and
+<code>GetUi32</code>) correctly swap byte orders during file header
+processing and stream encoding.</li>
+<li><strong>Memory Alignment:</strong> Many RISC architectures enforce
+strict memory alignment or suffer high penalties for unaligned memory
+accesses. Audit and replace direct unaligned pointer casts with safe
+read/write macros (e.g., <code>GetUi32</code> via byte-wise shifts or
+<code>memcpy</code>).</li>
+<li><strong>Word Size and Data Models:</strong> Confirm that assumptions
+regarding 32-bit (<code>ILP32</code>) vs. 64-bit (<code>LP64</code> or
+<code>LLP64</code>) data sizes match variable declarations, particularly
+for buffer pointers and 64-bit file offsets (<code>UInt64</code>).</li>
+</ul>
+<h3 id="4-manage-assembly-and-hardware-acceleration">4. Manage Assembly
+and Hardware Acceleration</h3>
+<p>7-Zip achieves maximum throughput by leveraging architecture-specific
+vector extensions and assembly code (e.g., x86 SSE/AVX, ARM NEON, or
+RISC-V Vector).</p>
+<ul>
+<li><strong>Initial Bootstrap:</strong> Disable architecture-specific
+assembly by undefining hardware acceleration macros (e.g., compile with
+generic C implementations for CRC and AES first).</li>
+<li><strong>Optimization Phase:</strong> Port or rewrite critical
+performance bottlenecks into native assembly or compiler intrinsics.
+Focus on:
+<ul>
+<li><strong>CRC-32 and CRC-64:</strong> Implement using native CRC
+instructions if supported by the CPU.</li>
+<li><strong>AES and SHA-256:</strong> Use native cryptographic
+extensions if available.</li>
+<li><strong>LZMA Match Finder:</strong> Optimize the sliding-dictionary
+search routines using SIMD operations.</li>
+</ul></li>
+</ul>
+<h3 id="5-compile-and-link-the-executables">5. Compile and Link the
+Executables</h3>
+<p>Compile the standalone command-line client (<code>7z</code> or
+<code>7za</code>) first, as it contains fewer dependencies on
+higher-level system APIs.</p>
+<ul>
+<li>Verify that the runtime linking step successfully resolves standard
+library routines (memory allocation, threading primitives like pthreads
+or Win32 threads).</li>
+<li>Resolve any undefined symbols resulting from missing
+platform-specific assembly functions.</li>
+</ul>
+<h3 id="6-validate-and-benchmark">6. Validate and Benchmark</h3>
+<p>Perform rigorous testing to guarantee data integrity and measure
+performance:</p>
+<ul>
+<li><strong>Integrity Testing:</strong> Compress and decompress various
+payloads (binary, text, sparse files) and verify checksums against
+standard references to confirm byte-for-byte compatibility.</li>
+<li><strong>Edge-Case Validation:</strong> Test maximum dictionary sizes
+and multi-threaded compression to detect race conditions or memory
+alignment crashes.</li>
+<li><strong>Built-in Benchmark:</strong> Run the native benchmark
+command (<code>7za b</code>) to evaluate compression and decompression
+speeds in Million Instructions Per Second (MIPS), ensuring the new build
+performs efficiently on the target hardware.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-to-port-7-zip-to-a-new-cpu-architecture';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

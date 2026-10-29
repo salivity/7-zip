@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Processes Solid Block Sizes - 7-zip</title>
+    <meta name="description" content="When creating an archive in the 7z format, 7-Zip uses a technique called solid compression to bundle multiple files together into a single continuous data stream before applying compression algorithms like LZMA or LZMA2. The solid block size setting deter">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-processes-solid-block-sizes">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Processes Solid Block Sizes - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-processes-solid-block-sizes" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When creating an archive in the 7z format, 7-Zip uses a technique called solid compression to bundle multiple files together into a single continuous data stream before applying compression algorithms like LZMA or LZMA2. The solid block size setting deter" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-processes-solid-block-sizes">How 7-Zip Processes Solid
+Block Sizes</h1>
+<p>When creating an archive in the 7z format, 7-Zip uses a technique
+called solid compression to bundle multiple files together into a single
+continuous data stream before applying compression algorithms like LZMA
+or LZMA2. The solid block size setting determines the maximum
+uncompressed volume of data allowed in one continuous stream before a
+new block is initiated. By configuring this parameter, users directly
+manipulate how 7-Zip balances overall compression efficiency against
+multi-threading capabilities, decompression speeds, and archive fault
+tolerance.</p>
+<h3 id="file-sorting-and-concatenation">File Sorting and
+Concatenation</h3>
+<p>Before compression begins, 7-Zip sorts files based on metadata,
+prioritizing file extensions, names, and modification dates. This
+organization ensures that identical or closely related file types are
+grouped adjacent to one another.</p>
+<p>Once sorted, 7-Zip treats these files not as individual files, but as
+a single contiguous stream of bytes. This allows the compression
+dictionary to reference redundant data patterns that appear across
+entirely different files, which drastically reduces the final archive
+size when dealing with collections of similar files (such as source code
+or text documents).</p>
+<h3 id="solid-block-boundary-enforcement">Solid Block Boundary
+Enforcement</h3>
+<p>During the creation process, 7-Zip tracks the cumulative uncompressed
+size of the files being read into the active stream.</p>
+<ul>
+<li><strong>Reaching the Limit:</strong> Once the uncompressed byte
+count crosses the designated solid block size threshold (such as 2 GB, 4
+GB, or a custom value), 7-Zip closes the current solid block.</li>
+<li><strong>Flushing the Stream:</strong> Closing a block flushes the
+compression state and resets the dictionary window.</li>
+<li><strong>Starting a New Block:</strong> The next file in the queue
+begins a completely separate, independent solid block, repeating the
+sorting-and-streaming process.</li>
+</ul>
+<p>If the solid block size is set to "Solid" (infinite), 7-Zip packs all
+files into a single unbroken block. Conversely, setting it to
+"Non-solid" forces the archiver to treat each file as its own
+independent block.</p>
+<h3 id="multi-threading-and-cpu-utilization">Multi-Threading and CPU
+Utilization</h3>
+<p>Solid block sizes directly govern how 7-Zip utilizes modern
+multi-core processors:</p>
+<ul>
+<li><strong>Independent Threads:</strong> Because a solid block relies
+on past data within that exact stream, a single solid block cannot be
+compressed across multiple threads using the legacy LZMA algorithm.</li>
+<li><strong>LZMA2 Handling:</strong> Under LZMA2, 7-Zip can split data
+into chunks across threads within a block, but distinct solid blocks are
+inherently independent.</li>
+<li><strong>Parallel Block Processing:</strong> When multiple solid
+blocks are defined, 7-Zip can assign each block to a separate CPU
+thread, allowing distinct groups of files to be compressed completely in
+parallel without thread contention.</li>
+</ul>
+<h3 id="trade-offs-in-block-sizing">Trade-Offs in Block Sizing</h3>
+<p>Adjusting the solid block size alters archive performance
+characteristics:</p>
+<ul>
+<li><strong>Compression Ratio:</strong> Larger solid blocks provide
+higher compression ratios because the sliding dictionary has a
+continuous flow of data from which to find matching patterns.</li>
+<li><strong>Extraction Speed:</strong> To extract a single file from
+inside a solid block, 7-Zip must decompress all preceding data within
+that specific block up to the target file. Smaller solid blocks
+significantly speed up random file access and selective extraction.</li>
+<li><strong>Data Recovery:</strong> If corruption occurs within a solid
+block, all subsequent data within that same block may become
+inaccessible. Limiting the block size isolates corruption to a single
+block, protecting the integrity of the rest of the archive.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-processes-solid-block-sizes';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

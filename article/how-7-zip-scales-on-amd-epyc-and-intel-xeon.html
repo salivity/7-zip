@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Scales on AMD EPYC and Intel Xeon - 7-zip</title>
+    <meta name="description" content="This article explores how the open-source archiver 7-Zip scales across high-core-count enterprise processors, specifically AMD EPYC and Intel Xeon platforms. While 7-Zip’s native LZMA and LZMA2 compression algorithms offer built-in multithreading that ben">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-scales-on-amd-epyc-and-intel-xeon">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Scales on AMD EPYC and Intel Xeon - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-scales-on-amd-epyc-and-intel-xeon" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explores how the open-source archiver 7-Zip scales across high-core-count enterprise processors, specifically AMD EPYC and Intel Xeon platforms. While 7-Zip’s native LZMA and LZMA2 compression algorithms offer built-in multithreading that ben" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-scales-on-amd-epyc-and-intel-xeon">How 7-Zip Scales on
+AMD EPYC and Intel Xeon</h1>
+<p>This article explores how the open-source archiver 7-Zip scales
+across high-core-count enterprise processors, specifically AMD EPYC and
+Intel Xeon platforms. While 7-Zip’s native LZMA and LZMA2 compression
+algorithms offer built-in multithreading that benefits greatly from
+parallel processing, performance gains often hit diminishing returns on
+ultra-dense, multi-socket architectures due to memory bandwidth limits,
+cache contention, and non-uniform memory access (NUMA) overhead.</p>
+<h3 id="the-parallel-architecture-of-lzma2">The Parallel Architecture of
+LZMA2</h3>
+<p>7-Zip scales across multiple cores primarily through the LZMA2
+compression algorithm. Unlike the original LZMA format, which was
+largely serial, LZMA2 divides uncompressed data streams into independent
+blocks and distributes them across available CPU threads.</p>
+<p>Because each thread can compress its designated block independently,
+compression workloads scale near-linearly on consumer chips and mid-tier
+enterprise processors up to 16 to 32 cores. However, decompression
+remains fundamentally less parallelized than compression, often
+utilizing only a fraction of the available threads because it depends
+heavily on block boundaries and sequential dependencies within the
+compressed stream.</p>
+<h3 id="diminishing-returns-at-high-core-counts">Diminishing Returns at
+High Core Counts</h3>
+<p>When deployed on modern server chips featuring 64, 96, or 128 cores
+per socket (such as AMD EPYC Genoa/Bergamo or Intel Xeon Sapphire
+Rapids/Emerald Rapids), 7-Zip rarely scales linearly across all threads
+in a single process. Several hardware-level bottlenecks emerge:</p>
+<ul>
+<li><strong>Memory Bandwidth Saturation:</strong> Compression requires
+significant memory bandwidth to continuously read input streams and
+write hash tables. When dozens of threads compete simultaneously for RAM
+access, memory channels become a major bottleneck, regardless of raw
+compute headroom.</li>
+<li><strong>Cache Contention:</strong> LZMA uses large dictionary sizes
+to achieve high compression ratios. If the working set per thread
+exceeds the processor's L3 cache, performance drops sharply as threads
+are forced to fetch data from main memory.</li>
+<li><strong>NUMA and Inter-Socket Latency:</strong> Multi-die processors
+and dual-socket configurations split CPU cores into multiple NUMA nodes.
+When a single 7-Zip instance spawns threads across different compute
+dies or CPU sockets, high-latency interconnect traffic across AMD
+Infinity Fabric or Intel UPI degrades performance.</li>
+</ul>
+<h3 id="amd-epyc-vs-intel-xeon-in-7-zip-scaling">AMD EPYC vs. Intel Xeon
+in 7-Zip Scaling</h3>
+<p>Both processor families handle high-thread compression workloads
+differently:</p>
+<ul>
+<li><strong>AMD EPYC:</strong> With its chiplet architecture and massive
+pools of L3 cache—especially on "X" variants featuring 3D V-Cache—EPYC
+excels at keeping dictionary data close to the execution cores. However,
+scheduling 128 or more threads within a single task across multiple Core
+Complex Dies (CCDs) introduces inter-core synchronization latency.</li>
+<li><strong>Intel Xeon:</strong> Intel's monolithic and tiled
+architectures typically offer strong per-core throughput and balanced
+memory access. Xeon handles multi-threaded tasks efficiently, but
+configurations with smaller L3 cache allocations per core may experience
+earlier memory bandwidth saturation compared to high-cache EPYC
+alternatives.</li>
+</ul>
+<h3 id="optimization-strategies-for-server-deployments">Optimization
+Strategies for Server Deployments</h3>
+<p>To achieve maximum compression efficiency on high-core-count servers,
+executing a single 7-Zip process with maximum threads (e.g.,
+<code>-mmt128</code>) is often counterproductive. The following
+adjustments yield better performance:</p>
+<ol type="1">
+<li><strong>Process Parallelism:</strong> Instead of running one archive
+job across 64+ cores, partition workloads into multiple concurrent jobs
+pinned to specific NUMA nodes or CPU sockets using tools like
+<code>numactl</code> on Linux or CPU affinity settings on Windows.</li>
+<li><strong>Cap Thread Counts:</strong> In most LZMA2 configurations,
+sweet-spot efficiency peaks between 16 and 32 threads per archive job.
+Capping threads to this range avoids excessive thread management
+overhead.</li>
+<li><strong>Balance Dictionary Size with RAM:</strong> Reduce dictionary
+sizes when using higher thread counts to ensure each active thread fits
+within the local cache tier, minimizing costly trips to system
+memory.</li>
+</ol></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-scales-on-amd-epyc-and-intel-xeon';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

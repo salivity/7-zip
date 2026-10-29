@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Memory Consumption: Dictionary and Threads - 7-zip</title>
+    <meta name="description" content="Memory consumption in 7-Zip is primarily dictated by the compression algorithm, the selected dictionary size, the match finder method, and the number of concurrent threads. While decompression memory scales almost exclusively with the dictionary size, com">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-memory-consumption-dictionary-and-threads">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Memory Consumption: Dictionary and Threads - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-memory-consumption-dictionary-and-threads" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Memory consumption in 7-Zip is primarily dictated by the compression algorithm, the selected dictionary size, the match finder method, and the number of concurrent threads. While decompression memory scales almost exclusively with the dictionary size, com" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-memory-consumption-dictionary-and-threads">7-Zip Memory
+Consumption: Dictionary and Threads</h1>
+<p>Memory consumption in 7-Zip is primarily dictated by the compression
+algorithm, the selected dictionary size, the match finder method, and
+the number of concurrent threads. While decompression memory scales
+almost exclusively with the dictionary size, compression memory scales
+dramatically as the number of CPU threads increases under multi-threaded
+algorithms like LZMA2. Understanding the underlying formulas allows
+users to optimize compression speed without exhausting system RAM.</p>
+<h2 id="decompression-memory-formula">Decompression Memory Formula</h2>
+<p>Decompression requires significantly less memory than compression and
+is largely independent of thread count for a single archive stream:</p>
+<p><span class="math display">\[\text{Decompression Memory} \approx D +
+2 \text{ MB}\]</span></p>
+<ul>
+<li><strong><span class="math inline">\(D\)</span></strong>: The
+dictionary size used during compression (e.g., 16 MB, 64 MB, 128
+MB).</li>
+<li><strong>Overhead</strong>: A small buffer allocation, typically
+between 2 MB and 4 MB.</li>
+</ul>
+<p>Because the decompressor only needs to maintain the sliding
+dictionary window to rebuild the data, memory consumption directly
+mirrors the dictionary size.</p>
+<h2 id="compression-memory-formula">Compression Memory Formula</h2>
+<p>Compression memory usage depends heavily on the match finder
+algorithm and the number of threads (<span
+class="math inline">\(T\)</span>). In modern 7-Zip archives, the default
+algorithm is <strong>LZMA2</strong>, which divides data into blocks and
+compresses them concurrently across multiple threads.</p>
+<h3 id="the-general-formula-lzma2">The General Formula (LZMA2)</h3>
+<p><span class="math display">\[\text{Total Compression Memory} \approx
+T \times (M \times D) + \text{System Buffers}\]</span></p>
+<p>Where:</p>
+<ul>
+<li><strong><span class="math inline">\(T\)</span></strong>: Number of
+active compression threads.</li>
+<li><strong><span class="math inline">\(D\)</span></strong>: Dictionary
+size.</li>
+<li><strong><span class="math inline">\(M\)</span></strong>: Match
+finder multiplier (determined by the compression level).</li>
+<li><strong>System Buffers</strong>: Additional chunk and I/O buffers
+(typically <span class="math inline">\(D \times 2\)</span> to <span
+class="math inline">\(D \times 4\)</span> per stream, plus base program
+overhead of roughly 10–30 MB).</li>
+</ul>
+<h3 id="match-finder-multipliers-m">Match Finder Multipliers (<span
+class="math inline">\(M\)</span>)</h3>
+<p>The multiplier depends on the match finder (MF) selected by the
+compression level:</p>
+<ul>
+<li><strong>BT4 (Normal, Maximum, Ultra levels):</strong> <span
+class="math inline">\(M \approx 11.5\)</span></li>
+<li><strong>BT3 (Fast level):</strong> <span class="math inline">\(M
+\approx 9.5\)</span></li>
+<li><strong>BT2 / HC4 (Fastest level):</strong> <span
+class="math inline">\(M \approx 7.5\)</span></li>
+</ul>
+<p>For default, high-compression workflows using BT4, each thread
+requires roughly <strong><span class="math inline">\(11.5 \times
+D\)</span></strong> for the sliding window and hash chains.</p>
+<h3 id="practical-simplified-formula-for-bt4-defaultultra">Practical
+Simplified Formula for BT4 (Default/Ultra)</h3>
+<p>For standard high-compression presets with <span
+class="math inline">\(T\)</span> threads:</p>
+<p><span class="math display">\[\text{Memory} \approx T \times (11.5
+\times D) + (T \times 2 \times D)\]</span></p>
+<p>In practice, 7-Zip simplifies its GUI memory estimation to
+approximately:</p>
+<p><span class="math display">\[\text{Memory} \approx T \times (12
+\text{ to } 13) \times D\]</span></p>
+<p><em>(Note: If <span class="math inline">\(T\)</span> exceeds the
+number of available chunks or data size is smaller than the block size,
+memory usage caps at the number of active blocks.)</em></p>
+<h2 id="legacy-lzma-lzma1-memory-formula">Legacy LZMA (LZMA1) Memory
+Formula</h2>
+<p>Unlike LZMA2, the original LZMA algorithm does not support
+multi-block parallelism. It supports a maximum of 2 threads (one for
+compression and one for match finding):</p>
+<p><span class="math display">\[\text{LZMA Compression Memory} \approx
+11.5 \times D + 6 \text{ MB}\]</span></p>
+<p>Threads set beyond 2 in LZMA mode do not increase memory consumption
+or compression speed.</p>
+<h2 id="example-calculation">Example Calculation</h2>
+<p>Compressing an archive using <strong>LZMA2</strong>,
+<strong>Ultra</strong> (BT4 match finder), a <strong>64 MB
+dictionary</strong>, and <strong>8 threads</strong>:</p>
+<ol type="1">
+<li><strong>Per-thread memory:</strong> <span class="math inline">\(64
+\text{ MB} \times 11.5 = 736 \text{ MB}\)</span></li>
+<li><strong>Total thread allocation:</strong> <span
+class="math inline">\(8 \times 736 \text{ MB} = 5,888 \text{
+MB}\)</span></li>
+<li><strong>Buffer and overhead allocation:</strong> <span
+class="math inline">\(\approx 8 \times 128 \text{ MB} \approx 1,024
+\text{ MB}\)</span></li>
+<li><strong>Estimated total memory:</strong> <span
+class="math inline">\(\approx 6.9 \text{ GB}\)</span> to <span
+class="math inline">\(7.2 \text{ GB}\)</span> of RAM.</li>
+</ol></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-memory-consumption-dictionary-and-threads';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Encrypted Self-Extracting Archives in 7-Zip - 7-zip</title>
+    <meta name="description" content="This article explains how 7-Zip creates password-protected self-extracting (SFX) archives for secure file sharing without requiring extraction software on the recipient&#39;s machine. You will learn the exact steps to build these executable packages, the secu">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/create-encrypted-self-extracting-archives-in-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Create Encrypted Self-Extracting Archives in 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/create-encrypted-self-extracting-archives-in-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how 7-Zip creates password-protected self-extracting (SFX) archives for secure file sharing without requiring extraction software on the recipient&#39;s machine. You will learn the exact steps to build these executable packages, the secu" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="create-encrypted-self-extracting-archives-in-7-zip">Create
+Encrypted Self-Extracting Archives in 7-Zip</h1>
+<p>This article explains how 7-Zip creates password-protected
+self-extracting (SFX) archives for secure file sharing without requiring
+extraction software on the recipient's machine. You will learn the exact
+steps to build these executable packages, the security protocols
+involved, and the practical limitations you must consider before sharing
+them.</p>
+<p>Yes, 7-Zip can create password-protected self-extracting archives. A
+self-extracting archive packages your compressed files inside an
+<code>.exe</code> file. When the recipient runs the file, an extraction
+prompt appears, allowing them to unpack the contents even if they do not
+have 7-Zip or any other archiving tool installed.</p>
+<h3 id="how-to-create-a-password-protected-sfx-archive">How to Create a
+Password-Protected SFX Archive</h3>
+<ol type="1">
+<li><strong>Select Your Files:</strong> Open File Explorer, select the
+files or folders you want to compress, right-click them, and navigate to
+<strong>7-Zip &gt; Add to archive...</strong></li>
+<li><strong>Set Archive Format to 7z:</strong> Under the <strong>Archive
+format</strong> dropdown menu, ensure <strong>7z</strong> is selected.
+The SFX option is not available for formats like ZIP or TAR.</li>
+<li><strong>Enable Self-Extracting Mode:</strong> Check the box labeled
+<strong>Create SFX archive</strong>. The output file extension in the
+top field will automatically change from <code>.7z</code> to
+<code>.exe</code>.</li>
+<li><strong>Configure Encryption:</strong> In the
+<strong>Encryption</strong> section on the right:
+<ul>
+<li>Enter your chosen password and confirm it.</li>
+<li>Ensure the <strong>Encryption method</strong> is set to
+<strong>AES-256</strong>.</li>
+</ul></li>
+<li><strong>Generate the Archive:</strong> Click <strong>OK</strong> to
+compress and encrypt the files into an executable.</li>
+</ol>
+<h3 id="security-and-technical-details">Security and Technical
+Details</h3>
+<p>7-Zip uses 256-bit AES encryption to protect the contents of the
+archive. This provides robust, industry-standard security against
+brute-force attacks, provided a strong, complex passphrase is used.</p>
+<p>When the recipient double-clicks the generated <code>.exe</code> file
+on a Windows system, the embedded 7-Zip extraction module launches. It
+prompts the user for the password before unpacking the data to the
+specified destination.</p>
+<h3 id="limitations-and-considerations">Limitations and
+Considerations</h3>
+<p>While convenient, using encrypted SFX archives involves several
+limitations:</p>
+<ul>
+<li><strong>Visible File Names:</strong> In the standard 7-Zip
+interface, checking "Create SFX archive" disables the "Encrypt file
+names" option. Consequently, anyone who runs the <code>.exe</code> file
+can view the names and sizes of the files inside, even though they
+cannot extract or read the actual contents without the password.</li>
+<li><strong>Email and Gateway Blocks:</strong> Most corporate email
+servers, webmail providers, and messaging apps automatically block
+<code>.exe</code> attachments to prevent malware distribution. You may
+need to share the file via secure cloud storage rather than direct email
+attachments.</li>
+<li><strong>Platform Dependency:</strong> Standard 7-Zip SFX archives
+are Windows executable files. They will not natively execute on macOS or
+Linux systems without third-party compatibility tools or manual
+extraction via archive managers.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/create-encrypted-self-extracting-archives-in-7-zip';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Create and Extract ISO Files with 7-Zip - 7-zip</title>
+    <meta name="description" content="This guide covers everything you need to know about handling ISO files with 7-Zip and alternative tools. While 7-Zip is an exceptional, lightweight utility for opening and extracting files from disk images, it cannot generate bootable ISO files on its own">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-create-and-extract-iso-files-with-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Create and Extract ISO Files with 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-create-and-extract-iso-files-with-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide covers everything you need to know about handling ISO files with 7-Zip and alternative tools. While 7-Zip is an exceptional, lightweight utility for opening and extracting files from disk images, it cannot generate bootable ISO files on its own" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-create-and-extract-iso-files-with-7-zip">How to Create
+and Extract ISO Files with 7-Zip</h1>
+<p>This guide covers everything you need to know about handling ISO
+files with 7-Zip and alternative tools. While 7-Zip is an exceptional,
+lightweight utility for opening and extracting files from disk images,
+it cannot generate bootable ISO files on its own. Below, you will find
+direct instructions on how to extract ISO images using 7-Zip, followed
+by the standard method for creating functional, bootable ISOs using
+dedicated disc-authoring software.</p>
+<h2 id="how-to-extract-an-iso-image-using-7-zip">How to Extract an ISO
+Image Using 7-Zip</h2>
+<p>7-Zip natively treats ISO files as standard archives. You can extract
+the entire contents or specific files without mounting the image to a
+virtual drive.</p>
+<h3 id="method-1-using-the-context-menu">Method 1: Using the Context
+Menu</h3>
+<ol type="1">
+<li>Locate the ISO file in Windows File Explorer.</li>
+<li>Right-click the file and navigate to <strong>7-Zip</strong>.</li>
+<li>Select <strong>Extract Here</strong> to dump the files into the
+current folder, or select <strong>Extract to "[Filename]"</strong> to
+unpack the files into a new, dedicated folder.</li>
+</ol>
+<h3 id="method-2-using-the-7-zip-file-manager">Method 2: Using the 7-Zip
+File Manager</h3>
+<ol type="1">
+<li>Open <strong>7-Zip File Manager</strong>.</li>
+<li>Browse to the directory containing your ISO file.</li>
+<li>Double-click the ISO file to view its internal contents.</li>
+<li>Select the files or folders you need, click the
+<strong>Extract</strong> button on the top toolbar, select a destination
+folder, and click <strong>OK</strong>.</li>
+</ol>
+<hr />
+<h2 id="why-7-zip-cannot-create-bootable-iso-images">Why 7-Zip Cannot
+Create Bootable ISO Images</h2>
+<p>7-Zip only supports packing archives into formats like
+<code>.7z</code>, <code>.zip</code>, <code>.tar</code>, and
+<code>.wim</code>. It cannot write to the ISO file format.</p>
+<p>Furthermore, a "bootable" ISO requires a specialized master boot
+record or an El Torito boot catalog that instructs hardware BIOS or UEFI
+firmware on how to start an operating system. Standard archive managers
+cannot inject these boot sectors into an archive.</p>
+<hr />
+<h2 id="how-to-create-a-bootable-iso-image">How to Create a Bootable ISO
+Image</h2>
+<p>To create a functional bootable ISO from extracted files, use a
+dedicated disc authoring utility such as <strong>ImgBurn</strong> or
+<strong>AnyBurn</strong>.</p>
+<h3 id="steps-using-imgburn">Steps Using ImgBurn:</h3>
+<ol type="1">
+<li>Download and launch <strong>ImgBurn</strong>.</li>
+<li>Select <strong>Create image file from files/folders</strong>.</li>
+<li>In the <strong>Source</strong> section, browse and select the folder
+containing your bootable setup files (such as an extracted Windows or
+Linux distribution).</li>
+<li>In the <strong>Destination</strong> section, specify where to save
+the output <code>.iso</code> file.</li>
+<li>Go to the <strong>Advanced</strong> tab on the right panel, then
+select the <strong>Bootable Disc</strong> sub-tab.</li>
+<li>Check the box labeled <strong>Make Image Bootable</strong>.</li>
+<li>Set the <strong>Boot Image</strong> path by selecting the boot
+loader file (e.g., <code>boot\etfsboot.com</code> for older Windows
+installers or the designated UEFI <code>.bin</code>/<code>.efi</code>
+file).</li>
+<li>Set the <strong>Sectors To Load</strong> (typically <code>8</code>
+for modern UEFI/BIOS loaders) and leave the developer ID standard.</li>
+<li>Click the <strong>Build</strong> icon at the bottom left to generate
+your bootable ISO file.</li>
+</ol></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-to-create-and-extract-iso-files-with-7-zip';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

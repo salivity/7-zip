@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract EXT2, EXT3, and EXT4 Images with 7-Zip - 7-zip</title>
+    <meta name="description" content="7-Zip natively supports opening and extracting raw files from EXT2, EXT3, and EXT4 partition images without requiring Linux environments or specialized mounting software. This utility can treat these raw Linux filesystem dumps as standard archives, allowi">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/extract-ext-2-ext-3-and-ext-4-images-with-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Extract EXT2, EXT3, and EXT4 Images with 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/extract-ext-2-ext-3-and-ext-4-images-with-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip natively supports opening and extracting raw files from EXT2, EXT3, and EXT4 partition images without requiring Linux environments or specialized mounting software. This utility can treat these raw Linux filesystem dumps as standard archives, allowi" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="extract-ext2-ext3-and-ext4-images-with-7-zip">Extract EXT2,
+EXT3, and EXT4 Images with 7-Zip</h1>
+<p>7-Zip natively supports opening and extracting raw files from EXT2,
+EXT3, and EXT4 partition images without requiring Linux environments or
+specialized mounting software. This utility can treat these raw Linux
+filesystem dumps as standard archives, allowing Windows users to browse,
+view, and extract internal files and folders directly to their local
+storage.</p>
+<h3 id="how-7-zip-handles-ext-partitions">How 7-Zip Handles EXT
+Partitions</h3>
+<p>7-Zip includes built-in parsers for various filesystem formats,
+including the Linux Extended Filesystem family (EXT2, EXT3, and EXT4).
+When you create a raw sector-by-sector image of a partition—typically
+generated using tools like the Linux <code>dd</code> command or disk
+imaging utilities—7-Zip treats that binary image just like a
+<code>.zip</code> or <code>.7z</code> archive.</p>
+<p>Supported raw image extensions generally include:</p>
+<ul>
+<li><code>.img</code></li>
+<li><code>.raw</code></li>
+<li><code>.dd</code></li>
+<li>Files without extensions or generic binary dumps containing an EXT
+superblock.</li>
+</ul>
+<h3 id="steps-to-extract-files">Steps to Extract Files</h3>
+<ol type="1">
+<li><strong>Locate the Image File:</strong> Ensure your image is a
+direct, uncompressed raw partition dump.</li>
+<li><strong>Open with 7-Zip:</strong> Right-click the image file,
+navigate to the <strong>7-Zip</strong> context menu, and select
+<strong>Open archive</strong>. If the context menu does not recognize
+the extension, open the 7-Zip File Manager manually, locate the file,
+and double-click it.</li>
+<li><strong>Browse the Contents:</strong> 7-Zip displays the root
+directory hierarchy of the Linux filesystem, including standard
+directories such as <code>/etc</code>, <code>/home</code>, and
+<code>/var</code>.</li>
+<li><strong>Extract:</strong> Select the specific files or folders you
+need, click the <strong>Extract</strong> button, choose your destination
+folder, and confirm.</li>
+</ol>
+<h3 id="technical-considerations-and-limitations">Technical
+Considerations and Limitations</h3>
+<ul>
+<li><strong>Read-Only Access:</strong> 7-Zip can only read and extract
+data from EXT images. It cannot modify, add, or delete files inside an
+EXT2, EXT3, or EXT4 image.</li>
+<li><strong>Full Disk Images vs. Partition Images:</strong> If the raw
+file is a full disk image containing a partition table (MBR or GPT)
+rather than a single partition dump, 7-Zip will usually open the file
+and display each partition as an individual item (e.g.,
+<code>0.ext</code>, <code>1.fat</code>). You must double-click the
+specific EXT partition inside 7-Zip to access its files.</li>
+<li><strong>Linux Permissions and Symlinks:</strong> When extracting to
+an NTFS or FAT32 filesystem on Windows, standard Linux permissions
+(POSIX permissions), ownership, and symbolic links may be lost or
+converted into standard text files or empty shortcuts.</li>
+<li><strong>Compression and Encryption:</strong> 7-Zip handles
+uncompressed raw dumps. If the image is compressed with tools like
+<code>gzip</code> or <code>xz</code> (e.g., <code>.img.gz</code>), you
+must first decompress the container to access the underlying
+<code>.img</code> file. Encrypted partitions (such as LUKS) cannot be
+read by 7-Zip directly.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/extract-ext-2-ext-3-and-ext-4-images-with-7-zip';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

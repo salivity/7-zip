@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compress Each Subfolder Separately with 7-Zip - 7-zip</title>
+    <meta name="description" content="Compressing multiple folders individually can be tedious when done manually through a graphical interface. This guide demonstrates how to automate 7-Zip using the command line across Windows Command Prompt, PowerShell, and Linux Bash. By running a simple">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/compress-each-subfolder-separately-with-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Compress Each Subfolder Separately with 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/compress-each-subfolder-separately-with-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Compressing multiple folders individually can be tedious when done manually through a graphical interface. This guide demonstrates how to automate 7-Zip using the command line across Windows Command Prompt, PowerShell, and Linux Bash. By running a simple" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="compress-each-subfolder-separately-with-7-zip">Compress Each
+Subfolder Separately with 7-Zip</h1>
+<p>Compressing multiple folders individually can be tedious when done
+manually through a graphical interface. This guide demonstrates how to
+automate 7-Zip using the command line across Windows Command Prompt,
+PowerShell, and Linux Bash. By running a simple loop script, you can
+automatically scan a directory, iterate through each individual
+subdirectory, and compress each one into its own standalone
+<code>.7z</code> or <code>.zip</code> archive.</p>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>Ensure 7-Zip is installed on your system. On Windows, the default
+installation path is typically
+<code>C:\Program Files\7-Zip\7z.exe</code>. You can either call the
+executable using its full path or add the 7-Zip installation directory
+to your system's <code>PATH</code> environment variable.</p>
+<hr />
+<h3 id="method-1-windows-command-prompt-cmd">Method 1: Windows Command
+Prompt (CMD)</h3>
+<h4 id="command-prompt-one-liner">Command Prompt One-Liner</h4>
+<p>Open Command Prompt, navigate to the parent folder containing your
+subdirectories using the <code>cd</code> command, and run the following
+command:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="at">/d</span> <span class="er">%X</span> <span class="er">in</span> <span class="er">(*)</span> <span class="er">do</span> <span class="er">&quot;C:\Program</span> <span class="er">Files\7-Zip\7z.exe&quot;</span> <span class="er">a</span> <span class="er">&quot;%X.7z&quot;</span> <span class="er">&quot;%X&quot;</span></span></code></pre></div>
+<h4 id="in-a-batch-script-bat">In a Batch Script (.bat)</h4>
+<p>If you are saving the command inside a <code>.bat</code> file, double
+the percent signs (<code>%%X</code>):</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">@</span><span class="bu">echo off</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="at">/d</span> <span class="er">%%X</span> <span class="er">in</span> <span class="er">(*)</span> <span class="er">do</span> <span class="er">(</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;C:\Program Files\7-Zip\7z.exe&quot;</span> a <span class="st">&quot;</span><span class="sc">%%</span><span class="va">X</span><span class="st">.7z&quot;</span> <span class="st">&quot;</span><span class="sc">%%</span><span class="va">X</span><span class="st">&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">pause</span></span></code></pre></div>
+<ul>
+<li><strong><code>/d</code></strong>: Limits the loop to directories
+only.</li>
+<li><strong><code>%X</code></strong>: Represents the current folder name
+in the loop.</li>
+<li><strong><code>a</code></strong>: Tells 7-Zip to add files to an
+archive.</li>
+<li><strong><code>"%X.7z"</code></strong>: Sets the output archive name
+to match the folder name. Change <code>.7z</code> to <code>.zip</code>
+if you prefer standard ZIP archives.</li>
+</ul>
+<hr />
+<h3 id="method-2-windows-powershell">Method 2: Windows PowerShell</h3>
+<p>PowerShell offers a modern and flexible approach using the
+<code>Get-ChildItem</code> cmdlet. Open PowerShell, navigate to your
+target directory, and execute:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Directory <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;</span> <span class="st">&quot;C:\Program Files\7-Zip\7z.exe&quot;</span> a <span class="st">&quot;</span><span class="op">$(</span><span class="va">$_</span><span class="op">.</span><span class="fu">Name</span><span class="op">)</span><span class="st">.7z&quot;</span> <span class="st">&quot;</span><span class="op">$(</span><span class="va">$_</span><span class="op">.</span><span class="fu">FullName</span><span class="op">)</span><span class="st">&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<ul>
+<li><strong><code>-Directory</code></strong>: Ensures only folders are
+retrieved, ignoring loose files in the root folder.</li>
+<li><strong><code>ForEach-Object</code></strong>: Iterates through each
+folder returned.</li>
+<li><strong><code>&amp;</code></strong>: The call operator used to
+execute the 7-Zip binary.</li>
+<li><strong><code>$($_.Name).7z</code></strong>: Uses the folder's name
+for the archive.</li>
+<li><strong><code>$($_.FullName)</code></strong>: Supplies the full path
+of the source directory.</li>
+</ul>
+<hr />
+<h3 id="method-3-linux--macos-bash">Method 3: Linux / macOS (Bash)</h3>
+<p>If you are using Linux or macOS with <code>p7zip</code> installed,
+use a Bash <code>for</code> loop:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> d <span class="kw">in</span> <span class="pp">*</span>/<span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">7z</span> a <span class="st">&quot;</span><span class="va">${d</span><span class="op">%</span>/<span class="va">}</span><span class="st">.7z&quot;</span> <span class="st">&quot;</span><span class="va">$d</span><span class="st">&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<ul>
+<li><strong><code>*/</code></strong>: Matches all subdirectories in the
+current path.</li>
+<li><strong><code>${d%/}</code></strong>: Strips the trailing slash from
+the directory name so the resulting archive is named
+<code>foldername.7z</code> instead of <code>foldername/.7z</code>.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/compress-each-subfolder-separately-with-7-zip';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

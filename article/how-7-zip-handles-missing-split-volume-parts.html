@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Handles Missing Split Volume Parts - 7-zip</title>
+    <meta name="description" content="7-Zip requires all parts of a split multi-volume archive to be present and undamaged to guarantee a complete extraction. When dealing with corrupt or missing split volumes—such as .7z.001, .part1.rar, or .z01 files—7-Zip strictly enforces data integrity c">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-handles-missing-split-volume-parts">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Handles Missing Split Volume Parts - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-handles-missing-split-volume-parts" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip requires all parts of a split multi-volume archive to be present and undamaged to guarantee a complete extraction. When dealing with corrupt or missing split volumes—such as .7z.001, .part1.rar, or .z01 files—7-Zip strictly enforces data integrity c" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-handles-missing-split-volume-parts">How 7-Zip Handles
+Missing Split Volume Parts</h1>
+<p>7-Zip requires all parts of a split multi-volume archive to be
+present and undamaged to guarantee a complete extraction. When dealing
+with corrupt or missing split volumes—such as <code>.7z.001</code>,
+<code>.part1.rar</code>, or <code>.z01</code> files—7-Zip strictly
+enforces data integrity checks. This article explains how 7-Zip detects
+missing or broken archive segments, the difference in handling between
+solid and non-solid compression, and the limitations of recovering
+partial data.</p>
+<h3 id="the-role-of-archive-headers">The Role of Archive Headers</h3>
+<p>To open or list the contents of a split archive, 7-Zip requires the
+volume containing the main archive header. In formats like 7z and RAR,
+this metadata is typically stored in the first volume (e.g.,
+<code>.001</code> or <code>.part1.rar</code>) or the last volume.</p>
+<p>If the volume containing the archive header is missing or
+corrupted:</p>
+<ul>
+<li>7-Zip will display an error such as "Cannot open file as
+archive."</li>
+<li>The program cannot read the file directory, file names, or file
+sizes, preventing extraction entirely.</li>
+</ul>
+<p>If the header volume is intact but subsequent volumes are
+missing:</p>
+<ul>
+<li>7-Zip can open the archive and display the full file list.</li>
+<li>Extraction will proceed normally until the decompressor requests
+data residing on a missing or corrupt segment.</li>
+</ul>
+<h3 id="solid-vs-non-solid-archives">Solid vs. Non-Solid Archives</h3>
+<p>The extraction behavior heavily depends on whether the multi-volume
+archive was compressed using "solid" mode.</p>
+<ul>
+<li><strong>Solid Archives (Default for .7z):</strong> In a solid
+archive, all files are packed into a single, continuous data stream
+before being split into separate volumes. If any volume is missing or
+corrupted, 7-Zip cannot decompress the stream past the point of
+corruption. Any files positioned after the damaged or missing section in
+the stream cannot be extracted, even if the subsequent volumes are
+intact.</li>
+<li><strong>Non-Solid Archives:</strong> In non-solid mode, each file is
+compressed independently. If a volume is missing, 7-Zip can still
+successfully extract files that are entirely contained within the intact
+volumes. However, any individual file that physically spans across the
+split boundary into a missing volume will fail extraction.</li>
+</ul>
+<h3 id="error-messages-generated-by-7-zip">Error Messages Generated by
+7-Zip</h3>
+<p>When 7-Zip encounters a broken or missing part during the extraction
+process, it halts the operation and displays one of several standard
+errors:</p>
+<ul>
+<li><strong>Unexpected End of Data:</strong> Occurs when the next
+sequential volume is completely missing from the directory.</li>
+<li><strong>Data Error:</strong> Occurs when a split part exists, but
+the compressed data inside is altered, truncated, or corrupt.</li>
+<li><strong>CRC Failed:</strong> Occurs after extraction when the
+computed checksum of the unpacked file does not match the checksum
+recorded in the header.</li>
+</ul>
+<h3 id="recovery-capabilities">Recovery Capabilities</h3>
+<p>7-Zip does not natively support built-in error recovery records for
+the <code>.7z</code> format. Unlike RAR archives that may contain
+dedicated parity recovery records, 7-Zip cannot rebuild missing data
+chunks on its own.</p>
+<p>When extraction fails on a corrupt or missing split file, 7-Zip
+typically deletes the incomplete output file from the destination folder
+by default. Users attempting to salvage partial data from non-solid
+archives must explicitly configure the extraction settings to keep
+broken files, or utilize command-line options such as <code>-bb0</code>
+combined with extraction attempts on isolated individual files.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-handles-missing-split-volume-parts';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

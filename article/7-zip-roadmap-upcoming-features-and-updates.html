@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Roadmap: Upcoming Features and Updates - 7-zip</title>
+    <meta name="description" content="This article explores the future trajectory of 7-Zip, highlighting planned capabilities, community-requested upgrades, and ongoing technical improvements. Because lead developer Igor Pavlov maintains a conservative, stability-first development cycle witho">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-roadmap-upcoming-features-and-updates">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Roadmap: Upcoming Features and Updates - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-roadmap-upcoming-features-and-updates" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explores the future trajectory of 7-Zip, highlighting planned capabilities, community-requested upgrades, and ongoing technical improvements. Because lead developer Igor Pavlov maintains a conservative, stability-first development cycle witho" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-roadmap-upcoming-features-and-updates">7-Zip Roadmap:
+Upcoming Features and Updates</h1>
+<p>This article explores the future trajectory of 7-Zip, highlighting
+planned capabilities, community-requested upgrades, and ongoing
+technical improvements. Because lead developer Igor Pavlov maintains a
+conservative, stability-first development cycle without a rigid public
+roadmap, insight into upcoming releases comes directly from recent
+source updates, official SourceForge discussions, and ongoing
+optimization efforts. Readers will gain a clear overview of expected
+performance enhancements, cross-platform expansions, modern algorithm
+considerations, and security improvements slated for future
+versions.</p>
+<h3 id="hardware-acceleration-and-architecture-optimizations">Hardware
+Acceleration and Architecture Optimizations</h3>
+<p>Future 7-Zip releases continue to focus heavily on extraction and
+compression speed by maximizing modern CPU instructions. Key
+hardware-focused developments include:</p>
+<ul>
+<li><strong>Expanded ARM64 Optimization:</strong> Following native ARM64
+support on Windows and Linux, future builds are slated to include
+further assembly optimizations specifically tuned for Apple Silicon and
+modern ARM processors.</li>
+<li><strong>Broader AVX-512 Support:</strong> Optimization for vector
+extensions continues to expand beyond hashing (such as SHA-256) into
+various stages of the LZMA and LZMA2 compression pipelines, speeding up
+large-scale data processing on high-end server and desktop chips.</li>
+<li><strong>Higher Core-Count Scalability:</strong> Adjustments to
+multi-threading memory management aim to prevent bottlenecks on modern
+processors featuring 32, 64, or more logical threads.</li>
+</ul>
+<h3 id="compression-algorithms-and-format-improvements">Compression
+Algorithms and Format Improvements</h3>
+<p>While the 7z archive format remains mature, refinements in how data
+is structured and processed remain an ongoing priority:</p>
+<ul>
+<li><strong>Refinements to LZMA2:</strong> Incremental adjustments to
+chunk division, dictionary sizes, and memory usage during extreme
+compression profiles.</li>
+<li><strong>Zstandard and Modern Codec Inquiries:</strong> While
+third-party forks (such as 7-Zip-ZS) have integrated algorithms like
+Zstandard and Brotli, official development is steadily evaluating how
+best to support these formats natively or via modular plugins without
+compromising the core program's security model.</li>
+<li><strong>Large Archive Handling:</strong> Improvements in handling
+archives containing millions of files or datasets larger than several
+terabytes, particularly regarding RAM overhead during indexing.</li>
+</ul>
+<h3 id="cross-platform-development-and-feature-parity">Cross-Platform
+Development and Feature Parity</h3>
+<p>The introduction of official Linux and macOS binaries
+(<code>7zz</code>) marked a major milestone for the project, and
+upcoming versions will deepen this integration:</p>
+<ul>
+<li><strong>POSIX Parity:</strong> Bringing advanced metadata handling,
+accurate permission preservation, and system-specific extended
+attributes up to parity with the legacy Windows edition.</li>
+<li><strong>Command-Line Standardization:</strong> Streamlining command
+syntax and error codes across Windows and Unix-like operating systems to
+provide uniform behavior for automated scripts and enterprise
+deployment.</li>
+</ul>
+<h3 id="security-and-operating-system-integration">Security and
+Operating System Integration</h3>
+<p>Security hardening remains the driving force behind recent patch
+cadences and future development goals:</p>
+<ul>
+<li><strong>Propagation of Security Flags:</strong> Ongoing updates to
+ensure proper handling of security metadata, such as Windows
+Zone.Identifier (Mark of the Web), ensuring that extracted executable
+files carry proper origin warnings.</li>
+<li><strong>Path Traversal Mitigations:</strong> Strict validation
+checks to prevent directory traversal vulnerabilities and symbolic link
+exploitation when decompressing untrusted archives.</li>
+<li><strong>Windows 11 Shell Polish:</strong> Continued refinement of
+integration with Windows 11’s revamped right-click context menu,
+reducing friction when compressing or extracting files within modern
+file management interfaces.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-roadmap-upcoming-features-and-updates';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

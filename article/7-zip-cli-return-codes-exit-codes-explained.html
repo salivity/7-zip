@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip CLI Return Codes: Exit Codes Explained - 7-zip</title>
+    <meta name="description" content="When running 7-Zip from the command line, the utility returns specific numeric exit codes (also called error levels or return codes) to indicate whether an operation completed successfully, encountered minor issues, or failed completely. This guide provid">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-cli-return-codes-exit-codes-explained">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip CLI Return Codes: Exit Codes Explained - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-cli-return-codes-exit-codes-explained" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When running 7-Zip from the command line, the utility returns specific numeric exit codes (also called error levels or return codes) to indicate whether an operation completed successfully, encountered minor issues, or failed completely. This guide provid" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-cli-return-codes-exit-codes-explained">7-Zip CLI Return
+Codes: Exit Codes Explained</h1>
+<p>When running 7-Zip from the command line, the utility returns
+specific numeric exit codes (also called error levels or return codes)
+to indicate whether an operation completed successfully, encountered
+minor issues, or failed completely. This guide provides a direct
+breakdown of all official 7-Zip command-line interface (CLI) return
+codes so you can accurately handle success, warnings, and errors in your
+automated scripts and batch files.</p>
+<h3 id="7-zip-exit-codes-list">7-Zip Exit Codes List</h3>
+<p>7-Zip uses standard process exit codes to communicate the result of
+an archive creation, extraction, or testing process:</p>
+<ul>
+<li><p><strong>0 – Success (No error)</strong><br />
+The operation completed successfully without any issues. All specified
+files were processed, compressed, or extracted as intended.</p></li>
+<li><p><strong>1 – Warning (Non-fatal error)</strong><br />
+The operation completed, but minor issues occurred. This most commonly
+happens when 7-Zip cannot access one or more files because they are
+locked by another program. The remaining files are still processed, but
+the archive may be incomplete.</p></li>
+<li><p><strong>2 – Fatal error</strong><br />
+A critical error occurred that prevented the operation from completing.
+Typical causes include a corrupted archive, incorrect passwords, invalid
+archive headers, or missing output destinations.</p></li>
+<li><p><strong>7 – Command line error</strong><br />
+The command syntax was incorrect. This occurs if you supply invalid
+command switches, misplace arguments, or use unsupported
+options.</p></li>
+<li><p><strong>8 – Not enough memory</strong><br />
+The system ran out of RAM required to perform the compression,
+decompression, or dictionary allocation needed for the
+operation.</p></li>
+<li><p><strong>255 – User stopped the process</strong><br />
+The operation was manually terminated by the user before completion
+(such as pressing <code>Ctrl + C</code> in the console).</p></li>
+</ul>
+<h3 id="how-to-check-7-zip-return-codes-in-scripts">How to Check 7-Zip
+Return Codes in Scripts</h3>
+<p>You can inspect these codes immediately after running a 7-Zip command
+to handle errors programmatically.</p>
+<h4 id="windows-command-prompt--batch">Windows Command Prompt /
+Batch</h4>
+<p>In Windows batch scripts, capture the result using the
+<code>%ERRORLEVEL%</code> variable:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>7z a backup.7z C:\Data\*</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="pp">%</span><span class="va">ERRORLEVEL</span><span class="pp">%</span> <span class="kw">EQU</span> 0 <span class="kw">(</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> Backup completed successfully.</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">)</span> <span class="cf">else</span> <span class="cf">if</span> <span class="pp">%</span><span class="va">ERRORLEVEL</span><span class="pp">%</span> <span class="kw">EQU</span> 1 <span class="kw">(</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> Backup finished with warnings.</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">)</span> <span class="cf">else</span> <span class="kw">(</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> Backup failed with error code <span class="pp">%</span><span class="va">ERRORLEVEL</span><span class="pp">%</span>.</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">)</span></span></code></pre></div>
+<h4 id="powershell">PowerShell</h4>
+<p>In PowerShell, use the <code>$LASTEXITCODE</code> variable:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&amp;</span> 7z a backup<span class="op">.</span>7z C<span class="op">:</span>\<span class="kw">Data</span>\<span class="op">*</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span><span class="va">$LASTEXITCODE</span> <span class="op">-eq</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Write-Host</span> <span class="st">&quot;Success&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Write-Host</span> <span class="st">&quot;7-Zip failed with code </span><span class="va">$LASTEXITCODE</span><span class="st">&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="linux--bash">Linux / Bash</h4>
+<p>In Unix-like environments using <code>p7zip</code>, check the
+<code>$?</code> variable:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a backup.7z /home/user/data/<span class="pp">*</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">STATUS</span><span class="op">=</span><span class="va">$?</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="va">$STATUS</span> <span class="ot">-eq</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Success&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> <span class="bu">[</span> <span class="va">$STATUS</span> <span class="ot">-eq</span> 1 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Warning: Some files could not be read&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Error: Failed with code </span><span class="va">$STATUS</span><span class="st">&quot;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code></pre></div></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-cli-return-codes-exit-codes-explained';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

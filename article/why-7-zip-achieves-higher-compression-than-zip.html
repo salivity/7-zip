@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why 7-Zip Achieves Higher Compression Than ZIP - 7-zip</title>
+    <meta name="description" content="7-Zip consistently outperforms standard ZIP utilities in data compression, often shrinking files by 30% to 70% more than the legacy .zip format. This superior performance is primarily driven by 7-Zip’s native LZMA and LZMA2 algorithms, support for massive">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/why-7-zip-achieves-higher-compression-than-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why 7-Zip Achieves Higher Compression Than ZIP - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/why-7-zip-achieves-higher-compression-than-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip consistently outperforms standard ZIP utilities in data compression, often shrinking files by 30% to 70% more than the legacy .zip format. This superior performance is primarily driven by 7-Zip’s native LZMA and LZMA2 algorithms, support for massive" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="why-7-zip-achieves-higher-compression-than-zip">Why 7-Zip
+Achieves Higher Compression Than ZIP</h1>
+<p>7-Zip consistently outperforms standard ZIP utilities in data
+compression, often shrinking files by 30% to 70% more than the legacy
+<code>.zip</code> format. This superior performance is primarily driven
+by 7-Zip’s native LZMA and LZMA2 algorithms, support for massive
+dictionary sizes, solid archiving capabilities, and specialized
+byte-level filters. While traditional ZIP utilities prioritize speed and
+backward compatibility, 7-Zip is engineered to maximize redundancy
+detection across entire file sets.</p>
+<h3 id="the-lzma-and-lzma2-algorithms">The LZMA and LZMA2
+Algorithms</h3>
+<p>Standard ZIP archives rely almost exclusively on the DEFLATE
+algorithm, which was created in the early 1990s. DEFLATE combines LZ77
+(sliding window compression) with Huffman coding. While fast and
+universally supported, DEFLATE is constrained by older architectural
+limits.</p>
+<p>In contrast, 7-Zip’s proprietary <code>.7z</code> format uses LZMA
+(Lempel-Ziv-Markov chain Algorithm) and its multithreaded successor,
+LZMA2. LZMA improves on DEFLATE in two key ways:</p>
+<ul>
+<li><strong>Complex Range Coding:</strong> Instead of Huffman coding,
+LZMA uses a range coder paired with Markov modeling, allowing it to
+predict and encode repeating data patterns with fractional-bit
+precision.</li>
+<li><strong>Variable Search Depths:</strong> LZMA evaluates data
+patterns more thoroughly, finding matches that DEFLATE skips in favor of
+processing speed.</li>
+</ul>
+<h3 id="massive-dictionary-sizes">Massive Dictionary Sizes</h3>
+<p>Data compression algorithms find repeated sequences of data within a
+"dictionary" or sliding window.</p>
+<ul>
+<li><strong>Standard ZIP (DEFLATE):</strong> Typically restricted to a
+32 KB sliding window. This means the algorithm can only identify
+matching patterns if they occur within 32 kilobytes of each other.</li>
+<li><strong>7-Zip (LZMA/LZMA2):</strong> Supports dictionary sizes
+ranging from 64 KB up to several gigabytes (commonly 16 MB to 64 MB by
+default). A larger dictionary allows 7-Zip to spot duplicate strings and
+structural redundancies across large distances within files or across
+multiple files, drastically increasing compression efficiency on large
+datasets.</li>
+</ul>
+<h3 id="solid-archiving">Solid Archiving</h3>
+<p>Traditional ZIP archives compress each file individually before
+packaging them into a container. If you compress 100 similar text files
+using standard ZIP, the utility compresses each file from scratch
+without learning from the preceding ones. While this allows users to
+extract a single file quickly without reading the entire archive, it
+sacrifices substantial compression potential.</p>
+<p>The <code>.7z</code> format utilizes "solid archiving." It treats
+multiple files as a single, continuous stream of data. Redundant data
+that exists across hundreds of different files—such as repeated headers,
+shared code, or duplicate media assets—is indexed and compressed as a
+unified block, resulting in massive space savings for collections of
+related files.</p>
+<h3 id="specialized-preprocessing-filters">Specialized Preprocessing
+Filters</h3>
+<p>7-Zip includes architecture-specific preprocessing filters designed
+for executable files and libraries, known as BCJ and BCJ2 converters.
+Machine code (like x86, ARM, or PowerPC binaries) contains thousands of
+near-identical absolute jump and call instructions that differ only by
+subtle target offsets. BCJ filters normalize these relative addresses
+into absolute values before LZMA compression begins. This normalization
+turns seemingly random code into highly repetitive patterns,
+significantly reducing the final size of software installations and
+binaries.</p>
+<h3 id="optimized-deflate-implementation">Optimized DEFLATE
+Implementation</h3>
+<p>Even when 7-Zip is instructed to output a standard <code>.zip</code>
+file rather than a <code>.7z</code> file, it frequently produces a
+smaller file than other archive managers. 7-Zip uses a heavily optimized
+implementation of the DEFLATE algorithm that searches deeper for optimal
+match sequences, squeezing 2% to 10% more efficiency out of the legacy
+ZIP format while retaining full compatibility with standard extraction
+tools.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/why-7-zip-achieves-higher-compression-than-zip';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

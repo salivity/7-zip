@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Stores File Timestamps and Attributes - 7-zip</title>
+    <meta name="description" content="This article explains how the 7-Zip archiving tool and its native 7z format record, structure, and preserve file metadata. It covers the specific data structures used for Creation, Modification, and Access timestamps, the precision of these records, and t">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-stores-file-timestamps-and-attributes">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Stores File Timestamps and Attributes - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-stores-file-timestamps-and-attributes" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how the 7-Zip archiving tool and its native 7z format record, structure, and preserve file metadata. It covers the specific data structures used for Creation, Modification, and Access timestamps, the precision of these records, and t" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-stores-file-timestamps-and-attributes">How 7-Zip
+Stores File Timestamps and Attributes</h1>
+<p>This article explains how the 7-Zip archiving tool and its native 7z
+format record, structure, and preserve file metadata. It covers the
+specific data structures used for Creation, Modification, and Access
+timestamps, the precision of these records, and the mechanism used to
+store standard Windows and POSIX file attributes within the archive
+headers.</p>
+<h3 id="the-7z-header-architecture">The 7z Header Architecture</h3>
+<p>The native 7z format organizes metadata using a modular,
+property-based header stream rather than attaching metadata individually
+to each file stream. File properties—such as timestamps, sizes, CRC
+checksums, and attributes—are grouped into dedicated arrays.</p>
+<p>To conserve space, 7-Zip typically compresses the entire header block
+using LZMA or LZMA2. Within this compressed header, metadata types are
+identified by predefined Property IDs (such as <code>kCTime</code> for
+Creation Time, <code>kMTime</code> for Modification Time, and
+<code>kATime</code> for Last Access Time).</p>
+<h3 id="timestamp-format-and-precision">Timestamp Format and
+Precision</h3>
+<p>Unlike legacy ZIP archives that rely on MS-DOS timestamp formats
+limited to two-second precision, the 7z format uses high-precision
+tracking:</p>
+<ul>
+<li><strong>Format:</strong> Timestamps are stored as 64-bit unsigned
+integers corresponding to the Windows <code>FILETIME</code>
+structure.</li>
+<li><strong>Epoch:</strong> The values measure the number of
+100-nanosecond intervals elapsed since January 1, 1601, in Coordinated
+Universal Time (UTC).</li>
+<li><strong>Resolution:</strong> 7-Zip natively preserves time down to
+100 nanoseconds, matching the native precision of the NTFS file
+system.</li>
+<li><strong>Time Zones:</strong> Because timestamps are converted to and
+stored in UTC, they remain immune to daylight saving changes and local
+time zone shifts across different systems.</li>
+</ul>
+<h3 id="handling-defined-and-undefined-timestamps">Handling Defined and
+Undefined Timestamps</h3>
+<p>Not every file within an archive necessarily possesses all three
+timestamps. 7-Zip handles this using boolean flags and bit vectors:</p>
+<ol type="1">
+<li><strong>AllAreDefined Flag:</strong> A single byte indicates whether
+every file in the folder or archive has a valid timestamp for that
+specific property.</li>
+<li><strong>Bitmaps:</strong> If some files lack a timestamp (for
+example, if Last Access tracking is disabled on the host system), 7-Zip
+includes a bitmask where each bit specifies whether the corresponding
+file includes the timestamp.</li>
+<li><strong>Data Array:</strong> Following the definition flags, the
+64-bit integer values are stored sequentially only for the files marked
+as valid.</li>
+</ol>
+<h3 id="storage-of-file-attributes">Storage of File Attributes</h3>
+<p>File attributes are separated from timestamps and stored under
+specific attribute property blocks:</p>
+<ul>
+<li><strong>Windows Attributes (<code>kWinAttrib</code>):</strong> 7-Zip
+records Windows file flags (such as Read-Only, Hidden, System, Archive,
+and Directory) as 32-bit unsigned integers (<code>DWORD</code>). These
+match the standard <code>GetFileAttributes</code> definitions from the
+Windows API.</li>
+<li><strong>Presence Mapping:</strong> Similar to timestamps, a boolean
+flag or bitmask specifies which entries carry attribute data, followed
+by an array of 32-bit values.</li>
+<li><strong>POSIX and Unix Permissions:</strong> In cross-platform
+implementations or specialized builds (like p7zip), Unix-style
+permissions (read, write, execute permissions and file type bits) are
+mapped into higher-order bits or handled through custom properties to
+ensure cross-platform compatibility without corrupting Windows attribute
+parsing.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-stores-file-timestamps-and-attributes';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

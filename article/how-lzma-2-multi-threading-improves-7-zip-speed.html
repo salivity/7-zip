@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How LZMA2 Multi-Threading Improves 7-Zip Speed - 7-zip</title>
+    <meta name="description" content="This article explains how the LZMA2 algorithm enhances data compression performance in 7-Zip through multi-threading. While the original LZMA algorithm was fundamentally restricted to single-threaded or dual-threaded operations, LZMA2 was designed to divi">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-lzma-2-multi-threading-improves-7-zip-speed">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How LZMA2 Multi-Threading Improves 7-Zip Speed - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-lzma-2-multi-threading-improves-7-zip-speed" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how the LZMA2 algorithm enhances data compression performance in 7-Zip through multi-threading. While the original LZMA algorithm was fundamentally restricted to single-threaded or dual-threaded operations, LZMA2 was designed to divi" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-lzma2-multi-threading-improves-7-zip-speed">How LZMA2
+Multi-Threading Improves 7-Zip Speed</h1>
+<p>This article explains how the LZMA2 algorithm enhances data
+compression performance in 7-Zip through multi-threading. While the
+original LZMA algorithm was fundamentally restricted to single-threaded
+or dual-threaded operations, LZMA2 was designed to divide data into
+independent chunks, allowing modern multi-core processors to compress
+data streams concurrently. Understanding this architecture clarifies why
+LZMA2 scales efficiently across high-core systems, how it minimizes
+throughput bottlenecks, and what trade-offs it introduces regarding
+memory usage and compression ratios.</p>
+<h3 id="the-single-thread-bottleneck-of-original-lzma">The Single-Thread
+Bottleneck of Original LZMA</h3>
+<p>The original LZMA (Lempel-Ziv-Markov chain-Algorithm) provides
+exceptionally high compression ratios, but its internal mechanics make
+parallelization difficult. LZMA relies on a single continuous sliding
+window and dynamic probability models that depend directly on the
+sequence of preceding bytes. Because the encoder must know the state of
+previous data to encode the next byte, the workload cannot easily be
+split across multiple CPU cores without breaking the compression
+context. As a result, standard LZMA in 7-Zip is typically limited to at
+most two threads (one for finding matches and one for entropy encoding),
+leaving modern multi-core CPUs largely underutilized.</p>
+<h3 id="how-lzma2-solves-the-problem-block-based-parallelism">How LZMA2
+Solves the Problem: Block-Based Parallelism</h3>
+<p>LZMA2 resolves this architectural limitation by packaging the LZMA
+stream into discrete, independent chunks. Instead of treating an entire
+file or archive as one uninterrupted data stream, LZMA2 segments the
+uncompressed input into separate blocks.</p>
+<ol type="1">
+<li><strong>Independent Chunk Processing</strong>: 7-Zip assigns
+individual data chunks to separate worker threads. Each thread
+compresses its designated block independently of the others.</li>
+<li><strong>Concurrent Execution</strong>: On an 8-core, 16-thread CPU,
+7-Zip can assign 16 chunks simultaneously, utilizing the full processing
+capacity of the hardware.</li>
+<li><strong>Stream Reconstruction</strong>: Once the threads finish
+compressing their individual chunks, 7-Zip assembles the resulting LZMA2
+blocks into the final <code>.7z</code> container sequentially.</li>
+</ol>
+<p>Because each thread operates on an isolated chunk, there is no need
+for cross-thread synchronization during the computationally heavy
+compression phase. This eliminates lock contention and allows
+near-linear scaling with core counts up to the thread limit configured
+by the user.</p>
+<h3 id="handling-incompressible-data-efficiently">Handling
+Incompressible Data Efficiently</h3>
+<p>Another way LZMA2 improves speed through multi-threading is its
+handling of incompressible data. If a thread encounters a block
+containing data that does not compress effectively (such as
+already-compressed media files or encrypted archives), LZMA2 detects
+this condition quickly. The thread can immediately store the chunk
+uncompressed instead of expending intensive CPU cycles attempting to
+optimize an LZMA model. This dynamic switching prevents single threads
+from stalling the entire multi-threaded pipeline on difficult data
+blocks.</p>
+<h3 id="the-impact-on-compression-ratio-and-memory">The Impact on
+Compression Ratio and Memory</h3>
+<p>While LZMA2 multi-threading dramatically reduces compression time, it
+introduces two practical trade-offs:</p>
+<ul>
+<li><strong>Slight Compression Ratio Loss</strong>: Because the sliding
+dictionary state must periodically reset between independent blocks, the
+encoder cannot reference patterns across chunk boundaries. This
+typically results in a negligible decrease in compression ratio compared
+to a single-stream LZMA archive, but the speed gains usually outweigh
+the minimal increase in file size.</li>
+<li><strong>Increased Memory Consumption</strong>: Each active thread
+requires its own dictionary buffer in RAM. If 7-Zip is configured to use
+a 64 MB dictionary with 8 threads, the compression process will require
+significantly more system memory than a single-threaded job. If system
+RAM is insufficient, 7-Zip will automatically reduce the number of
+active threads to prevent swapping.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-lzma-2-multi-threading-improves-7-zip-speed';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forensic Analysis of 7-Zip Archive Metadata - 7-zip</title>
+    <meta name="description" content="Digital forensics investigators frequently examine 7-Zip (.7z) archives to uncover evidence of data exfiltration, malware staging, and file tampering. This article details how investigators locate, extract, and interpret metadata embedded within the 7-Zip">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/forensic-analysis-of-7-zip-archive-metadata">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Forensic Analysis of 7-Zip Archive Metadata - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/forensic-analysis-of-7-zip-archive-metadata" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Digital forensics investigators frequently examine 7-Zip (.7z) archives to uncover evidence of data exfiltration, malware staging, and file tampering. This article details how investigators locate, extract, and interpret metadata embedded within the 7-Zip" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="forensic-analysis-of-7-zip-archive-metadata">Forensic Analysis
+of 7-Zip Archive Metadata</h1>
+<p>Digital forensics investigators frequently examine 7-Zip (.7z)
+archives to uncover evidence of data exfiltration, malware staging, and
+file tampering. This article details how investigators locate, extract,
+and interpret metadata embedded within the 7-Zip container format,
+explaining the technical structure of 7z headers, the critical
+timestamps and attributes preserved during compression, and the
+methodologies used to analyze both cleartext and encrypted archives.</p>
+<h2 id="the-architecture-of-7-zip-metadata">The Architecture of 7-Zip
+Metadata</h2>
+<p>Unlike standard ZIP files that store metadata in local file headers
+preceding each compressed file, the 7-Zip format consolidates metadata
+into dedicated header structures. A standard <code>.7z</code> file
+begins with a 32-byte Start Header that contains a specific signature
+(<code>37 7A BC AF 27 1C</code>), version information, and a relative
+offset pointing to the Main Header (often called the End Header).</p>
+<p>The Main Header contains the complete metadata catalog for the
+archive, including:</p>
+<ul>
+<li><strong>File Hierarchy:</strong> Original filenames, directory
+paths, and folder structures.</li>
+<li><strong>Stream Descriptors:</strong> Uncompressed sizes, packed
+sizes, and compression method identifiers (e.g., LZMA, LZMA2, PPMd,
+BZip2).</li>
+<li><strong>Data Integrity Values:</strong> CRC-32 checksums for each
+individual stream.</li>
+<li><strong>File Attributes:</strong> Standard Windows/DOS attributes
+(such as Read-Only, Hidden, System, and Archive flags).</li>
+</ul>
+<h2 id="extracting-forensic-timestamps">Extracting Forensic
+Timestamps</h2>
+<p>7-Zip preserves high-resolution timestamps, which are critical for
+building digital forensic timelines. By default, 7-Zip stores timestamps
+in the Windows <code>FILETIME</code> structure—a 64-bit value
+representing 100-nanosecond intervals since January 1, 1601 (UTC).</p>
+<p>Investigators analyze up to three distinct timestamps per file:</p>
+<ol type="1">
+<li><strong>Last Modified Time (MTime):</strong> Included by default in
+most 7-Zip archives.</li>
+<li><strong>Creation Time (CTime):</strong> Captured if the archive was
+created using specific switches or modern GUI versions configured to
+preserve complete time records.</li>
+<li><strong>Last Access Time (ATime):</strong> Preserved conditionally
+depending on the host operating system's settings and creation
+flags.</li>
+</ol>
+<p>Forensic practitioners compare these internal timestamps against the
+external file system timestamps of the <code>.7z</code> container
+itself. A discrepancy where internal files have creation or modification
+times newer than the container’s creation time suggests archive
+manipulation, container copying, or potential timestomping.</p>
+<h2 id="methods-and-tools-for-metadata-extraction">Methods and Tools for
+Metadata Extraction</h2>
+<p>Investigators rely on both native command-line utilities and
+specialized digital forensics platforms to parse metadata without
+modifying the original evidence.</p>
+<h3 id="technical-command-line-extraction">Technical Command-Line
+Extraction</h3>
+<p>The 7-Zip command-line tool provides a raw, structured dump of all
+metadata using the <code>-slt</code> (Show Technical Information)
+switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> l <span class="at">-slt</span> target_archive.7z</span></code></pre></div>
+<p>This output displays the exact compression method, physical block
+sizes, characteristics, CRC values, and complete 64-bit timestamps for
+every entry.</p>
+<h3 id="automated-forensic-suites">Automated Forensic Suites</h3>
+<p>Tools such as Magnet AXIOM, OpenText EnCase, and Autopsy
+automatically parse 7-Zip containers during ingestion. These suites
+parse the central header, extract individual file entries into the case
+database, and populate the master timeline with internal metadata,
+allowing investigators to correlate compressed file activity with system
+logs and registry events.</p>
+<h3 id="low-level-hex-and-python-parsing">Low-Level Hex and Python
+Parsing</h3>
+<p>When an archive is damaged, truncated, or subjected to anti-forensic
+wiping, examiners parse raw byte sequences using hex editors or
+libraries like <code>py7zr</code>. Investigators search for the
+<code>kEnd</code> marker (<code>0x00</code>) and metadata property IDs
+(such as <code>kCTime</code> [<code>0x13</code>], <code>kMTime</code>
+[<code>0x14</code>], and <code>kWinAttributes</code>
+[<code>0x15</code>]) to manually reconstruct archive contents when
+headers cannot be automatically read.</p>
+<h2 id="investigating-encrypted-archives">Investigating Encrypted
+Archives</h2>
+<p>7-Zip supports AES-256 encryption in two modes, each presenting
+different investigative scenarios:</p>
+<ol type="1">
+<li><strong>Standard Payload Encryption:</strong> The compressed data
+streams are encrypted, but the Main Header remains unencrypted. In this
+state, investigators can view all metadata—including file names,
+directory trees, file sizes, and timestamps—without requiring the
+decryption password. This allows examiners to prove that sensitive data
+was staged even if the file contents cannot be decrypted.</li>
+<li><strong>Header Encryption (<code>-mhe=on</code>):</strong> Both the
+data streams and the Main Header are encrypted. The initial 32-byte
+Start Header remains visible, indicating the archive type and encryption
+parameters, but all file names, timestamps, and attributes are hidden.
+In this scenario, examiners must recover the passphrase through memory
+analysis (extracting keys from process memory), credential harvesting,
+or targeted password recovery attacks before any metadata can be
+parsed.</li>
+</ol></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/forensic-analysis-of-7-zip-archive-metadata';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

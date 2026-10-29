@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract In-Memory Streams with 7z.dll API - 7-zip</title>
+    <meta name="description" content="This guide provides an overview of how to extract archive streams entirely within memory using the 7z.dll library. While 7z.dll does not provide high-level, procedural helper functions for memory extraction, it exposes low-level COM-style entry points and">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/extract-in-memory-streams-with-7-z-dll-api">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Extract In-Memory Streams with 7z.dll API - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/extract-in-memory-streams-with-7-z-dll-api" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide provides an overview of how to extract archive streams entirely within memory using the 7z.dll library. While 7z.dll does not provide high-level, procedural helper functions for memory extraction, it exposes low-level COM-style entry points and" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="extract-in-memory-streams-with-7zdll-api">Extract In-Memory
+Streams with 7z.dll API</h1>
+<p>This guide provides an overview of how to extract archive streams
+entirely within memory using the <code>7z.dll</code> library. While
+<code>7z.dll</code> does not provide high-level, procedural helper
+functions for memory extraction, it exposes low-level COM-style entry
+points and interfaces that allow developers to handle archive processing
+in memory by wrapping buffers into custom stream objects.</p>
+<h3 id="the-exported-functions-of-7zdll">The Exported Functions of
+7z.dll</h3>
+<p><code>7z.dll</code> is designed as a minimalist C-style dynamic link
+library that exposes only a handful of exported functions. The functions
+exported by the DLL are:</p>
+<ul>
+<li><strong><code>CreateObject</code></strong>: The primary API function
+used for archive processing. It instantiates the internal COM-style
+classes (such as archive handlers) and queries the requested interface.
+<ul>
+<li>Signature:
+<code>STDAPI CreateObject(const GUID *clsID, const GUID *interfaceID, void **outObject);</code></li>
+</ul></li>
+<li><strong><code>GetNumberOfFormats</code></strong>: Returns the total
+number of archive formats supported by the compiled DLL.
+<ul>
+<li>Signature:
+<code>STDAPI GetNumberOfFormats(UINT32 *numFormats);</code></li>
+</ul></li>
+<li><strong><code>GetHandlerProperty</code></strong>: Retrieves metadata
+and configuration properties for a specific archive format handler
+index.
+<ul>
+<li>Signature:
+<code>STDAPI GetHandlerProperty(PROPID propID, PROPVARIANT *value);</code></li>
+</ul></li>
+<li><strong><code>GetHandlerProperty2</code></strong>: An extended
+version of <code>GetHandlerProperty</code> that accepts a format index
+parameter to query properties for specific archive codecs.
+<ul>
+<li>Signature:
+<code>STDAPI GetHandlerProperty2(UInt32 formatIndex, PROPID propID, PROPVARIANT *value);</code></li>
+</ul></li>
+</ul>
+<h3 id="implementing-in-memory-extraction-via-createobject">Implementing
+In-Memory Extraction via CreateObject</h3>
+<p>Because <code>CreateObject</code> only provides raw interface
+pointers, extracting an archive strictly in memory requires implementing
+7-Zip's custom I/O interfaces inside your application. You do not write
+to or read from disk; instead, you wrap memory buffers within these
+interfaces.</p>
+<h4 id="1-required-interfaces">1. Required Interfaces</h4>
+<ul>
+<li><strong><code>IInArchive</code></strong>: Obtained directly from
+<code>CreateObject</code>. It controls archive operations, including
+opening the archive format and triggering decompression.</li>
+<li><strong><code>IInStream</code></strong>: Must be implemented by the
+caller. This interface wraps your in-memory input buffer (the raw
+archive bytes). It derives from <code>ISequentialInStream</code> and
+requires implementations for <code>Read</code> and <code>Seek</code>
+operations so <code>7z.dll</code> can navigate the archive
+structure.</li>
+<li><strong><code>IArchiveExtractCallback</code></strong>: Must be
+implemented by the caller to handle extraction events, check completion
+statuses, and direct the output destination.</li>
+<li><strong><code>ISequentialOutStream</code></strong>: Must be
+implemented by the caller to receive the decompressed payload. The
+<code>IArchiveExtractCallback::GetStream</code> method supplies an
+instance of this interface to <code>7z.dll</code>, directing the
+decompressed data into an allocated memory buffer via its
+<code>Write</code> method.</li>
+</ul>
+<h4 id="2-the-extraction-workflow">2. The Extraction Workflow</h4>
+<ol type="1">
+<li><strong>Load the Library</strong>: Load <code>7z.dll</code> using
+<code>LoadLibrary</code> and locate the <code>CreateObject</code> entry
+point via <code>GetProcAddress</code>.</li>
+<li><strong>Create the Archive Handler</strong>: Call
+<code>CreateObject</code> using the specific format Class ID (such as
+<code>CLSID_CFormat7z</code> or <code>CLSID_CFormatZip</code>) to obtain
+an <code>IInArchive</code> pointer.</li>
+<li><strong>Open the Stream</strong>: Instantiate your custom
+<code>IInStream</code> wrapper over the archive's memory buffer. Pass
+this instance to <code>IInArchive::Open</code>, specifying a maximum
+scan size.</li>
+<li><strong>Initiate Extraction</strong>: Call
+<code>IInArchive::Extract</code>. Pass the indices of the items to
+decompress, a test/extract mode flag, and an instance of your custom
+<code>IArchiveExtractCallback</code>.</li>
+<li><strong>Capture Output</strong>: When <code>7z.dll</code>
+decompressess an item, it invokes
+<code>IArchiveExtractCallback::GetStream</code>. Return your custom
+<code>ISequentialOutStream</code> implementation, which appends incoming
+bytes directly to your target memory buffer.</li>
+</ol></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/extract-in-memory-streams-with-7-z-dll-api';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

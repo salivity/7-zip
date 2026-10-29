@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Pipe to Stdout Command Line Switch - 7-zip</title>
+    <meta name="description" content="This article covers how to force 7-Zip into pipe mode for standard output (stdout) stream processing using the command line. You will learn the exact flag required to write data directly to stdout, how to use it for both decompression and compression work">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-pipe-to-stdout-command-line-switch">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Pipe to Stdout Command Line Switch - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-pipe-to-stdout-command-line-switch" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article covers how to force 7-Zip into pipe mode for standard output (stdout) stream processing using the command line. You will learn the exact flag required to write data directly to stdout, how to use it for both decompression and compression work" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-pipe-to-stdout-command-line-switch">7-Zip Pipe to Stdout
+Command Line Switch</h1>
+<p>This article covers how to force 7-Zip into pipe mode for standard
+output (stdout) stream processing using the command line. You will learn
+the exact flag required to write data directly to stdout, how to use it
+for both decompression and compression workflows, and how to effectively
+integrate 7-Zip into terminal pipelines.</p>
+<p>The command line flag that forces pipe mode for stdout stream
+processing in 7-Zip is <code>-so</code>. When appended to a 7-Zip
+command, <code>-so</code> instructs the utility to send data directly to
+the standard output stream rather than writing files to the disk.</p>
+<h3 id="extracting-archives-to-stdout">Extracting Archives to
+Stdout</h3>
+<p>To decompress files directly to standard output, combine the
+<code>e</code> (extract) or <code>x</code> (extract with paths) command
+with the <code>-so</code> switch. This is commonly used to pipe
+decompressed text or data into other command-line utilities without
+generating intermediate files:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> e archive.7z data.txt <span class="at">-so</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;target_string&quot;</span></span></code></pre></div>
+<p>In this example, 7-Zip decompresses <code>data.txt</code> and sends
+the uncompressed bytes directly to <code>grep</code> via standard
+output.</p>
+<h3 id="creating-archives-to-stdout">Creating Archives to Stdout</h3>
+<p>The <code>-so</code> flag can also direct an entire archive's output
+stream to stdout during compression using the <code>a</code> (add)
+command. This allows you to redirect the compressed stream over a
+network, to another program, or into a redirected file:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-txz</span> <span class="at">-so</span> dummy.xz large_file.tar <span class="op">&gt;</span> output.tar.xz</span></code></pre></div>
+<p>When writing archive streams to stdout, ensure that the chosen
+archive format supports sequential stream writing. Streaming formats
+such as <code>.xz</code>, <code>.gzip</code>, and <code>.bzip2</code>
+work natively with <code>-so</code>. Formats like standard multi-file
+<code>.7z</code> or <code>.zip</code> often require file seeking to
+write directory metadata, which can restrict certain stdout compression
+operations.</p>
+<h3 id="stream-management-and-clean-output">Stream Management and Clean
+Output</h3>
+<p>When <code>-so</code> is specified, 7-Zip automatically suppresses
+standard informational banners from the <code>stdout</code> channel to
+protect data integrity, routing progress and diagnostics to
+<code>stderr</code> instead. To suppress operational messages completely
+and ensure an entirely clean stream, combine <code>-so</code> with the
+<code>-bso0</code> switch:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> e archive.7z file.bin <span class="at">-so</span> <span class="at">-bso0</span> <span class="op">&gt;</span> extracted_file.bin</span></code></pre></div></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-pipe-to-stdout-command-line-switch';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

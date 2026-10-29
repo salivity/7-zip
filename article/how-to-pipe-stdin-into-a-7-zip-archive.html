@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Pipe Stdin into a 7-Zip Archive - 7-zip</title>
+    <meta name="description" content="This guide explains how to stream standard input (stdin) directly into a 7-Zip archive using the command-line interface. By utilizing 7-Zip&#39;s built-in standard input switch, you can compress data streams from other programs on the fly without writing temp">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-pipe-stdin-into-a-7-zip-archive">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Pipe Stdin into a 7-Zip Archive - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-pipe-stdin-into-a-7-zip-archive" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to stream standard input (stdin) directly into a 7-Zip archive using the command-line interface. By utilizing 7-Zip&#39;s built-in standard input switch, you can compress data streams from other programs on the fly without writing temp" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-pipe-stdin-into-a-7-zip-archive">How to Pipe Stdin into a
+7-Zip Archive</h1>
+<p>This guide explains how to stream standard input (<code>stdin</code>)
+directly into a 7-Zip archive using the command-line interface. By
+utilizing 7-Zip's built-in standard input switch, you can compress data
+streams from other programs on the fly without writing temporary files
+to disk. Below, you will find the exact argument syntax, optional
+parameters for specifying file names, and practical command
+examples.</p>
+<h3 id="the--si-switch-syntax">The <code>-si</code> Switch Syntax</h3>
+<p>The command-line syntax for reading from standard input in 7-Zip is
+the <code>-si</code> switch.</p>
+<p>The general syntax format is:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>data-producer<span class="op">&gt;</span> <span class="kw">|</span> <span class="ex">7z</span> a <span class="op">&lt;</span>archive_name<span class="op">&gt;</span> -si<span class="pp">[</span><span class="ss">internal_file_name</span><span class="pp">]</span></span></code></pre></div>
+<h3 id="syntax-options">Syntax Options</h3>
+<ul>
+<li><strong><code>-si</code> (Default Name):</strong> If you use the
+<code>-si</code> flag without appending a name, 7-Zip creates an archive
+containing a single file with no name or an empty extension, depending
+on the archive format.</li>
+<li><strong><code>-si&lt;name&gt;</code> (Explicit Name):</strong> You
+can specify the filename to be used inside the archive by immediately
+appending the desired name to the switch without a space (e.g.,
+<code>-sidata.txt</code>).</li>
+</ul>
+<h3 id="practical-examples">Practical Examples</h3>
+<p><strong>1. Compress Standard Output to an Archive</strong></p>
+<p>To pipe the output of a file directly into a 7-Zip archive and name
+the compressed entry <code>backup.sql</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mysqldump</span> <span class="at">-u</span> root <span class="at">-p</span> database_name <span class="kw">|</span> <span class="ex">7z</span> a db_backup.7z <span class="at">-sibackup.sql</span></span></code></pre></div>
+<p><strong>2. Stream and Compress a <code>tar</code> Stream</strong></p>
+<p>When archiving directories on Linux or macOS while preserving
+permissions, pair <code>tar</code> with 7-Zip:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-cf</span> <span class="at">-</span> /var/log <span class="kw">|</span> <span class="ex">7z</span> a logs.tar.7z <span class="at">-si</span></span></code></pre></div>
+<p>In this case, 7-Zip treats the incoming <code>tar</code> stream as
+the payload for the <code>logs.tar.7z</code> container.</p>
+<p><strong>3. Pipe Stdin and Stream to Stdout</strong></p>
+<p>You can combine <code>-si</code> (standard input) with
+<code>-so</code> (standard output) to create a completely streamable
+compression pipeline:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> large_file.bin <span class="kw">|</span> <span class="ex">7z</span> a dummy.7z <span class="at">-si</span> <span class="at">-so</span> <span class="op">&gt;</span> compressed_output.7z</span></code></pre></div>
+<p>When using <code>-so</code>, the archive file parameter in the
+command acts as a placeholder, as the resulting compressed stream is
+redirected directly to standard output.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-to-pipe-stdin-into-a-7-zip-archive';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

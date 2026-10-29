@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract Files by Wildcard in 7-Zip Scripts - 7-zip</title>
+    <meta name="description" content="Automating file extraction from compressed archives is a common requirement in data processing pipelines and system administration. This guide explains how to extract specific files matching wildcard patterns using the 7-Zip command-line utility (7z.exe).">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/extract-files-by-wildcard-in-7-zip-scripts">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Extract Files by Wildcard in 7-Zip Scripts - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/extract-files-by-wildcard-in-7-zip-scripts" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Automating file extraction from compressed archives is a common requirement in data processing pipelines and system administration. This guide explains how to extract specific files matching wildcard patterns using the 7-Zip command-line utility (7z.exe)." />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="extract-files-by-wildcard-in-7-zip-scripts">Extract Files by
+Wildcard in 7-Zip Scripts</h1>
+<p>Automating file extraction from compressed archives is a common
+requirement in data processing pipelines and system administration. This
+guide explains how to extract specific files matching wildcard patterns
+using the 7-Zip command-line utility (<code>7z.exe</code>). You will
+learn the core commands, proper wildcard syntax, directory recursion
+options, and how to implement these commands within automated shell
+scripts.</p>
+<h3 id="basic-command-syntax">Basic Command Syntax</h3>
+<p>7-Zip provides two primary commands for extraction:</p>
+<ul>
+<li><code>e</code>: Extracts files from an archive, flattening the
+folder structure (all files go into a single directory).</li>
+<li><code>x</code>: Extracts files with their full directory paths
+intact.</li>
+</ul>
+<p>To extract files matching a specific pattern, append the wildcard
+string to the end of the command or specify it using the include switch
+(<code>-i</code>).</p>
+<p>Basic structure:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x <span class="op">&lt;</span>archive_name<span class="op">&gt;</span> <span class="st">&quot;&lt;wildcard_pattern&gt;&quot;</span> <span class="at">-o</span><span class="op">&lt;</span>output_directory<span class="op">&gt;</span> -y</span></code></pre></div>
+<ul>
+<li><code>-o&lt;output_directory&gt;</code>: Specifies the destination
+directory (note: no space between <code>-o</code> and the path).</li>
+<li><code>-y</code>: Assumes "yes" to all prompts, which prevents
+scripts from hanging on overwrite warnings.</li>
+</ul>
+<h3 id="wildcard-usage">Wildcard Usage</h3>
+<p>7-Zip supports standard wildcards:</p>
+<ul>
+<li><code>*</code>: Matches zero or more characters.</li>
+<li><code>?</code>: Matches any single character.</li>
+</ul>
+<h4 id="extracting-by-file-extension">Extracting by File Extension</h4>
+<p>To extract all <code>.csv</code> files from an archive regardless of
+where they are located:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>7z x archive.zip *.csv <span class="at">-o</span><span class="st">&quot;C:\ExtractedFiles&quot;</span> <span class="at">-r</span> <span class="at">-y</span></span></code></pre></div>
+<p>The <code>-r</code> switch enables recursion, ensuring 7-Zip searches
+through all subfolders inside the archive for matching <code>.csv</code>
+files.</p>
+<h4 id="extracting-by-prefix-or-pattern">Extracting by Prefix or
+Pattern</h4>
+<p>To extract log files generated on a specific date format (e.g.,
+<code>log_2023_*.txt</code>):</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>7z x logs.7z log_2023_*.txt <span class="at">-o</span><span class="st">&quot;C:\Logs&quot;</span> <span class="at">-y</span></span></code></pre></div>
+<h3 id="using-the-include-switch--i">Using the Include Switch
+(<code>-i</code>)</h3>
+<p>When scripts require multiple wildcard patterns or complex filtering,
+use the include switch syntax (<code>-i[r[-|0]]!pattern</code>):</p>
+<ul>
+<li><code>-i!*.xml</code>: Includes all <code>.xml</code> files at the
+root level.</li>
+<li><code>-ir!*.xml</code>: Recursively includes all <code>.xml</code>
+files throughout all subdirectories.</li>
+<li><code>-ir!*.jpg -ir!*.png</code>: Extracts multiple matching file
+types in a single operation.</li>
+</ul>
+<p>Example:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>7z x data.tar.gz <span class="at">-ir</span>!*.json <span class="at">-ir</span>!*.xml <span class="at">-o</span><span class="st">&quot;C:\Processed&quot;</span> <span class="at">-y</span></span></code></pre></div>
+<h3 id="automation-script-examples">Automation Script Examples</h3>
+<h4 id="windows-batch-script-bat">Windows Batch Script
+(<code>.bat</code>)</h4>
+<p>This script checks an incoming folder for archives and extracts only
+<code>.pdf</code> files:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bat"><code class="sourceCode dosbat"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">@</span><span class="bu">echo off</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">SEVENZIP</span>=<span class="st">C:\Program Files\7-Zip\7z.exe&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">ARCHIVE_DIR</span>=<span class="st">C:\Archives&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="st">&quot;</span><span class="va">DEST_DIR</span>=<span class="st">C:\Output&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="er">%%A</span> <span class="er">in</span> <span class="er">(&quot;%ARCHIVE_DIR%\*.zip&quot;)</span> <span class="er">do</span> <span class="er">(</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;</span><span class="pp">%</span><span class="va">SEVENZIP</span><span class="pp">%</span><span class="st">&quot;</span> x <span class="st">&quot;</span><span class="sc">%%</span><span class="va">A</span><span class="st">&quot;</span> *.pdf <span class="at">-o</span><span class="st">&quot;</span><span class="pp">%</span><span class="va">DEST_DIR</span><span class="pp">%</span><span class="st">&quot;</span> <span class="at">-r</span> <span class="at">-y</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<h4 id="windows-powershell-script-ps1">Windows PowerShell Script
+(<code>.ps1</code>)</h4>
+<p>PowerShell provides robust error handling for automated 7-Zip
+tasks:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>$7zPath <span class="op">=</span> <span class="st">&quot;C:\Program Files\7-Zip\7z.exe&quot;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="va">$archives</span> <span class="op">=</span> <span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="st">&quot;C:\Archives&quot;</span> <span class="op">-</span>Filter <span class="st">&quot;*.zip&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="va">$destination</span> <span class="op">=</span> <span class="st">&quot;C:\Output&quot;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">foreach</span> <span class="op">(</span><span class="va">$archive</span> <span class="kw">in</span> <span class="va">$archives</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">$arguments</span> <span class="op">=</span> <span class="op">@(</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;x&quot;</span><span class="op">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;</span><span class="ch">`&quot;</span><span class="op">$(</span><span class="va">$archive</span><span class="op">.</span><span class="fu">FullName</span><span class="op">)</span><span class="ch">`&quot;</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;-ir!*report*.xlsx&quot;</span><span class="op">,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;-o</span><span class="ch">`&quot;</span><span class="va">$destination</span><span class="ch">`&quot;</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;-y&quot;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Start-Process</span> <span class="op">-</span>FilePath $7zPath <span class="op">-</span>ArgumentList <span class="va">$arguments</span> <span class="op">-</span>Wait <span class="op">-</span>NoNewWindow</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="linux-shell-script-sh">Linux Shell Script
+(<code>.sh</code>)</h4>
+<p>On Linux systems using <code>p7zip</code>:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="va">TARGET_DIR</span><span class="op">=</span><span class="st">&quot;/path/to/extracted&quot;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="va">$TARGET_DIR</span><span class="st">&quot;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> archive <span class="kw">in</span> /path/to/archives/<span class="pp">*</span>.7z<span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">7z</span> x <span class="st">&quot;</span><span class="va">$archive</span><span class="st">&quot;</span> <span class="at">-ir!</span><span class="st">&#39;*.sql&#39;</span> <span class="at">-o</span><span class="st">&quot;</span><span class="va">$TARGET_DIR</span><span class="st">&quot;</span> <span class="at">-y</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<p><em>Note: In Linux environments, wrap wildcard patterns in single
+quotes to prevent the host shell from expanding the wildcards before
+passing them to 7-Zip.</em></p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/extract-files-by-wildcard-in-7-zip-scripts';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

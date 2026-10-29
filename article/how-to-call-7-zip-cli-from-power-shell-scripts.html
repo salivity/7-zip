@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Call 7-Zip CLI from PowerShell Scripts - 7-zip</title>
+    <meta name="description" content="This guide explains how to execute the 7-Zip command-line interface (CLI) from within a Microsoft PowerShell script to automate file compression and extraction. You will learn the default executable path, how to use PowerShell&#39;s call operator (&amp;) to run c">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-call-7-zip-cli-from-power-shell-scripts">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Call 7-Zip CLI from PowerShell Scripts - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-call-7-zip-cli-from-power-shell-scripts" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to execute the 7-Zip command-line interface (CLI) from within a Microsoft PowerShell script to automate file compression and extraction. You will learn the default executable path, how to use PowerShell&#39;s call operator (&amp;) to run c" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-call-7-zip-cli-from-powershell-scripts">How to Call 7-Zip
+CLI from PowerShell Scripts</h1>
+<p>This guide explains how to execute the 7-Zip command-line interface
+(CLI) from within a Microsoft PowerShell script to automate file
+compression and extraction. You will learn the default executable path,
+how to use PowerShell's call operator (<code>&amp;</code>) to run
+commands, how to pass arguments for archiving and unzipping, and how to
+capture execution exit codes for error handling.</p>
+<h2 id="locating-7-zip">Locating 7-Zip</h2>
+<p>To use the 7-Zip CLI, you must call <code>7z.exe</code>. By default,
+64-bit installations place the executable in:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">$sevenZipPath</span> <span class="op">=</span> <span class="st">&quot;</span><span class="va">$env</span><span class="op">:</span><span class="va">ProgramFiles</span><span class="st">\7-Zip\7z.exe&quot;</span></span></code></pre></div>
+<p>Verify that the executable exists before running commands:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(-not</span> <span class="op">(</span><span class="fu">Test-Path</span> <span class="va">$sevenZipPath</span><span class="op">))</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">Throw</span> <span class="st">&quot;7-Zip executable not found at: </span><span class="va">$sevenZipPath</span><span class="st">&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 id="using-the-call-operator-">Using the Call Operator
+(<code>&amp;</code>)</h2>
+<p>The recommended way to execute external programs with arguments in
+PowerShell is the call operator (<code>&amp;</code>).</p>
+<h3 id="1-creating-an-archive-compression">1. Creating an Archive
+(Compression)</h3>
+<p>To compress a file or folder, use the <code>a</code> (add)
+command.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">$sevenZip</span> <span class="op">=</span> <span class="st">&quot;</span><span class="va">$env</span><span class="op">:</span><span class="va">ProgramFiles</span><span class="st">\7-Zip\7z.exe&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">$sourcePath</span> <span class="op">=</span> <span class="st">&quot;C:\Data\Logs&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="va">$destinationZip</span> <span class="op">=</span> <span class="st">&quot;C:\Backups\Logs.zip&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Run 7-Zip to create an archive</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">&amp;</span> <span class="va">$sevenZip</span> a <span class="op">-</span>tzip <span class="va">$destinationZip</span> <span class="va">$sourcePath</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the exit code</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span><span class="va">$LASTEXITCODE</span> <span class="op">-eq</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Write-Output</span> <span class="st">&quot;Archive created successfully.&quot;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Write-Error</span> <span class="st">&quot;Archiving failed with exit code </span><span class="va">$LASTEXITCODE</span><span class="st">.&quot;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Common switches used when creating archives:</p>
+<ul>
+<li><code>-tzip</code> or <code>-t7z</code>: Specifies the archive
+format.</li>
+<li><code>-mx9</code>: Sets the compression level to ultra (levels range
+from <code>0</code> for none to <code>9</code> for ultra).</li>
+<li><code>-pYourPassword</code>: Encrypts the archive with a
+password.</li>
+</ul>
+<h3 id="2-extracting-an-archive">2. Extracting an Archive</h3>
+<p>To extract files, use either <code>e</code> (extract to current
+directory, ignoring folder structure) or <code>x</code> (extract with
+full paths).</p>
+<blockquote>
+<p><strong>Important:</strong> The <code>-o</code> output directory
+switch must not have a space between the switch and the directory
+path.</p>
+</blockquote>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">$sevenZip</span> <span class="op">=</span> <span class="st">&quot;</span><span class="va">$env</span><span class="op">:</span><span class="va">ProgramFiles</span><span class="st">\7-Zip\7z.exe&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="va">$archivePath</span> <span class="op">=</span> <span class="st">&quot;C:\Backups\Logs.zip&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="va">$extractPath</span> <span class="op">=</span> <span class="st">&quot;C:\RestoredLogs&quot;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># -y automatically answers yes to all prompts (overwrite files)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="op">&amp;</span> <span class="va">$sevenZip</span> x <span class="va">$archivePath</span> <span class="st">&quot;-o</span><span class="va">$extractPath</span><span class="st">&quot;</span> <span class="op">-</span>y</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span><span class="va">$LASTEXITCODE</span> <span class="op">-eq</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Write-Output</span> <span class="st">&quot;Extraction completed successfully.&quot;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 id="alternative-method-using-start-process">Alternative Method:
+Using <code>Start-Process</code></h2>
+<p>If you need the process to run synchronously and capture output or
+hide the window, use <code>Start-Process</code>:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">$params</span> <span class="op">=</span> @<span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    FilePath     <span class="op">=</span> <span class="st">&quot;</span><span class="va">$env</span><span class="op">:</span><span class="va">ProgramFiles</span><span class="st">\7-Zip\7z.exe&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    ArgumentList <span class="op">=</span> <span class="op">@(</span><span class="st">&quot;a&quot;</span><span class="op">,</span> <span class="st">&quot;C:\Backups\Data.7z&quot;</span><span class="op">,</span> <span class="st">&quot;C:\Data&quot;</span><span class="op">,</span> <span class="st">&quot;-mx=9&quot;</span><span class="op">)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    NoNewWindow  <span class="op">=</span> <span class="va">$true</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    Wait         <span class="op">=</span> <span class="va">$true</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    PassThru     <span class="op">=</span> <span class="va">$true</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="va">$process</span> <span class="op">=</span> <span class="fu">Start-Process</span> @params</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span><span class="va">$process</span><span class="op">.</span><span class="fu">ExitCode</span> <span class="op">-eq</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Write-Output</span> <span class="st">&quot;Operation completed without errors.&quot;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Write-Error</span> <span class="st">&quot;7-Zip finished with error code: </span><span class="op">$(</span><span class="va">$process</span><span class="op">.</span><span class="fu">ExitCode</span><span class="op">)</span><span class="st">&quot;</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 id="7-zip-exit-codes">7-Zip Exit Codes</h2>
+<p>When handling errors, evaluate <code>$LASTEXITCODE</code> against
+standard 7-Zip return values:</p>
+<ul>
+<li><strong>0</strong>: Normal execution (Success)</li>
+<li><strong>1</strong>: Warning (Non-fatal errors, such as files locked
+by other processes)</li>
+<li><strong>2</strong>: Fatal error</li>
+<li><strong>7</strong>: Command line error (Incorrect syntax or
+parameters)</li>
+<li><strong>8</strong>: Not enough memory for operation</li>
+<li><strong>255</strong>: User stopped the process</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-to-call-7-zip-cli-from-power-shell-scripts';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

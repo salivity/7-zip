@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Command Line: Set Compression Level - 7-zip</title>
+    <meta name="description" content="This guide explains how to set the compression level in 7-Zip using the command line. You will learn the exact syntax for the compression switch, understand the available compression levels from store to ultra, and see practical examples of how to apply t">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-command-line-set-compression-level">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Command Line: Set Compression Level - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-command-line-set-compression-level" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to set the compression level in 7-Zip using the command line. You will learn the exact syntax for the compression switch, understand the available compression levels from store to ultra, and see practical examples of how to apply t" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-command-line-set-compression-level">7-Zip Command Line:
+Set Compression Level</h1>
+<p>This guide explains how to set the compression level in 7-Zip using
+the command line. You will learn the exact syntax for the compression
+switch, understand the available compression levels from store to ultra,
+and see practical examples of how to apply these settings to your
+archives.</p>
+<h3 id="the-compression-level-switch--mx">The Compression Level Switch:
+<code>-mx</code></h3>
+<p>In 7-Zip, the compression level is controlled using the
+<code>-mx</code> switch. You can specify a level from <code>0</code> (no
+compression) to <code>9</code> (maximum compression).</p>
+<p>The syntax can be written as either <code>-mx[0-9]</code> or
+<code>-mx=[0-9]</code>.</p>
+<h3 id="available-compression-levels">Available Compression Levels</h3>
+<ul>
+<li><strong><code>-mx0</code> (Copy / Store):</strong> No compression is
+applied. Files are simply packaged into the archive container quickly
+without reducing file size.</li>
+<li><strong><code>-mx1</code> (Fastest):</strong> Lowest compression
+ratio, but completes the operation at the fastest speed with minimal CPU
+usage.</li>
+<li><strong><code>-mx3</code> (Fast):</strong> Low compression ratio,
+slightly better than level 1.</li>
+<li><strong><code>-mx5</code> (Normal):</strong> The default compression
+level used by 7-Zip if no switch is specified. It offers a balanced
+ratio of file size reduction to processing speed.</li>
+<li><strong><code>-mx7</code> (Maximum):</strong> High compression
+ratio. It requires more system memory (RAM) and CPU time.</li>
+<li><strong><code>-mx9</code> (Ultra):</strong> The highest possible
+compression ratio. This produces the smallest file sizes but requires
+the most time and substantial RAM.</li>
+</ul>
+<h3 id="command-examples">Command Examples</h3>
+<h4 id="1-ultra-compression--mx9">1. Ultra Compression
+(<code>-mx9</code>)</h4>
+<p>To create a <code>.7z</code> archive with the highest compression
+level:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-mx9</span> archive.7z C:<span class="dt">\p</span>ath<span class="dt">\t</span>o<span class="dt">\f</span>iles<span class="dt">\*</span></span></code></pre></div>
+<h4 id="2-fast-compression--mx1">2. Fast Compression
+(<code>-mx1</code>)</h4>
+<p>To create a quick archive when speed is more important than size:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-mx1</span> fast_backup.7z C:<span class="dt">\p</span>ath<span class="dt">\t</span>o<span class="dt">\f</span>iles<span class="dt">\*</span></span></code></pre></div>
+<h4 id="3-no-compression--store--mx0">3. No Compression / Store
+(<code>-mx0</code>)</h4>
+<p>To bundle files without any compression:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-mx0</span> storage.7z C:<span class="dt">\p</span>ath<span class="dt">\t</span>o<span class="dt">\f</span>iles<span class="dt">\*</span></span></code></pre></div>
+<h4 id="4-applying-to-zip-archives">4. Applying to ZIP Archives</h4>
+<p>The <code>-mx</code> switch works identically when targeting
+<code>.zip</code> output:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-tzip</span> <span class="at">-mx9</span> archive.zip C:<span class="dt">\p</span>ath<span class="dt">\t</span>o<span class="dt">\f</span>iles<span class="dt">\*</span></span></code></pre></div>
+<h3 id="important-considerations">Important Considerations</h3>
+<ul>
+<li><strong>Resource Usage:</strong> Higher levels (<code>-mx7</code>
+and <code>-mx9</code>) significantly increase memory consumption during
+both compression and decompression. Ensure the target system has
+sufficient RAM available.</li>
+<li><strong>File Types:</strong> Already compressed formats (such as
+JPEG, MP4, or PNG) will not shrink significantly, even at level 9. Using
+<code>-mx1</code> or <code>-mx0</code> on these formats saves time
+without losing noticeable space savings.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-command-line-set-compression-level';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

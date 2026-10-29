@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is 7-Zip Copy Compression Method? - 7-zip</title>
+    <meta name="description" content="The &quot;Copy&quot; compression method in 7-Zip is a setting that packages files into an archive without applying any data compression algorithms. This article explains how the Copy mode works, why it exists, and the specific scenarios where choosing zero compress">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/what-is-7-zip-copy-compression-method">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is 7-Zip Copy Compression Method? - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/what-is-7-zip-copy-compression-method" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The &quot;Copy&quot; compression method in 7-Zip is a setting that packages files into an archive without applying any data compression algorithms. This article explains how the Copy mode works, why it exists, and the specific scenarios where choosing zero compress" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="what-is-7-zip-copy-compression-method">What Is 7-Zip Copy
+Compression Method?</h1>
+<p>The "Copy" compression method in 7-Zip is a setting that packages
+files into an archive without applying any data compression algorithms.
+This article explains how the Copy mode works, why it exists, and the
+specific scenarios where choosing zero compression is superior to
+standard compression levels like Normal or Ultra.</p>
+<h3 id="how-copy-mode-works">How Copy Mode Works</h3>
+<p>In 7-Zip, compression levels range from "Copy" (Level 0) to "Ultra"
+(Level 9). When you select "Copy," 7-Zip functions purely as an archiver
+rather than a compressor—similar to the standard TAR format in Unix
+environments. It reads the selected files and writes them sequentially
+into a single container file (such as a <code>.7z</code> or
+<code>.zip</code>) along with their metadata, paths, and attributes, but
+it does not run algorithms like LZMA, LZMA2, or Deflate to reduce file
+size.</p>
+<h3 id="primary-use-cases-for-copy-mode">Primary Use Cases for Copy
+Mode</h3>
+<h4 id="1-archiving-pre-compressed-formats">1. Archiving Pre-Compressed
+Formats</h4>
+<p>Many common file types are already compressed using specialized,
+lossy or lossless algorithms. Running general-purpose compression on
+these formats yields virtually no size reduction and wastes system
+resources. Common examples include:</p>
+<ul>
+<li><strong>Media files:</strong> MP4, MKV, MP3, AAC, JPEG, PNG.</li>
+<li><strong>Other archives and packages:</strong> ZIP, RAR, DOCX, XLSX,
+APK, and installer packages.</li>
+</ul>
+<p>Using Copy mode on these files packages them without forcing the CPU
+to attempt pointless compression routines.</p>
+<h4 id="2-maximum-processing-speed">2. Maximum Processing Speed</h4>
+<p>Because the CPU does not need to analyze data patterns or build
+compression dictionaries, archive creation is virtually instantaneous.
+The operation speed is bottlenecked only by your storage drive's read
+and write speeds. This is ideal when you need to package large volumes
+of data on tight deadlines.</p>
+<h4 id="3-combining-multiple-small-files">3. Combining Multiple Small
+Files</h4>
+<p>Transferring thousands of individual files across a local network,
+cloud storage, or an external drive often results in severe transfer
+speed drops due to file system overhead. Copy mode allows you to bundle
+an entire directory structure into a single file quickly, drastically
+speeding up transfer times without the CPU overhead of full
+compression.</p>
+<h4 id="4-applying-encryption-without-delay">4. Applying Encryption
+Without Delay</h4>
+<p>7-Zip supports AES-256 encryption for both file contents and file
+headers. If your goal is strictly security rather than saving disk
+space, you can combine Copy mode with a password. This allows you to
+secure sensitive files quickly without waiting for a compression
+algorithm to process the data.</p>
+<h4 id="5-reducing-system-resource-usage">5. Reducing System Resource
+Usage</h4>
+<p>Standard 7-Zip compression, particularly using the LZMA2 algorithm on
+higher settings, can consume significant amounts of RAM and keep the CPU
+at 100% utilization. Copy mode uses minimal RAM and negligible
+processing power, making it ideal for background tasks, low-power
+devices, or virtual machines with limited allocated resources.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/what-is-7-zip-copy-compression-method';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

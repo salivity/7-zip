@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LZMA vs LZMA2: 7-Zip Compression Differences - 7-zip</title>
+    <meta name="description" content="The LZMA2 compression algorithm is an updated container format built on top of the original Lempel-Ziv-Markov chain algorithm (LZMA), designed specifically to resolve critical performance bottlenecks in 7-Zip. While both algorithms use the same core dicti">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/lzma-vs-lzma-2-7-zip-compression-differences">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="LZMA vs LZMA2: 7-Zip Compression Differences - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/lzma-vs-lzma-2-7-zip-compression-differences" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The LZMA2 compression algorithm is an updated container format built on top of the original Lempel-Ziv-Markov chain algorithm (LZMA), designed specifically to resolve critical performance bottlenecks in 7-Zip. While both algorithms use the same core dicti" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="lzma-vs-lzma2-7-zip-compression-differences">LZMA vs LZMA2:
+7-Zip Compression Differences</h1>
+<p>The LZMA2 compression algorithm is an updated container format built
+on top of the original Lempel-Ziv-Markov chain algorithm (LZMA),
+designed specifically to resolve critical performance bottlenecks in
+7-Zip. While both algorithms use the same core dictionary-based
+compression engine, LZMA2 introduces major improvements in
+multi-threaded CPU utilization, the handling of uncompressible data, and
+dynamic stream management. These updates make LZMA2 significantly faster
+and more resource-efficient on modern multi-core systems without
+sacrificing compression ratio.</p>
+<h3 id="true-multi-threading-support">True Multi-Threading Support</h3>
+<p>The most significant limitation of the original LZMA is its
+restricted multi-threading capability. When compressing data using
+original LZMA, 7-Zip can effectively utilize at most two threads—one for
+the match finder and one for the main compression process. This creates
+a severe bottleneck on modern multi-core processors.</p>
+<p>LZMA2 solves this by splitting the input data into multiple
+independent chunks. Each chunk is processed in parallel across available
+CPU cores. As a result, LZMA2 can scale across 4, 8, 16, or more
+threads, dramatically reducing overall compression time on multi-core
+systems.</p>
+<h3 id="efficient-handling-of-incompressible-data">Efficient Handling of
+Incompressible Data</h3>
+<p>The original LZMA attempts to compress all incoming data, regardless
+of its content. When processing data that is already compressed or
+naturally random (such as JPEG images, MP3 audio, or encrypted files),
+LZMA wastes CPU cycles and can actually cause "data expansion,"
+resulting in an output file larger than the original input.</p>
+<p>LZMA2 dynamically inspects the data during compression. If a block of
+data is determined to be incompressible, LZMA2 stops attempting to
+compress it and stores it as uncompressed raw data. This eliminates data
+inflation and prevents the processor from wasting cycles on unshrinkable
+files.</p>
+<h3 id="dynamic-state-resets">Dynamic State Resets</h3>
+<p>In original LZMA, the entire compressed stream relies on a continuous
+dictionary state established from the start of the file. If the nature
+of the incoming data changes (for example, transitioning from text to
+executable binary), the algorithm cannot easily adapt its internal
+probabilities.</p>
+<p>LZMA2 permits dynamic dictionary and property resets between data
+chunks. The compressor can change encoding parameters or reset the LZMA
+state mid-stream to optimize for different types of data bundled within
+the same archive.</p>
+<h3 id="compression-ratio-vs-speed">Compression Ratio vs. Speed</h3>
+<p>At its core, LZMA2 uses the same entropy encoding and dictionary
+mechanisms as LZMA. Consequently, the compression ratio between the two
+algorithms is virtually identical on single-threaded runs. However,
+because LZMA2 divides data into discrete chunks for multi-threading,
+each thread maintains its own context, which can cause a negligible
+decrease in compression ratio (typically under 1%). In practical use,
+the dramatic increase in compression speed far outweighs this minor
+difference.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/lzma-vs-lzma-2-7-zip-compression-differences';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>
