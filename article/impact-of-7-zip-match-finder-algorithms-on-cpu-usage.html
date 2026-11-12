@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impact of 7-Zip Match Finder Algorithms on CPU Usage - 7-zip</title>
+    <meta name="description" content="The efficiency of 7-Zip&#39;s LZMA and LZMA2 compression formats heavily relies on match finder algorithms, which scan incoming data to detect repeating sequences. These algorithms—primarily Hash Chains (HC) and Binary Trees (BT)—represent the most computatio">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/impact-of-7-zip-match-finder-algorithms-on-cpu-usage">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Impact of 7-Zip Match Finder Algorithms on CPU Usage - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/impact-of-7-zip-match-finder-algorithms-on-cpu-usage" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The efficiency of 7-Zip&#39;s LZMA and LZMA2 compression formats heavily relies on match finder algorithms, which scan incoming data to detect repeating sequences. These algorithms—primarily Hash Chains (HC) and Binary Trees (BT)—represent the most computatio" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="impact-of-7-zip-match-finder-algorithms-on-cpu-usage">Impact of
+7-Zip Match Finder Algorithms on CPU Usage</h1>
+<p>The efficiency of 7-Zip's LZMA and LZMA2 compression formats heavily
+relies on match finder algorithms, which scan incoming data to detect
+repeating sequences. These algorithms—primarily Hash Chains (HC) and
+Binary Trees (BT)—represent the most computationally expensive phase of
+the compression pipeline. This article examines how the choice of match
+finder dictates CPU cycle consumption, how different variants balance
+throughput against compression ratios, and how secondary parameters like
+dictionary size and fast bytes amplify processor workload.</p>
+<h3 id="the-role-of-match-finders-in-7-zip">The Role of Match Finders in
+7-Zip</h3>
+<p>During LZMA/LZMA2 compression, the encoder replaces redundant byte
+patterns with references to previously seen data. The match finder's job
+is to scan a sliding dictionary window and identify the longest possible
+matching sequences. Because checking every potential byte offset across
+megabytes or gigabytes of memory is computationally infeasible, 7-Zip
+uses algorithmic data structures to narrow the search space.</p>
+<p>This phase is typically responsible for 70% to 90% of the total CPU
+cycles consumed during compression. Consequently, the chosen match
+finder algorithm serves as the primary governor of CPU cycle utilization
+and execution time.</p>
+<h3 id="hash-chains-vs-binary-trees">Hash Chains vs. Binary Trees</h3>
+<p>7-Zip provides several match finder implementations, broadly
+categorized into Hash Chains and Binary Trees, denoted with prefixes (HC
+or BT) and suffix numbers indicating the minimum hashing depth (e.g.,
+HC4, BT4):</p>
+<ul>
+<li><strong>Hash Chains (HC2, HC3, HC4):</strong> Hash chain finders
+index prefixes of 2, 3, or 4 bytes into hash tables pointing to linked
+lists of previous occurrences. When seeking matches, the algorithm
+traverses these chains sequentially. Hash chains terminate earlier and
+make fewer pointer jumps, leading to significantly lower CPU cycle
+consumption and higher compression speed at the expense of a slightly
+lower compression ratio.</li>
+<li><strong>Binary Trees (BT2, BT3, BT4):</strong> Binary tree finders
+maintain self-balancing search trees for matched sequences. This
+structure allows the algorithm to locate longer and more optimal matches
+across larger dictionary windows. However, maintaining and traversing
+binary trees requires substantially more comparisons, memory pointer
+dereferencing, and branch evaluations, resulting in high CPU cycle
+consumption per processed megabyte.</li>
+</ul>
+<h3 id="factors-amplifying-cpu-cycle-consumption">Factors Amplifying CPU
+Cycle Consumption</h3>
+<p>The workload imposed by a match finder scales according to several
+configuration parameters:</p>
+<ul>
+<li><strong>Fast Bytes (<code>fb</code> parameter):</strong> The fast
+bytes setting defines the maximum length of a match the finder attempts
+to evaluate before stopping. Increasing this value (e.g., from 32 to
+273) forces match finders—especially BT4—to execute significantly deeper
+comparisons inside the search tree, causing CPU cycle usage to spike
+non-linearly.</li>
+<li><strong>Dictionary Size:</strong> Larger dictionary sizes expand the
+search window. While modern algorithms use hash tables to limit direct
+lookups, larger windows cause CPU cache invalidations. As data sizes
+exceed L1, L2, and L3 caches, memory latency forces CPU execution
+pipelines to stall, increasing the effective cycle cost per byte
+compressed.</li>
+<li><strong>Branch Prediction and Cache Misses:</strong> Binary tree
+implementations generate frequent, pseudo-random pointer dereferencing
+as nodes are inserted and rotated. On modern out-of-order processors,
+mispredicted branches and cache misses waste substantial clock cycles
+compared to linear hash chain traversals.</li>
+</ul>
+<h3 id="impact-on-multi-core-utilization">Impact on Multi-Core
+Utilization</h3>
+<p>Under LZMA, match finding is largely single-threaded, meaning a heavy
+match finder like BT4 will saturate a single core at 100% until
+completion. Under LZMA2, 7-Zip partitions streams into discrete chunks
+compressed in parallel. In this scenario, intensive match finders
+consume 100% of the available cycles across all assigned logical cores,
+driving maximum CPU power draw and thermal throttling on high-core-count
+processors.</p>
+<h3 id="selecting-the-right-algorithm">Selecting the Right
+Algorithm</h3>
+<ul>
+<li><strong>Use Hash Chains (HC4):</strong> When optimizing for
+throughput, battery life, or constrained CPU capacity. Fast and normal
+presets in 7-Zip leverage HC-based logic to reduce cycle costs while
+retaining acceptable compression ratios.</li>
+<li><strong>Use Binary Trees (BT4):</strong> When final archive size is
+the only priority and compute resources are abundant. Maximum and Ultra
+presets mandate BT4, allocating massive CPU cycle budgets to extract the
+smallest possible file sizes.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/impact-of-7-zip-match-finder-algorithms-on-cpu-usage';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

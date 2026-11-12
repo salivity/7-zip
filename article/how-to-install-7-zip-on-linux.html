@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Install 7-Zip on Linux - 7-zip</title>
+    <meta name="description" content="This guide provides straightforward instructions for installing 7-Zip across various Linux distributions using native package managers. You will learn the exact commands required to install the official modern 7-Zip release or the widely supported p7zip p">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-install-7-zip-on-linux">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Install 7-Zip on Linux - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-install-7-zip-on-linux" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide provides straightforward instructions for installing 7-Zip across various Linux distributions using native package managers. You will learn the exact commands required to install the official modern 7-Zip release or the widely supported p7zip p" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-install-7-zip-on-linux">How to Install 7-Zip on
+Linux</h1>
+<p>This guide provides straightforward instructions for installing 7-Zip
+across various Linux distributions using native package managers. You
+will learn the exact commands required to install the official modern
+7-Zip release or the widely supported <code>p7zip</code> package on
+Debian, Ubuntu, Fedora, Arch Linux, and openSUSE.</p>
+<h2 id="ubuntu-debian-and-linux-mint">Ubuntu, Debian, and Linux
+Mint</h2>
+<p>Modern versions of Ubuntu (22.04 and later) and Debian (12 and later)
+include the official 7-Zip package directly in their repositories.</p>
+<p>Update your repository index:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update</span></code></pre></div>
+<p>Install the official 7-Zip binary:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install 7zip</span></code></pre></div>
+<p>If you are on an older release, you can install the legacy
+<code>p7zip</code> utility instead:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install p7zip-full p7zip-rar</span></code></pre></div>
+<h2 id="fedora-rhel-and-centos">Fedora, RHEL, and CentOS</h2>
+<p>On Fedora and enterprise distributions, the package is commonly
+packaged as <code>p7zip</code>.</p>
+<p>For Fedora:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install p7zip p7zip-plugins</span></code></pre></div>
+<p>For RHEL or CentOS (ensure the EPEL repository is enabled first):</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install epel-release</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install p7zip p7zip-plugins</span></code></pre></div>
+<h2 id="arch-linux-and-manjaro">Arch Linux and Manjaro</h2>
+<p>Arch Linux provides the modern upstream 7-Zip package in its core
+repositories.</p>
+<p>Install 7-Zip using <code>pacman</code>:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> pacman <span class="at">-S</span> 7zip</span></code></pre></div>
+<p>Alternatively, to install the older <code>p7zip</code>
+implementation:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> pacman <span class="at">-S</span> p7zip</span></code></pre></div>
+<h2 id="opensuse">openSUSE</h2>
+<p>On openSUSE Leap or Tumbleweed, you can use the <code>zypper</code>
+package manager.</p>
+<p>Install 7-Zip:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> zypper refresh</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> zypper install 7zip</span></code></pre></div>
+<p>If the <code>7zip</code> package is unavailable on older releases,
+install <code>p7zip</code>:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> zypper install p7zip</span></code></pre></div>
+<h2 id="alternative-install-via-snap">Alternative: Install via Snap</h2>
+<p>If your distribution has Snap enabled, you can install the standalone
+package universally across distributions:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> snap install 7zip-standalone</span></code></pre></div>
+<h2 id="verifying-the-installation">Verifying the Installation</h2>
+<p>Depending on which version you installed, verify the installation by
+checking the program version:</p>
+<p>For modern 7-Zip:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7zz</span></span></code></pre></div>
+<p>For legacy <code>p7zip</code>:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span></span></code></pre></div>
+<p>Running either command without arguments will display the installed
+version number, available commands, and supported archive formats.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-to-install-7-zip-on-linux';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

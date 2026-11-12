@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How LZMA2 Handles Uncompressible Data in 7-Zip - 7-zip</title>
+    <meta name="description" content="This article explains how the LZMA2 compression algorithm manages incompressible data streams within 7-Zip. While traditional compression algorithms can cause file bloat and waste processing cycles when encountering already compressed or random data, LZMA">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-lzma-2-handles-uncompressible-data-in-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How LZMA2 Handles Uncompressible Data in 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-lzma-2-handles-uncompressible-data-in-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how the LZMA2 compression algorithm manages incompressible data streams within 7-Zip. While traditional compression algorithms can cause file bloat and waste processing cycles when encountering already compressed or random data, LZMA" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-lzma2-handles-uncompressible-data-in-7-zip">How LZMA2
+Handles Uncompressible Data in 7-Zip</h1>
+<p>This article explains how the LZMA2 compression algorithm manages
+incompressible data streams within 7-Zip. While traditional compression
+algorithms can cause file bloat and waste processing cycles when
+encountering already compressed or random data, LZMA2 uses a chunk-based
+container format that identifies non-compressible blocks and stores them
+raw. Below is an overview of the mechanics, chunk structure, and
+performance benefits behind LZMA2’s handling of incompressible
+chunks.</p>
+<h3 id="the-problem-with-traditional-lzma">The Problem with Traditional
+LZMA</h3>
+<p>The original LZMA algorithm treats an input stream as a continuous
+sequence. When fed data that cannot be compressed—such as encrypted
+files, JPEGs, or already compressed archives—the algorithm continues to
+update its probability models and emit encoded symbols. This results in
+two major drawbacks:</p>
+<ol type="1">
+<li><strong>Data Expansion:</strong> The output size becomes larger than
+the input size due to encoding overhead.</li>
+<li><strong>Wasted CPU Cycles:</strong> The processor expends resources
+calculating complex range encoding and dictionary matches for zero
+gain.</li>
+</ol>
+<h3 id="the-lzma2-chunking-mechanism">The LZMA2 Chunking Mechanism</h3>
+<p>LZMA2 is an envelope format built on top of the raw LZMA compression
+engine. Instead of compressing the entire stream continuously, LZMA2
+divides the input into variable-sized chunks:</p>
+<ul>
+<li><strong>Compressed Chunks:</strong> Can contain up to 2 MB of
+uncompressed data.</li>
+<li><strong>Uncompressed Chunks:</strong> Can contain up to 64 KB
+(65,536 bytes) of raw data.</li>
+</ul>
+<p>Each chunk is preceded by a control byte that dictates how the
+decoder must interpret the following payload.</p>
+<h3 id="detecting-incompressible-data">Detecting Incompressible
+Data</h3>
+<p>During compression, 7-Zip monitors the compression ratio of the
+current block. If the compressed output exceeds the original input size,
+the compressor aborts the compression of that specific block.</p>
+<p>Instead of writing the expanded encoded data, the compressor discards
+it and marks the data as an uncompressed chunk.</p>
+<h3 id="storing-raw-data-chunks">Storing Raw Data Chunks</h3>
+<p>When an uncompressible chunk is written, LZMA2 encapsulates it using
+a minimal header format:</p>
+<ol type="1">
+<li><strong>Control Byte:</strong> LZMA2 uses a specific control byte
+(values <code>0x01</code> or <code>0x02</code>) to signal an
+uncompressed chunk.
+<ul>
+<li><code>0x01</code> indicates that the LZMA state dictionary should be
+reset.</li>
+<li><code>0x02</code> indicates that the dictionary state should be
+preserved.</li>
+</ul></li>
+<li><strong>Data Size:</strong> A two-byte integer follows the control
+byte, storing the uncompressed size minus one (supporting up to 65,535
+bytes).</li>
+<li><strong>Payload:</strong> The original, raw bytes are copied
+directly to the archive without any encoding.</li>
+</ol>
+<p>Because the maximum uncompressed chunk size is 64 KB, large
+incompressible files are simply split into sequential 64 KB chunks, each
+adding only a 3-byte header overhead
+(<code>1 control byte + 2 size bytes</code>). This limits data expansion
+to less than 0.005%.</p>
+<h3 id="advantages-of-the-lzma2-approach">Advantages of the LZMA2
+Approach</h3>
+<ul>
+<li><strong>Zero File Bloat:</strong> Overhead on random or
+pre-compressed data is virtually negligible compared to standard
+LZMA.</li>
+<li><strong>CPU Efficiency:</strong> The encoder quickly moves through
+non-compressible sections without running deep dictionary searches.</li>
+<li><strong>State Management:</strong> When transitions occur between
+compressible and incompressible data, LZMA2 can preserve or reset its
+dictionary states, allowing it to resume optimal compression immediately
+when compressible patterns reappear.</li>
+<li><strong>Multi-threading Stability:</strong> Because data is split
+into independent or semi-independent blocks, multiple threads can
+process different chunks concurrently without corrupting global
+compression states.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-lzma-2-handles-uncompressible-data-in-7-zip';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

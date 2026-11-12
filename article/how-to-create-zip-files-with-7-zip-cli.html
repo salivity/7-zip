@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Create ZIP Files With 7-Zip CLI - 7-zip</title>
+    <meta name="description" content="This guide explains how to generate standard ZIP archives using the 7-Zip command-line interface (CLI) instead of the default 7z format. You will learn the exact command-line switch required to define the archive type, the basic command syntax, and practi">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-create-zip-files-with-7-zip-cli">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Create ZIP Files With 7-Zip CLI - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-create-zip-files-with-7-zip-cli" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to generate standard ZIP archives using the 7-Zip command-line interface (CLI) instead of the default 7z format. You will learn the exact command-line switch required to define the archive type, the basic command syntax, and practi" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-create-zip-files-with-7-zip-cli">How to Create ZIP Files
+With 7-Zip CLI</h1>
+<p>This guide explains how to generate standard ZIP archives using the
+7-Zip command-line interface (CLI) instead of the default 7z format. You
+will learn the exact command-line switch required to define the archive
+type, the basic command syntax, and practical examples for compressing
+files and directories into ZIP files.</p>
+<h2 id="the-flag--tzip">The Flag: <code>-tzip</code></h2>
+<p>To create a <code>.zip</code> archive instead of the default
+<code>.7z</code> format, use the <strong><code>-tzip</code></strong>
+flag. The <code>-t</code> switch specifies the type of archive, and
+appending <code>zip</code> instructs 7-Zip to format the output as a
+standard ZIP file.</p>
+<h2 id="basic-syntax">Basic Syntax</h2>
+<p>The standard command structure for creating a ZIP file is:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-tzip</span> <span class="op">&lt;</span>archive_name.zip<span class="op">&gt;</span> <span class="op">&lt;</span>file_or_folder_to_compress<span class="op">&gt;</span></span></code></pre></div>
+<ul>
+<li><strong><code>a</code></strong>: The command to add files to an
+archive.</li>
+<li><strong><code>-tzip</code></strong>: The switch that forces the
+archive format to ZIP.</li>
+<li><strong><code>&lt;archive_name.zip&gt;</code></strong>: The name of
+the resulting archive file.</li>
+<li><strong><code>&lt;file_or_folder_to_compress&gt;</code></strong>:
+The target files or directories to include.</li>
+</ul>
+<h2 id="practical-examples">Practical Examples</h2>
+<h3 id="1-compressing-a-single-file">1. Compressing a Single File</h3>
+<p>To compress a single document into a ZIP archive:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-tzip</span> archive.zip document.pdf</span></code></pre></div>
+<h3 id="2-compressing-multiple-files">2. Compressing Multiple Files</h3>
+<p>To compress multiple specified files:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-tzip</span> archive.zip file1.txt file2.jpg file3.png</span></code></pre></div>
+<h3 id="3-compressing-an-entire-directory">3. Compressing an Entire
+Directory</h3>
+<p>To compress a folder and all of its contents:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-tzip</span> backup.zip ./my_folder/</span></code></pre></div>
+<h3 id="4-setting-the-compression-level">4. Setting the Compression
+Level</h3>
+<p>You can combine <code>-tzip</code> with the <code>-mx</code> flag to
+define compression strength (from <code>0</code> for no compression up
+to <code>9</code> for ultra compression):</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-tzip</span> <span class="at">-mx9</span> archive.zip ./my_folder/</span></code></pre></div></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-to-create-zip-files-with-7-zip-cli';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

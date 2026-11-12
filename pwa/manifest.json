@@ -1,0 +1,22 @@
+{
+  "short_name": "7-zip",
+  "name": "7-zip",
+  "icons": [
+    {
+      "src": "/7-zip/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/7-zip/pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "https://salivity.github.io/7-zip",
+  "background_color": "#F0F4F8",
+  "theme_color": "#F0F4F8",
+  "display": "standalone",
+  "orientation": "portrait"
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compiling 7-Zip SDK for iOS and Android - 7-zip</title>
+    <meta name="description" content="The 7-Zip SDK (primarily distributed as the LZMA SDK) can be fully compiled and integrated into both iOS and Android native mobile applications. Because the core compression and extraction algorithms are written in standard ANSI C and C++, the source code">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/compiling-7-zip-sdk-for-i-os-and-android">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Compiling 7-Zip SDK for iOS and Android - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/compiling-7-zip-sdk-for-i-os-and-android" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The 7-Zip SDK (primarily distributed as the LZMA SDK) can be fully compiled and integrated into both iOS and Android native mobile applications. Because the core compression and extraction algorithms are written in standard ANSI C and C++, the source code" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="compiling-7-zip-sdk-for-ios-and-android">Compiling 7-Zip SDK for
+iOS and Android</h1>
+<p>The 7-Zip SDK (primarily distributed as the LZMA SDK) can be fully
+compiled and integrated into both iOS and Android native mobile
+applications. Because the core compression and extraction algorithms are
+written in standard ANSI C and C++, the source code is platform-agnostic
+and does not rely on Windows-specific APIs. This article details how
+developers can compile the SDK across both mobile platforms, configure
+the necessary native build tools, and interface the native code with
+mobile app runtimes.</p>
+<h3 id="why-the-7-zip-sdk-is-portable">Why the 7-Zip SDK is
+Portable</h3>
+<p>The core logic of the 7-Zip SDK—commonly used for handling
+<code>.7z</code> archives and LZMA/LZMA2 compression—is self-contained.
+The C and C++ source code relies only on basic standard library
+functions for memory management and I/O operations. Because standard
+mobile compilers support ANSI C and modern C++, the code compiles
+cleanly for target architectures including ARM64 (arm64-v8a for Android,
+arm64 for iOS) and x86_64 for mobile emulators and simulators.</p>
+<h3 id="compiling-for-android-via-the-ndk">Compiling for Android via the
+NDK</h3>
+<p>To compile the 7-Zip SDK for Android native applications, you must
+use the Android Native Development Kit (NDK).</p>
+<ol type="1">
+<li><strong>Include the Source Files:</strong> Copy the required C or
+C++ source files (such as <code>LzmaDec.c</code>,
+<code>LzmaEnc.c</code>, <code>7zDec.c</code>, and archive handling
+files) into your project's <code>cpp</code> or <code>jni</code>
+directory.</li>
+<li><strong>Build Configuration:</strong> Use CMake or
+<code>ndk-build</code> to define the native compilation targets. With
+CMake, add the source files to an <code>add_library</code> target
+configured to build a shared library (<code>.so</code>).</li>
+<li><strong>Bridge via JNI:</strong> Create Java Native Interface (JNI)
+wrapper functions to bridge Java/Kotlin calls with the SDK's native
+functions. This allows your Android runtime to pass file paths, buffers,
+or streams to the 7-Zip compression routines.</li>
+<li><strong>Target Architectures:</strong> Configure your
+<code>build.gradle</code> file to compile native binaries for
+<code>arm64-v8a</code>, <code>armeabi-v7a</code>, and
+<code>x86_64</code>.</li>
+</ol>
+<h3 id="compiling-for-ios-using-xcode">Compiling for iOS using
+Xcode</h3>
+<p>Compiling the SDK for iOS natively is straightforward due to Xcode's
+native support for C and C++.</p>
+<ol type="1">
+<li><strong>Add Files to Xcode:</strong> Import the native
+<code>.c</code> and <code>.h</code> files directly into your Xcode
+workspace and assign them to your application target.</li>
+<li><strong>Configure Build Settings:</strong> Ensure your project
+builds for standard iOS architectures (<code>arm64</code> for physical
+devices and <code>arm64</code>/<code>x86_64</code> for simulators).</li>
+<li><strong>Language Interoperability:</strong>
+<ul>
+<li><strong>Objective-C:</strong> C functions can be called directly
+from Objective-C or Objective-C++ files.</li>
+<li><strong>Swift:</strong> To use the SDK in Swift, expose the
+necessary header files (like <code>7zTypes.h</code> and
+<code>LzmaDec.h</code>) inside the project’s Objective-C Bridging
+Header, or package the source files into a C-based Swift Package (SPM)
+or Framework.</li>
+</ul></li>
+</ol>
+<h3 id="implementation-considerations">Implementation
+Considerations</h3>
+<ul>
+<li><strong>Memory Usage:</strong> Compressing files via the 7-Zip SDK
+with high dictionary sizes requires significant RAM. On mobile devices,
+keep dictionary sizes modest (such as 16MB or 32MB) to prevent operating
+system terminations caused by out-of-memory errors.</li>
+<li><strong>Full Archive Support vs. Stream Compression:</strong> If
+your application only requires decompression of LZMA streams,
+integrating minimal C files (like <code>LzmaDec.c</code>) is recommended
+to keep the binary size low. If multi-file <code>.7z</code> container
+support, encryption, or multi-threading is needed, include the full
+suite of container decoders (<code>7zDec.c</code>, <code>7zIn.c</code>,
+etc.).</li>
+<li><strong>Licensing:</strong> Most of the LZMA SDK is in the public
+domain, though certain archive-handling modules fall under the GNU LGPL.
+Verify the specific licensing of the source files you include to ensure
+compliance with mobile app store distribution rules.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/compiling-7-zip-sdk-for-i-os-and-android';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

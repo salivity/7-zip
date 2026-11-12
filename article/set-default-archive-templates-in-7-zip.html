@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Default Archive Templates in 7-Zip - 7-zip</title>
+    <meta name="description" content="This guide explains how to customize and establish default archive creation settings in 7-Zip File Manager. While 7-Zip does not feature a dedicated &quot;profiles&quot; menu like some competitors, you can set persistent default compression parameters through the g">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/set-default-archive-templates-in-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Set Default Archive Templates in 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/set-default-archive-templates-in-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to customize and establish default archive creation settings in 7-Zip File Manager. While 7-Zip does not feature a dedicated &quot;profiles&quot; menu like some competitors, you can set persistent default compression parameters through the g" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="set-default-archive-templates-in-7-zip">Set Default Archive
+Templates in 7-Zip</h1>
+<p>This guide explains how to customize and establish default archive
+creation settings in 7-Zip File Manager. While 7-Zip does not feature a
+dedicated "profiles" menu like some competitors, you can set persistent
+default compression parameters through the graphical interface's memory,
+deploy Windows Registry files for specific configurations, or build
+dedicated context-menu templates using the 7-Zip command-line tool.</p>
+<h3 id="method-1-setting-persistent-defaults-in-the-gui">Method 1:
+Setting Persistent Defaults in the GUI</h3>
+<p>7-Zip automatically saves the parameters used during your last
+compression task as the default baseline for future archives.</p>
+<ol type="1">
+<li>Open <strong>7-Zip File Manager</strong>.</li>
+<li>Select any file or folder and click the green <strong>Add</strong>
+button (or press <code>Alt + Enter</code>) to open the <strong>Add to
+Archive</strong> dialog.</li>
+<li>Configure your preferred default options:
+<ul>
+<li><strong>Archive format:</strong> Choose between 7z, zip, tar, or
+wim.</li>
+<li><strong>Compression level:</strong> Set your standard level (e.g.,
+Normal, Maximum, or Ultra).</li>
+<li><strong>Compression method:</strong> Select LZMA2, Deflate, or your
+preferred algorithm.</li>
+<li><strong>Dictionary size and Word size:</strong> Adjust according to
+your typical system memory availability.</li>
+<li><strong>Encryption:</strong> Set a default algorithm (AES-256) if
+applicable.</li>
+</ul></li>
+<li>Click <strong>OK</strong> to execute the compression.</li>
+</ol>
+<p>7-Zip writes these choices to the Windows Registry under
+<code>HKEY_CURRENT_USER\Software\7-Zip\Compression</code>. The next time
+you open the <strong>Add to Archive</strong> window, these settings will
+load automatically as your default template.</p>
+<hr />
+<h3
+id="method-2-creating-reusable-template-profiles-via-registry">Method 2:
+Creating Reusable Template Profiles via Registry</h3>
+<p>If you switch between different compression standards (for example, a
+high-compression archive profile versus a quick-store profile), you can
+back up and swap configurations using Registry files.</p>
+<ol type="1">
+<li><p>Set up your desired template options using <strong>Method
+1</strong> and complete an archive creation.</p></li>
+<li><p>Press <code>Win + R</code>, type <code>regedit</code>, and press
+<strong>Enter</strong>.</p></li>
+<li><p>Navigate to:</p>
+<pre class="text"><code>HKEY_CURRENT_USER\Software\7-Zip\Compression</code></pre></li>
+<li><p>Right-click the <strong>Compression</strong> folder and select
+<strong>Export</strong>.</p></li>
+<li><p>Save the file with a recognizable name, such as
+<code>7Zip-Ultra-Template.reg</code>.</p></li>
+<li><p>Repeat the process in 7-Zip for another profile (such as
+<code>7Zip-Fast-Zip.reg</code>).</p></li>
+</ol>
+<p>Double-clicking any of your exported <code>.reg</code> files before
+archiving will instantly switch 7-Zip's default settings to that saved
+configuration.</p>
+<hr />
+<h3 id="method-3-building-one-click-template-shortcuts">Method 3:
+Building One-Click Template Shortcuts</h3>
+<p>To create distinct templates that bypass the 7-Zip interface
+entirely, use the Windows <strong>Send To</strong> menu paired with
+<code>7z.exe</code>.</p>
+<ol type="1">
+<li><p>Press <code>Win + R</code>, type <code>shell:sendto</code>, and
+press <strong>Enter</strong>.</p></li>
+<li><p>Right-click an empty space, choose <strong>New</strong> &gt;
+<strong>Shortcut</strong>.</p></li>
+<li><p>In the location field, enter your command-line template using the
+path to your 7-Zip installation:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;C:\Program Files\7-Zip\7z.exe&quot;</span> a <span class="at">-t7z</span> <span class="at">-mx</span>=9 <span class="at">-m0</span>=lzma2 <span class="at">-md</span>=64m <span class="st">&quot;</span><span class="pp">%~</span><span class="va">1</span><span class="st">.7z&quot;</span></span></code></pre></div>
+<ul>
+<li><code>-t7z</code>: Sets the format to 7z.</li>
+<li><code>-mx=9</code>: Applies Ultra compression.</li>
+<li><code>-m0=lzma2</code>: Sets the compression method to LZMA2.</li>
+<li><code>-md=64m</code>: Sets the dictionary size to 64MB.</li>
+</ul></li>
+<li><p>Click <strong>Next</strong>, name the shortcut (e.g.,
+<code>Compress with Ultra Template</code>), and click
+<strong>Finish</strong>.</p></li>
+</ol>
+<p>You can now right-click any file in Windows, navigate to <strong>Send
+to</strong>, and apply that specific compression template instantly.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/set-default-archive-templates-in-7-zip';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix 7-Zip Blocked Registry Access Error - 7-zip</title>
+    <meta name="description" content="Encountering a 7-Zip installation failure caused by blocked registry access usually indicates that Windows permissions or third-party security software are preventing the installer from writing necessary keys. This article provides straightforward trouble">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/fix-7-zip-blocked-registry-access-error">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Fix 7-Zip Blocked Registry Access Error - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/fix-7-zip-blocked-registry-access-error" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Encountering a 7-Zip installation failure caused by blocked registry access usually indicates that Windows permissions or third-party security software are preventing the installer from writing necessary keys. This article provides straightforward trouble" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="fix-7-zip-blocked-registry-access-error">Fix 7-Zip Blocked
+Registry Access Error</h1>
+<p>Encountering a 7-Zip installation failure caused by blocked registry
+access usually indicates that Windows permissions or third-party
+security software are preventing the installer from writing necessary
+keys. This article provides straightforward troubleshooting steps to
+resolve these access restrictions, including running the installer with
+elevated privileges, adjusting Windows Registry permissions manually,
+configuring security software, and utilizing alternative installation
+formats.</p>
+<h3 id="run-the-installer-as-administrator">Run the Installer as
+Administrator</h3>
+<p>The most common cause of registry write failures is a lack of
+elevated administrative privileges.</p>
+<ol type="1">
+<li>Locate the downloaded 7-Zip setup file (<code>.exe</code> or
+<code>.msi</code>).</li>
+<li>Right-click the file and select <strong>Run as
+administrator</strong>.</li>
+<li>When prompted by the User Account Control (UAC) dialog, click
+<strong>Yes</strong> to allow the installer to make changes to your
+system.</li>
+</ol>
+<h3 id="temporarily-disable-antivirus-and-endpoint-security">Temporarily
+Disable Antivirus and Endpoint Security</h3>
+<p>Security suites and anti-ransomware features often lock registry
+hives to prevent unauthorized modifications, occasionally blocking
+legitimate software like 7-Zip.</p>
+<ol type="1">
+<li>Open your antivirus or Windows Security interface.</li>
+<li>Temporarily turn off real-time protection or features such as
+"Controlled Folder Access" and "Tamper Protection."</li>
+<li>Attempt to run the 7-Zip installer again.</li>
+<li>Re-enable all security protections immediately after the
+installation finishes.</li>
+</ol>
+<h3 id="grant-full-control-to-the-target-registry-keys">Grant Full
+Control to the Target Registry Keys</h3>
+<p>If the installer specifies an error code or points to a specific
+registry path (such as <code>HKEY_LOCAL_MACHINE\SOFTWARE\7-Zip</code> or
+shell extension keys), you must grant full permissions to that key.</p>
+<ol type="1">
+<li>Press <code>Windows Key + R</code>, type <code>regedit</code>, and
+press <strong>Enter</strong>.</li>
+<li>Navigate to the key causing the issue (commonly
+<code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths</code>
+or <code>HKEY_LOCAL_MACHINE\SOFTWARE\7-Zip</code>).</li>
+<li>Right-click the folder/key and select
+<strong>Permissions</strong>.</li>
+<li>Click <strong>Advanced</strong>.</li>
+<li>Ensure your user account or the <strong>Administrators</strong>
+group is listed as the <strong>Owner</strong>. If not, click
+<strong>Change</strong>, type your Windows username, click <strong>Check
+Names</strong>, and click <strong>OK</strong>.</li>
+<li>Check the box labeled <strong>Replace all child object permission
+entries with inheritable permission entries from this object</strong>,
+then click <strong>Apply</strong>.</li>
+<li>In the main Permissions window, select
+<strong>Administrators</strong>, check the box for <strong>Full
+Control</strong> under the <strong>Allow</strong> column, and click
+<strong>OK</strong>.</li>
+<li>Retry the installation.</li>
+</ol>
+<h3 id="repair-corrupt-system-files">Repair Corrupt System Files</h3>
+<p>Damaged system components can interfere with proper registry
+access.</p>
+<ol type="1">
+<li>Press <code>Windows Key + S</code>, type <code>cmd</code>,
+right-click <strong>Command Prompt</strong>, and select <strong>Run as
+administrator</strong>.</li>
+<li>Type <code>sfc /scannow</code> and press
+<strong>Enter</strong>.</li>
+<li>Wait for the scan to finish and repair any corrupted files.</li>
+<li>Type <code>DISM /Online /Cleanup-Image /RestoreHealth</code> and
+press <strong>Enter</strong> to fix the Windows component store.</li>
+<li>Restart your computer and run the 7-Zip setup.</li>
+</ol>
+<h3 id="use-the-7-zip-standalone-or-portable-build">Use the 7-Zip
+Standalone or Portable Build</h3>
+<p>If system policies completely prohibit modifying the registry, bypass
+the standard installer entirely.</p>
+<ol type="1">
+<li>Download the 7-Zip <strong>portable</strong> version or the
+<strong>extra</strong> standalone archive (<code>.7z</code> or
+command-line version) from the official 7-Zip website.</li>
+<li>Extract the archive into a non-restricted directory, such as a
+custom folder in your user directory
+(<code>C:\Users\&lt;Username&gt;\7-Zip</code>).</li>
+<li>Run <code>7zFM.exe</code> directly from that directory without
+needing to write installation keys to the Windows Registry.</li>
+</ol></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/fix-7-zip-blocked-registry-access-error';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

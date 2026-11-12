@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Processes VHD and VHDX Files - 7-zip</title>
+    <meta name="description" content="7-Zip processes Virtual Hard Disk (VHD) and VHDX files by treating these virtual disk images as standard multi-volume or partitioned archive containers. Rather than requiring the host operating system to mount the disk as a block device, 7-Zip parses the">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-processes-vhd-and-vhdx-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Processes VHD and VHDX Files - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-processes-vhd-and-vhdx-files" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip processes Virtual Hard Disk (VHD) and VHDX files by treating these virtual disk images as standard multi-volume or partitioned archive containers. Rather than requiring the host operating system to mount the disk as a block device, 7-Zip parses the" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-processes-vhd-and-vhdx-files">How 7-Zip Processes VHD
+and VHDX Files</h1>
+<p>7-Zip processes Virtual Hard Disk (VHD) and VHDX files by treating
+these virtual disk images as standard multi-volume or partitioned
+archive containers. Rather than requiring the host operating system to
+mount the disk as a block device, 7-Zip parses the internal headers,
+block allocation tables, and embedded file systems directly. This allows
+users to inspect the partition layout, navigate directories, and extract
+individual files without running hypervisors, virtual disk services, or
+administrative mounting utilities.</p>
+<h3 id="header-detection-and-metadata-parsing">Header Detection and
+Metadata Parsing</h3>
+<p>When a <code>.vhd</code> or <code>.vhdx</code> file is opened, 7-Zip
+reads the beginning and ending sectors of the file to identify the
+container signature.</p>
+<ul>
+<li><strong>VHD Processing:</strong> 7-Zip locates the 512-byte
+footer—located either at the very end of dynamic/differencing images or
+at the beginning of fixed images—which identifies disk geometry, disk
+type (fixed or dynamic), and points to the dynamic header.</li>
+<li><strong>VHDX Processing:</strong> 7-Zip parses the 1 MB file header
+region, verifying the <code>vhdxfile</code> signature. It processes the
+log replay metadata and reads the active metadata table to determine
+block size, sector size, and disk geometry.</li>
+</ul>
+<h3 id="block-allocation-and-sector-mapping">Block Allocation and Sector
+Mapping</h3>
+<p>Virtual disk images often use dynamic sizing, meaning data blocks are
+not stored contiguously on the physical drive. 7-Zip resolves this using
+an internal translation layer:</p>
+<ol type="1">
+<li><strong>Reading the Block Allocation Table (BAT):</strong> 7-Zip
+loads the BAT to map logical disk blocks to their physical offsets
+within the container file.</li>
+<li><strong>Dynamic Reconstruction:</strong> For dynamic disks, empty or
+unallocated blocks are treated as zeroes on the fly, eliminating the
+need to expand the disk to its full virtual capacity in system
+memory.</li>
+<li><strong>Differencing Disks:</strong> If a disk is a differencing
+image, 7-Zip reads the modified blocks referenced in the child image's
+BAT. However, complete reconstruction requires access to the parent
+image chain.</li>
+</ol>
+<h3 id="partition-and-file-system-analysis">Partition and File System
+Analysis</h3>
+<p>Once 7-Zip constructs a coherent virtual byte stream from the BAT
+mapping, it scans the virtual sector zero for partition tables:</p>
+<ul>
+<li><strong>MBR and GPT Decoding:</strong> 7-Zip identifies Master Boot
+Record (MBR) or GUID Partition Table (GPT) structures. If multiple
+partitions exist, 7-Zip exposes each partition as an individual item or
+virtual folder (e.g., <code>0.fat</code>, <code>1.ntfs</code>).</li>
+<li><strong>File System Parsing:</strong> Inside each partition, 7-Zip
+utilizes its native file system decoders. It reads the master file
+tables and directory trees for common formats, including NTFS, FAT,
+exFAT, and Linux file systems like ext2, ext3, and ext4.</li>
+</ul>
+<h3 id="read-only-extraction-pipeline">Read-Only Extraction
+Pipeline</h3>
+<p>7-Zip handles VHD and VHDX formats strictly in read-only mode. Once
+the file system tree is loaded into the user interface or command-line
+buffer, operations follow the standard archive extraction path. When a
+user extracts a file, 7-Zip queries the file's data run in the internal
+file system, translates those logical offsets through the virtual disk's
+BAT, and reads the raw sectors directly from the container file to write
+them to the destination path.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-processes-vhd-and-vhdx-files';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

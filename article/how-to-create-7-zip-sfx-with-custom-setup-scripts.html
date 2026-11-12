@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Create 7-Zip SFX with Custom Setup Scripts - 7-zip</title>
+    <meta name="description" content="Yes, 7-Zip can create self-extracting (SFX) archives that automatically execute custom installation setup scripts or commands upon extraction. While the basic 7-Zip GUI only creates simple self-extracting archives, you can combine 7-Zip&#39;s command-line too">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-create-7-zip-sfx-with-custom-setup-scripts">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Create 7-Zip SFX with Custom Setup Scripts - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-create-7-zip-sfx-with-custom-setup-scripts" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Yes, 7-Zip can create self-extracting (SFX) archives that automatically execute custom installation setup scripts or commands upon extraction. While the basic 7-Zip GUI only creates simple self-extracting archives, you can combine 7-Zip&#39;s command-line too" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-create-7-zip-sfx-with-custom-setup-scripts">How to Create
+7-Zip SFX with Custom Setup Scripts</h1>
+<p>Yes, 7-Zip can create self-extracting (SFX) archives that
+automatically execute custom installation setup scripts or commands upon
+extraction. While the basic 7-Zip GUI only creates simple
+self-extracting archives, you can combine 7-Zip's command-line tool, an
+extended SFX module, and a configuration file to build automated,
+scripted installers.</p>
+<h3 id="required-components">Required Components</h3>
+<p>To create an advanced SFX installer, you need three files:</p>
+<ol type="1">
+<li><strong>The SFX Module (<code>7zS.sfx</code> or
+<code>7zSD.sfx</code>):</strong> Available in the official <strong>7-Zip
+Extra</strong> package, these modules support configuration directives
+and script execution.</li>
+<li><strong>The Configuration Script (<code>config.txt</code>):</strong>
+A plain text file defining the installer's behavior and the commands to
+run.</li>
+<li><strong>The Payload Archive (<code>archive.7z</code>):</strong> A
+standard 7z archive containing your program files and any setup script
+(such as a <code>.bat</code>, <code>.cmd</code>, <code>.ps1</code>, or
+<code>.exe</code>).</li>
+</ol>
+<hr />
+<h3 id="step-1-create-the-payload-archive">Step 1: Create the Payload
+Archive</h3>
+<p>Compress your application files and your custom installation script
+into a standard <code>.7z</code> file using 7-Zip:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a archive.7z ./source_files/<span class="pp">*</span></span></code></pre></div>
+<hr />
+<h3 id="step-2-write-the-configuration-script">Step 2: Write the
+Configuration Script</h3>
+<p>Create a text file named <code>config.txt</code> encoded in
+<strong>UTF-8</strong>. Use the following structure to define the
+execution parameters:</p>
+<pre class="text"><code>;!@Install@!UTF-8!
+Title=&quot;Application Setup&quot;
+BeginPrompt=&quot;Do you want to install this application?&quot;
+ExecuteFile=&quot;setup.bat&quot;
+ExecuteParameters=&quot;/silent&quot;
+;!@InstallEnd@!</code></pre>
+<h4 id="key-configuration-directives">Key Configuration Directives:</h4>
+<ul>
+<li><strong><code>Title</code></strong>: The window title displayed
+during extraction.</li>
+<li><strong><code>BeginPrompt</code></strong>: A confirmation message
+shown before extraction begins.</li>
+<li><strong><code>ExecuteFile</code></strong>: The script or binary to
+launch after files are extracted.</li>
+<li><strong><code>ExecuteParameters</code></strong>: Optional
+command-line flags passed to the executed file.</li>
+<li><strong><code>RunProgram</code></strong>: An alternative directive
+for launching standard Windows commands directly.</li>
+</ul>
+<hr />
+<h3 id="step-3-combine-files-into-the-final-executable">Step 3: Combine
+Files into the Final Executable</h3>
+<p>Combine the module, configuration script, and payload archive into a
+single executable using the Windows binary copy command:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">copy</span> <span class="at">/b</span> 7zS.sfx + config.txt + archive.7z Installer.exe</span></code></pre></div>
+<p>When a user runs <code>Installer.exe</code>, the package extracts the
+compressed contents into a temporary directory, automatically runs the
+designated setup script with any specified parameters, and cleans up the
+temporary files after execution completes.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-to-create-7-zip-sfx-with-custom-setup-scripts';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

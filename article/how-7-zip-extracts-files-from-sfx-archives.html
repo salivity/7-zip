@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Extracts Files from SFX Archives - 7-zip</title>
+    <meta name="description" content="Self-extracting (SFX) archives package compressed data alongside an executable module that unpacks the contents without requiring external software. However, running an untrusted executable file poses significant security risks. 7-Zip solves this problem">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-extracts-files-from-sfx-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Extracts Files from SFX Archives - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-extracts-files-from-sfx-archives" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Self-extracting (SFX) archives package compressed data alongside an executable module that unpacks the contents without requiring external software. However, running an untrusted executable file poses significant security risks. 7-Zip solves this problem" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-extracts-files-from-sfx-archives">How 7-Zip Extracts
+Files from SFX Archives</h1>
+<p>Self-extracting (SFX) archives package compressed data alongside an
+executable module that unpacks the contents without requiring external
+software. However, running an untrusted executable file poses
+significant security risks. 7-Zip solves this problem by treating SFX
+<code>.exe</code> files as passive data containers rather than programs
+to be executed, parsing their binary layout to safely locate and extract
+the embedded files without executing any code.</p>
+<h3 id="the-structure-of-an-sfx-archive">The Structure of an SFX
+Archive</h3>
+<p>A typical Windows SFX archive is built using the Portable Executable
+(PE) file format. It consists of two primary components concatenated
+together:</p>
+<ol type="1">
+<li><strong>The SFX Stub:</strong> A standalone Windows executable
+containing the uncompressed logic required to decompress the payload and
+provide a user interface.</li>
+<li><strong>The Archive Payload:</strong> The actual compressed data
+(such as a standard <code>.7z</code> or <code>.zip</code> stream),
+typically appended directly to the end of the executable stub or
+embedded within a resource section.</li>
+</ol>
+<h3 id="header-parsing-and-overlay-detection">Header Parsing and Overlay
+Detection</h3>
+<p>When you open an SFX executable in 7-Zip, the software reads the file
+header instead of invoking the Windows loader. Windows PE files define
+specific section headers that state where the code, data, and resources
+end.</p>
+<p>Any data appended after the last officially declared PE section is
+known as an "overlay." In most SFX configurations, the archive stream
+lives in this overlay region. 7-Zip reads the PE headers, calculates the
+defined size of the executable file, and identifies where the overlay
+begins.</p>
+<h3 id="signature-scanning">Signature Scanning</h3>
+<p>If the archive is not appended as a clean overlay or if the PE
+structure has been modified, 7-Zip uses signature scanning.</p>
+<p>7-Zip scans the binary content of the file for specific "magic bytes"
+that identify the beginning of supported archive formats. For instance,
+a 7z archive begins with the byte sequence
+<code>37 7A BC AF 27 1C</code> (<code>7z¼¯'</code>). Once 7-Zip detects
+this signature inside the <code>.exe</code>, it marks the byte offset
+where the compressed data starts.</p>
+<h3 id="extracting-the-compressed-stream">Extracting the Compressed
+Stream</h3>
+<p>Once the starting offset of the archive data is determined, 7-Zip
+feeds the remainder of the file into its standard decompression engine.
+The preceding executable stub is entirely ignored.</p>
+<p>From this offset, 7-Zip processes the stream identically to a
+standalone <code>.7z</code>, <code>.zip</code>, or <code>.rar</code>
+file:</p>
+<ul>
+<li>It reads the archive's internal header block to index file names,
+directory structures, timestamps, and attributes.</li>
+<li>If encryption is enabled, it prompts for a password and decrypts the
+header and blocks.</li>
+<li>It decompresses the data streams using the appropriate codec, such
+as LZMA or LZMA2, and writes the output files to disk.</li>
+</ul>
+<p>By decoupling the data stream from the executable envelope, 7-Zip
+allows users to inspect and extract files from SFX archives on any
+platform—even non-Windows environments—without triggering the executable
+code.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-extracts-files-from-sfx-archives';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

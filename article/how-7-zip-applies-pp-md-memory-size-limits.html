@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Applies PPMd Memory Size Limits - 7-zip</title>
+    <meta name="description" content="This article examines how the 7-Zip compression utility enforces memory limits when utilizing the PPMd (Prediction by Partial Matching) algorithm. PPMd is a specialized statistical compression method primarily used for text. 7-Zip controls PPMd memory con">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-applies-pp-md-memory-size-limits">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Applies PPMd Memory Size Limits - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-applies-pp-md-memory-size-limits" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines how the 7-Zip compression utility enforces memory limits when utilizing the PPMd (Prediction by Partial Matching) algorithm. PPMd is a specialized statistical compression method primarily used for text. 7-Zip controls PPMd memory con" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-applies-ppmd-memory-size-limits">How 7-Zip Applies
+PPMd Memory Size Limits</h1>
+<p>This article examines how the 7-Zip compression utility enforces
+memory limits when utilizing the PPMd (Prediction by Partial Matching)
+algorithm. PPMd is a specialized statistical compression method
+primarily used for text. 7-Zip controls PPMd memory consumption through
+fixed upfront buffer allocation, a dedicated internal sub-allocator, and
+automatic model-reset mechanisms that strictly prevent the process from
+exceeding user-defined memory thresholds during both compression and
+decompression.</p>
+<h3 id="pre-execution-allocation">Pre-Execution Allocation</h3>
+<p>Unlike sliding-window algorithms such as LZMA, which dynamically
+expand buffer usage based on dictionary sizes and multi-threading
+requirements, PPMd operates within a strictly bounded, pre-allocated
+memory block. When a user configures a memory limit—either via the 7-Zip
+graphical interface or the command line (e.g.,
+<code>-m0=PPMd:mem=256m</code>)—7-Zip reads this value prior to starting
+the operation.</p>
+<p>Upon execution, 7-Zip requests a single contiguous block of system
+memory matching that exact value via its PPMd wrapper
+(<code>Ppmd7_Alloc</code> or <code>Ppmd8_Alloc</code>, based on the PPMd
+implementation version). If the operating system cannot provide this
+contiguous block, the process halts immediately with an allocation error
+rather than degrading into dynamic system heap expansion.</p>
+<h3 id="the-dedicated-sub-allocator">The Dedicated Sub-Allocator</h3>
+<p>Once the initial block of memory is assigned, PPMd ceases making
+standard operating system memory calls (such as <code>malloc</code> or
+<code>HeapAlloc</code>). Instead, it relies on a custom internal
+sub-allocator.</p>
+<p>PPMd models data by building a complex trie of context trees,
+tracking character frequencies and order histories. To store these nodes
+efficiently:</p>
+<ul>
+<li>The pre-allocated memory pool is partitioned into discrete memory
+units.</li>
+<li>The sub-allocator divides available memory into index-based free
+lists categorized by allocation unit size.</li>
+<li>Context nodes are created, split, and recycled strictly within this
+bounded space.</li>
+</ul>
+<p>By shifting memory management away from the host operating system
+kernel to this internal sub-allocator, 7-Zip eliminates memory
+fragmentation issues and ensures that runtime execution cannot leak or
+grow beyond the initial boundary.</p>
+<h3 id="memory-saturation-and-model-resets">Memory Saturation and Model
+Resets</h3>
+<p>As high-order context models grow during the processing of large
+files, the pre-allocated memory buffer eventually fills up. When the
+sub-allocator detects that no free units remain, 7-Zip does not expand
+the buffer. Instead, it activates PPMd’s internal maintenance
+routines:</p>
+<ol type="1">
+<li><strong>Context Rescaling:</strong> The model halves or scales down
+context frequencies to free unused statistical counters.</li>
+<li><strong>Model Pruning and Restart:</strong> If rescaling does not
+recover sufficient space, the engine triggers a model restart mechanism
+(<code>RestartModelRare</code>). This purges stale, low-frequency
+context branches and resets the model to a baseline state while
+retaining only essential context paths.</li>
+</ol>
+<p>Compression then continues using the newly freed segments inside the
+original memory envelope. This cycle repeats as often as necessary
+across large streams, locking the total runtime footprint at the chosen
+limit.</p>
+<h3 id="decompression-memory-parity">Decompression Memory Parity</h3>
+<p>7-Zip records the designated PPMd memory size directly into the
+archive stream metadata. During decompression, the extraction engine
+reads this parameter and pre-allocates an identical memory buffer.
+Because PPMd is a deterministic state-machine algorithm, the
+decompressor must follow the exact same sub-allocation, frequency
+scaling, and model restart steps as the compressor. If the extracting
+machine has less available RAM than specified in the archive header, the
+extraction process fails immediately at the initialization stage,
+protecting the host system from out-of-memory crashes.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-applies-pp-md-memory-size-limits';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

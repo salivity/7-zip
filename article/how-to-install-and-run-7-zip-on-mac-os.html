@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Install and Run 7-Zip on macOS - 7-zip</title>
+    <meta name="description" content="This guide provides a straightforward walkthrough on how to install and run 7-Zip on macOS. While 7-Zip is traditionally a Windows application, an official command-line version is available for macOS alongside third-party package managers. Below, you will">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-install-and-run-7-zip-on-mac-os">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Install and Run 7-Zip on macOS - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-install-and-run-7-zip-on-mac-os" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide provides a straightforward walkthrough on how to install and run 7-Zip on macOS. While 7-Zip is traditionally a Windows application, an official command-line version is available for macOS alongside third-party package managers. Below, you will" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-install-and-run-7-zip-on-macos">How to Install and Run
+7-Zip on macOS</h1>
+<p>This guide provides a straightforward walkthrough on how to install
+and run 7-Zip on macOS. While 7-Zip is traditionally a Windows
+application, an official command-line version is available for macOS
+alongside third-party package managers. Below, you will find the
+quickest installation methods using Homebrew or the official standalone
+binary, followed by essential commands to compress and extract
+files.</p>
+<h2 id="method-1-install-using-homebrew-recommended">Method 1: Install
+Using Homebrew (Recommended)</h2>
+<p>The easiest way to install and maintain 7-Zip on a Mac is via
+Homebrew, the macOS package manager.</p>
+<ol type="1">
+<li><p>Open the <strong>Terminal</strong> app from Applications &gt;
+Utilities.</p></li>
+<li><p>If you do not have Homebrew installed, paste the following
+command and press Enter:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/bin/bash</span> <span class="at">-c</span> <span class="st">&quot;</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-fsSL</span> https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="va">)</span><span class="st">&quot;</span></span></code></pre></div></li>
+<li><p>Once Homebrew is ready, install the official 7-Zip package:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install sevenzip</span></code></pre></div></li>
+<li><p>Verify the installation:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span></span></code></pre></div></li>
+</ol>
+<h2 id="method-2-manual-installation-from-the-official-binary">Method 2:
+Manual Installation from the Official Binary</h2>
+<p>If you prefer not to use Homebrew, you can install the standalone
+macOS console version directly from 7-Zip.</p>
+<ol type="1">
+<li><p>Go to the official 7-Zip download page and download the macOS
+console version (available for both x86-64 and ARM64 / Apple
+Silicon).</p></li>
+<li><p>Open Terminal and navigate to your <code>Downloads</code>
+directory:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Downloads</span></code></pre></div></li>
+<li><p>Extract the downloaded <code>.tar.xz</code> file (replace the
+filename with your downloaded version):</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xf</span> 7z2301-mac.tar.xz</span></code></pre></div></li>
+<li><p>Move the executable binary to your local bin directory to run it
+from anywhere:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mv 7zz /usr/local/bin/7z</span></code></pre></div></li>
+<li><p>Grant execution permissions if prompted:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod +x /usr/local/bin/7z</span></code></pre></div></li>
+</ol>
+<h2 id="how-to-run-7-zip-on-macos">How to Run 7-Zip on macOS</h2>
+<p>7-Zip runs through the macOS Terminal using simple command-line
+arguments.</p>
+<h3 id="1-extract-an-archive">1. Extract an Archive</h3>
+<p>To extract an archive while preserving its original directory
+structure, use the <code>x</code> command:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x filename.7z</span></code></pre></div>
+<p>To extract directly to a specific folder:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x filename.7z <span class="at">-o</span>/path/to/destination/</span></code></pre></div>
+<h3 id="2-create-a-compressed-archive">2. Create a Compressed
+Archive</h3>
+<p>To compress files or folders into a <code>.7z</code> archive, use the
+<code>a</code> (add) command:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a archive_name.7z /path/to/folder_or_file</span></code></pre></div>
+<p>You can also specify other formats such as <code>.zip</code>:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a archive_name.zip file1.txt file2.txt</span></code></pre></div>
+<h3 id="3-list-archive-contents">3. List Archive Contents</h3>
+<p>To view the contents of an archive without extracting it, use the
+<code>l</code> command:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> l filename.7z</span></code></pre></div>
+<h3 id="4-create-a-password-protected-archive">4. Create a
+Password-Protected Archive</h3>
+<p>To encrypt an archive with a password:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a secured.7z /path/to/folder <span class="at">-pYourPassword</span> <span class="at">-mhe</span><span class="op">=</span>on</span></code></pre></div>
+<p>The <code>-mhe=on</code> flag also encrypts the file names inside the
+archive.</p>
+<h2 id="graphical-alternative-for-macos">Graphical Alternative for
+macOS</h2>
+<p>Because the official 7-Zip release on macOS operates exclusively in
+the command line, users who prefer a graphical interface (GUI) can
+install <strong>Keka</strong>, an open-source macOS file archiver
+powered by the 7-Zip core engine. Keka supports drag-and-drop
+compression and extraction for <code>.7z</code> and various other
+formats.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-to-install-and-run-7-zip-on-mac-os';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

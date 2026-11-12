@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best 7-Zip Ultra Compression Settings - 7-zip</title>
+    <meta name="description" content="Achieving the highest possible compression ratio in 7-Zip requires adjusting specific parameters beyond the default presets to maximize space savings at the expense of processing time and memory usage. This guide outlines the exact settings—including arch">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/best-7-zip-ultra-compression-settings">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Best 7-Zip Ultra Compression Settings - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/best-7-zip-ultra-compression-settings" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Achieving the highest possible compression ratio in 7-Zip requires adjusting specific parameters beyond the default presets to maximize space savings at the expense of processing time and memory usage. This guide outlines the exact settings—including arch" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="best-7-zip-ultra-compression-settings">Best 7-Zip Ultra
+Compression Settings</h1>
+<p>Achieving the highest possible compression ratio in 7-Zip requires
+adjusting specific parameters beyond the default presets to maximize
+space savings at the expense of processing time and memory usage. This
+guide outlines the exact settings—including archive format, dictionary
+size, word size, and solid block options—needed to produce the smallest
+file sizes possible.</p>
+<h3 id="recommended-settings-for-maximum-compression">Recommended
+Settings for Maximum Compression</h3>
+<p>To achieve maximum compression, open the 7-Zip compression dialog and
+apply the following values:</p>
+<ul>
+<li><p><strong>Archive format:</strong> <code>7z</code><br />
+The native <code>.7z</code> container is required, as it supports modern
+algorithms like LZMA and LZMA2 alongside solid archiving, offering
+significantly higher compression than formats like
+<code>.zip</code>.</p></li>
+<li><p><strong>Compression level:</strong> <code>Ultra</code><br />
+This sets the base search depth and match-finding algorithms to their
+maximum computational effort.</p></li>
+<li><p><strong>Compression method:</strong> <code>LZMA2</code><br />
+LZMA2 is recommended for modern multi-core processors. It provides
+compression ratios nearly identical to the original LZMA while properly
+utilizing multi-threading. If maximum absolute compression on a single
+stream is desired regardless of speed, original <code>LZMA</code> can
+occasionally yield marginally smaller files.</p></li>
+<li><p><strong>Dictionary size:</strong> <code>64 MB</code> to
+<code>1024 MB</code> (RAM dependent)<br />
+A larger dictionary size allows the algorithm to find duplicate patterns
+across greater distances within the data. Set this to the highest value
+your system memory permits. Note that compression requires approximately
+10 to 12 times the dictionary size in RAM, while decompression requires
+only the dictionary size itself. For example, a 64 MB dictionary
+requires around 700 MB of RAM to compress, while a 1024 MB dictionary
+can require up to 10–12 GB of available RAM.</p></li>
+<li><p><strong>Word size:</strong> <code>273</code><br />
+Set the word size to the absolute maximum of 273. This parameter defines
+the maximum sequence length 7-Zip searches for to identify repeating
+patterns. Increasing this value increases compression time, but reduces
+output file size.</p></li>
+<li><p><strong>Solid Block size:</strong> <code>Solid</code><br />
+Selecting "Solid" treats all files in the archive as a single,
+continuous stream of data. This dramatically improves compression when
+archiving multiple files of similar formats, as the compressor can find
+patterns spanning across multiple files.</p></li>
+<li><p><strong>Number of CPU threads:</strong> Adjusted to available
+RAM<br />
+Because LZMA2 allocates dictionary memory per thread chunk, reducing the
+number of active threads lowers total memory consumption, allowing you
+to use a larger dictionary size if RAM is constrained.</p></li>
+</ul>
+<h3 id="advanced-parameters-for-executables-and-binaries">Advanced
+Parameters for Executables and Binaries</h3>
+<p>For archives containing mixed executables (such as x86 Windows
+binaries and DLLs), you can add the following to the
+<strong>Parameters</strong> box at the bottom of the window:</p>
+<pre class="text"><code>f=BCJ2</code></pre>
+<p>The BCJ2 filter specifically transforms 32-bit x86 machine
+instructions (such as jumps and calls) into relative addresses,
+significantly improving LZMA's ability to compress executable code.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/best-7-zip-ultra-compression-settings';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

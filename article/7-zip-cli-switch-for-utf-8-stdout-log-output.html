@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip CLI Switch for UTF-8 stdout Log Output - 7-zip</title>
+    <meta name="description" content="Managing console output in the 7-Zip command-line interface (CLI) is essential for automated scripting, log parsing, and multi-language file processing. This article explains which switches control output encoding and stream destinations in 7-Zip, specifi">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-cli-switch-for-utf-8-stdout-log-output">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip CLI Switch for UTF-8 stdout Log Output - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-cli-switch-for-utf-8-stdout-log-output" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Managing console output in the 7-Zip command-line interface (CLI) is essential for automated scripting, log parsing, and multi-language file processing. This article explains which switches control output encoding and stream destinations in 7-Zip, specifi" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-cli-switch-for-utf-8-stdout-log-output">7-Zip CLI Switch
+for UTF-8 stdout Log Output</h1>
+<p>Managing console output in the 7-Zip command-line interface (CLI) is
+essential for automated scripting, log parsing, and multi-language file
+processing. This article explains which switches control output encoding
+and stream destinations in 7-Zip, specifically focusing on how to route
+detailed log messages directly to standard output (stdout) formatted in
+UTF-8.</p>
+<p>To send log output directly to <code>stdout</code> in UTF-8 format
+using the 7-Zip CLI, you combine the character set switch with the
+stream redirection switch:</p>
+<ul>
+<li><strong><code>-sccUTF-8</code></strong>: Sets the console input and
+output character set to UTF-8.</li>
+<li><strong><code>-bso1</code></strong>: Explicitly directs standard
+operational and log output to <code>stdout</code> (stream 1).</li>
+</ul>
+<h3 id="the-primary-encoding-switch--sccutf-8">The Primary Encoding
+Switch: <code>-sccUTF-8</code></h3>
+<p>By default, 7-Zip on Windows uses the OEM (DOS) character encoding
+for console input and output. To ensure that file names, paths, and log
+entries are printed in UTF-8, use the <code>-scc</code> switch:</p>
+<pre class="text"><code>-sccUTF-8</code></pre>
+<p>This tells the 7-Zip engine to encode all standard terminal output in
+UTF-8, preventing character corruption when archiving or listing items
+with non-ASCII or Unicode names.</p>
+<h3 id="directing-log-streams--bso-and--bb">Directing Log Streams:
+<code>-bso</code> and <code>-bb</code></h3>
+<p>7-Zip separates its console stream types into standard messages
+(<code>-bso</code>), progress information (<code>-bsp</code>), and error
+messages (<code>-bse</code>).</p>
+<ul>
+<li><strong><code>-bso1</code></strong>: Ensures standard logs and
+information messages flow directly to <code>stdout</code>.</li>
+<li><strong><code>-bb[0-3]</code></strong>: Controls the log detail
+level. Setting <code>-bb3</code> provides the most detailed per-file
+operation logging.</li>
+</ul>
+<p>If you want clean log output routed to <code>stdout</code> without
+progress bars interfering, redirect progress to <code>stderr</code>
+(<code>-bsp2</code>) or disable it entirely (<code>-bsp0</code>).</p>
+<h3 id="complete-command-example">Complete Command Example</h3>
+<p>To create an archive with full logging sent directly to
+<code>stdout</code> in UTF-8 encoding while suppressing progress
+noise:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a archive.7z /path/to/files/ <span class="at">-sccUTF-8</span> <span class="at">-bso1</span> <span class="at">-bsp0</span> <span class="at">-bb3</span></span></code></pre></div>
+<p>For extracting files with UTF-8 log output piped to another tool:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x archive.7z <span class="at">-o</span>/destination/ <span class="at">-sccUTF-8</span> <span class="at">-bso1</span> <span class="at">-bb1</span></span></code></pre></div>
+<p>By pairing <code>-sccUTF-8</code> with <code>-bso1</code>, any
+external process capturing <code>stdout</code> receives clean,
+accurately encoded UTF-8 logs.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-cli-switch-for-utf-8-stdout-log-output';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

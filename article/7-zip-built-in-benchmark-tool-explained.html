@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Built-In Benchmark Tool Explained - 7-zip</title>
+    <meta name="description" content="7-Zip includes a native performance testing feature known simply as the 7-Zip Benchmark. This integrated utility evaluates a computer&#39;s processor and memory performance by running intensive compression and decompression cycles using the LZMA algorithm. Th">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-built-in-benchmark-tool-explained">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Built-In Benchmark Tool Explained - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-built-in-benchmark-tool-explained" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip includes a native performance testing feature known simply as the 7-Zip Benchmark. This integrated utility evaluates a computer&#39;s processor and memory performance by running intensive compression and decompression cycles using the LZMA algorithm. Th" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-built-in-benchmark-tool-explained">7-Zip Built-In
+Benchmark Tool Explained</h1>
+<p>7-Zip includes a native performance testing feature known simply as
+the <strong>7-Zip Benchmark</strong>. This integrated utility evaluates
+a computer's processor and memory performance by running intensive
+compression and decompression cycles using the LZMA algorithm. This
+guide explains what the utility is, how it measures hardware
+performance, how to run it via both graphical and command-line
+interfaces, and why it remains a standard test in hardware reviews.</p>
+<h3 id="what-is-the-7-zip-benchmark">What Is the 7-Zip Benchmark?</h3>
+<p>The 7-Zip Benchmark is a free, built-in diagnostic test bundled
+directly into the 7-Zip file archiver. Rather than requiring third-party
+testing software, users can immediately measure their CPU’s data
+handling capabilities within the application. The tool operates by
+compressing and decompressing randomly generated data entirely in RAM,
+preventing storage drive speeds (such as SSD or HDD bottlenecks) from
+skewing the results.</p>
+<h3 id="how-it-measures-performance">How It Measures Performance</h3>
+<p>The utility reports performance using <strong>MIPS</strong> (Million
+Instructions Per Second) or <strong>GIPS</strong> (Giga Instructions Per
+Second), broken down into two distinct phases:</p>
+<ul>
+<li><strong>Compressing:</strong> This phase heavily tests CPU branch
+prediction, cache speed, and system memory latency. It represents the
+processing power required to search for patterns and reduce file
+sizes.</li>
+<li><strong>Decompressing:</strong> This phase is simpler
+algorithmically but relies heavily on raw integer pipeline throughput
+and L1/L2 hardware cache performance.</li>
+<li><strong>Total Rating:</strong> A combined average score that
+provides an overall assessment of the system's multi-core
+efficiency.</li>
+</ul>
+<p>Because the tool can scale across multiple threads, it effectively
+benchmarks both single-core performance and multi-threaded scaling on
+modern processors.</p>
+<h3 id="how-to-run-the-benchmark">How to Run the Benchmark</h3>
+<p>The utility can be accessed via the graphical interface or the
+command line:</p>
+<h4 id="using-the-graphical-user-interface-gui">Using the Graphical User
+Interface (GUI)</h4>
+<ol type="1">
+<li>Open the <strong>7-Zip File Manager</strong>.</li>
+<li>Click on the <strong>Tools</strong> menu at the top of the
+window.</li>
+<li>Select <strong>Benchmark</strong> (or press the hotkey assigned by
+your operating system).</li>
+<li>In the pop-up window, configure the <strong>Dictionary size</strong>
+and the <strong>Number of CPU threads</strong> you want to test.</li>
+<li>The test will run continuously until you click
+<strong>Stop</strong>.</li>
+</ol>
+<h4 id="using-the-command-line">Using the Command Line</h4>
+<p>You can run the benchmark from the terminal or Command Prompt using
+the 7-Zip executable:</p>
+<ul>
+<li>Standard run: <code>7z b</code></li>
+<li>Specify thread count (e.g., 8 threads):
+<code>7z b -mmt=8</code></li>
+</ul>
+<h3 id="why-the-benchmark-is-widely-used">Why the Benchmark Is Widely
+Used</h3>
+<p>Hardware reviewers and overclockers frequently use the 7-Zip
+Benchmark for several reasons:</p>
+<ul>
+<li><strong>Zero Cost and Lightweight:</strong> It requires no separate
+purchase, complex installation, or extensive disk space.</li>
+<li><strong>Stability Testing:</strong> Continuous execution pushes CPU
+cores and system RAM hard enough to expose unstable overclocks or memory
+timings.</li>
+<li><strong>Real-World Representation:</strong> Unlike purely synthetic
+benchmarks, it reflects real-world computational workloads involving
+data compression, integer math, and memory bandwidth.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-built-in-benchmark-tool-explained';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

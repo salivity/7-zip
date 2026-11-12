@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Update 7-Zip Without Losing Settings - 7-zip</title>
+    <meta name="description" content="Updating 7-Zip is vital for maintaining system security, patching vulnerabilities, and improving archive handling performance. However, many users worry that upgrading will reset their custom context menu shortcuts, default compression profiles, and file">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-to-update-7-zip-without-losing-settings">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Update 7-Zip Without Losing Settings - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-to-update-7-zip-without-losing-settings" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Updating 7-Zip is vital for maintaining system security, patching vulnerabilities, and improving archive handling performance. However, many users worry that upgrading will reset their custom context menu shortcuts, default compression profiles, and file" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-update-7-zip-without-losing-settings">How to Update 7-Zip
+Without Losing Settings</h1>
+<p>Updating 7-Zip is vital for maintaining system security, patching
+vulnerabilities, and improving archive handling performance. However,
+many users worry that upgrading will reset their custom context menu
+shortcuts, default compression profiles, and file associations. This
+guide explains how to safely update 7-Zip directly over an existing
+installation to ensure that all personal configurations and preferences
+remain completely intact.</p>
+<h3 id="how-7-zip-stores-preferences">How 7-Zip Stores Preferences</h3>
+<p>7-Zip stores its configuration data—including file associations,
+custom context menu options, and history—in the Windows Registry under
+<code>HKEY_CURRENT_USER\Software\7-Zip</code> and
+<code>HKEY_LOCAL_MACHINE\Software\7-Zip</code>.</p>
+<p>Because preferences reside in the registry rather than the
+application directory, standard updates do not overwrite your settings
+as long as you do not perform a full uninstall.</p>
+<h3 id="step-1-back-up-current-settings-optional">Step 1: Back Up
+Current Settings (Optional)</h3>
+<p>Creating a backup of your configuration ensures you can restore your
+setup if an unexpected error occurs:</p>
+<ol type="1">
+<li>Press <code>Windows Key + R</code>, type <code>regedit</code>, and
+press <strong>Enter</strong>.</li>
+<li>Navigate to: <code>HKEY_CURRENT_USER\Software\7-Zip</code></li>
+<li>Right-click the <strong>7-Zip</strong> folder and select
+<strong>Export</strong>.</li>
+<li>Choose a destination, name the file <code>7zip_backup.reg</code>,
+and click <strong>Save</strong>.</li>
+</ol>
+<h3 id="step-2-check-your-current-7-zip-architecture">Step 2: Check Your
+Current 7-Zip Architecture</h3>
+<p>Installing a version with a different system architecture (e.g.,
+32-bit over 64-bit) can cause duplicate installations or lost
+integration:</p>
+<ol type="1">
+<li>Open 7-Zip.</li>
+<li>Click <strong>Help</strong> in the top menu and select <strong>About
+7-Zip</strong>.</li>
+<li>Note whether the version says <strong>x64</strong> (64-bit) or
+<strong>x86</strong> (32-bit).</li>
+</ol>
+<h3 id="step-3-download-and-run-the-latest-installer">Step 3: Download
+and Run the Latest Installer</h3>
+<p>To retain settings, you must install the new version over the old one
+without uninstalling first:</p>
+<ol type="1">
+<li>Visit the official 7-Zip website.</li>
+<li>Download the installer that matches your architecture (usually
+64-bit Windows x64).</li>
+<li>Close any open 7-Zip windows or active file compression tasks.</li>
+<li>Launch the downloaded installer.</li>
+<li>Verify that the destination folder matches your existing
+installation path (typically <code>C:\Program Files\7-Zip</code>).</li>
+<li>Click <strong>Install</strong>.</li>
+</ol>
+<p>The installer will replace the core executable, libraries, and
+language files while leaving all existing registry configuration entries
+untouched.</p>
+<h3 id="step-4-verify-your-configuration">Step 4: Verify Your
+Configuration</h3>
+<p>Once the installation finishes, open 7-Zip to confirm your settings
+are active:</p>
+<ol type="1">
+<li>Go to <strong>Tools</strong> &gt; <strong>Options</strong>.</li>
+<li>Check the <strong>7-Zip</strong> tab to confirm your context menu
+items are still selected.</li>
+<li>Check the <strong>System</strong> tab to confirm that file
+associations (such as <code>.7z</code>, <code>.zip</code>,
+<code>.rar</code>) are still assigned properly. If any were revoked by a
+recent Windows update, click the <code>+</code> icon to reapply
+them.</li>
+</ol></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-to-update-7-zip-without-losing-settings';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

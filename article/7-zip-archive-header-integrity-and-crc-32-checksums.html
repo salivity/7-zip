@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Archive Header Integrity and CRC32 Checksums - 7-zip</title>
+    <meta name="description" content="7-Zip protects the structural metadata of its archives by embedding 32-bit Cyclic Redundancy Check (CRC32) checksums directly within the archive header layout. This article explains how the 7z format uses CRC32 algorithms to validate the Start Header and">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-archive-header-integrity-and-crc-32-checksums">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Archive Header Integrity and CRC32 Checksums - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-archive-header-integrity-and-crc-32-checksums" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip protects the structural metadata of its archives by embedding 32-bit Cyclic Redundancy Check (CRC32) checksums directly within the archive header layout. This article explains how the 7z format uses CRC32 algorithms to validate the Start Header and" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-archive-header-integrity-and-crc32-checksums">7-Zip
+Archive Header Integrity and CRC32 Checksums</h1>
+<p>7-Zip protects the structural metadata of its archives by embedding
+32-bit Cyclic Redundancy Check (CRC32) checksums directly within the
+archive header layout. This article explains how the 7z format uses
+CRC32 algorithms to validate the Start Header and the Main Header,
+ensuring that directory layouts, compression parameters, and file
+boundaries remain uncorrupted before extraction begins.</p>
+<h3 id="the-7z-header-architecture">The 7z Header Architecture</h3>
+<p>The 7z archive format separates compressed payload data from the
+metadata required to decompress it. The metadata is housed in structured
+blocks known as headers. To ensure these headers have not suffered from
+disk corruption, transmission errors, or incomplete downloads, 7-Zip
+implements a two-tier verification mechanism using CRC32.</p>
+<p>An unencrypted 7z archive primarily contains two critical header
+structures:</p>
+<ol type="1">
+<li><strong>The Start Header:</strong> A fixed 32-byte structure located
+at the very beginning of the archive.</li>
+<li><strong>The Next Header (Main Header):</strong> A variable-length
+structure, typically located at the end of the archive, containing
+metadata such as filenames, file sizes, timestamps, and compression
+filters.</li>
+</ol>
+<h3 id="verifying-the-start-header">Verifying the Start Header</h3>
+<p>When 7-Zip opens an archive, it first reads the 32-byte Start Header.
+This fixed-size block contains the following layout:</p>
+<ul>
+<li><strong>Bytes 0–5:</strong> The 7z signature
+(<code>'7', 'z', 0xBC, 0xAF, 0x27, 0x1C</code>).</li>
+<li><strong>Bytes 6–7:</strong> Major and minor format version
+numbers.</li>
+<li><strong>Bytes 8–11:</strong> CRC32 of the Start Header data (bytes
+12 through 31).</li>
+<li><strong>Bytes 12–19:</strong> 64-bit integer pointing to the
+relative offset of the Next Header.</li>
+<li><strong>Bytes 20–27:</strong> 64-bit integer representing the size
+of the Next Header.</li>
+<li><strong>Bytes 28–31:</strong> CRC32 of the Next Header.</li>
+</ul>
+<p>Integrity verification begins at byte 8. 7-Zip computes the CRC32
+hash of bytes 12 through 31. It compares the resulting value with the
+4-byte checksum stored at bytes 8–11. If these values do not match, the
+archive is immediately flagged as damaged because the pointer to the
+main catalog is unreliable.</p>
+<h3 id="validating-the-main-header">Validating the Main Header</h3>
+<p>Once the Start Header passes verification, 7-Zip uses the offset and
+size values to locate and read the Next Header.</p>
+<p>Before parsing the streams and properties defined in the Next Header,
+7-Zip calculates the CRC32 hash of the entire Next Header block. It
+compares this newly computed checksum against the
+<code>NextHeaderCRC</code> value stored in bytes 28–31 of the Start
+Header.</p>
+<p>If the hashes match, 7-Zip proceeds with decompression. If they
+differ, 7-Zip triggers a "Headers Error" and aborts processing,
+preventing crashes caused by attempting to parse malformed data
+structures.</p>
+<h3 id="encoded-and-compressed-headers">Encoded and Compressed
+Headers</h3>
+<p>The 7z format allows the Main Header to be compressed (typically with
+LZMA) or encrypted (using AES-256). In these configurations, header
+integrity verification functions in stages:</p>
+<ol type="1">
+<li><strong>Encoded Stream Verification:</strong> The
+<code>NextHeaderCRC</code> in the Start Header validates the compressed
+or encrypted byte stream before decompression or decryption occurs.</li>
+<li><strong>Internal Structure Verification:</strong> Within the decoded
+header stream, individual metadata blocks (such as file lists, folder
+descriptors, and property streams) can include their own embedded CRC32
+values to ensure internal consistency after decoding.</li>
+</ol>
+<p>By validating both the location pointers and the metadata payload
+through standard CRC32 algorithms, 7-Zip prevents corrupted archives
+from causing memory faults or silent file corruption during
+extraction.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-archive-header-integrity-and-crc-32-checksums';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>
