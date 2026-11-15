@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip LZMA Floating-Point Calculations Explained - 7-zip</title>
+    <meta name="description" content="7-Zip does not use floating-point calculations during LZMA encoding; instead, it relies entirely on fixed-point arithmetic, scaled integers, and precomputed lookup tables. This architectural choice guarantees cross-platform determinism, enhances computati">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-lzma-floating-point-calculations-explained">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip LZMA Floating-Point Calculations Explained - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-lzma-floating-point-calculations-explained" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip does not use floating-point calculations during LZMA encoding; instead, it relies entirely on fixed-point arithmetic, scaled integers, and precomputed lookup tables. This architectural choice guarantees cross-platform determinism, enhances computati" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-lzma-floating-point-calculations-explained">7-Zip LZMA
+Floating-Point Calculations Explained</h1>
+<p>7-Zip does not use floating-point calculations during LZMA encoding;
+instead, it relies entirely on fixed-point arithmetic, scaled integers,
+and precomputed lookup tables. This architectural choice guarantees
+cross-platform determinism, enhances computational efficiency, and
+prevents precision mismatches across different processor
+architectures.</p>
+<h3 id="the-requirement-for-determinism">The Requirement for
+Determinism</h3>
+<p>A primary design requirement for lossless compression tools like
+7-Zip is binary determinism. If an encoder utilized hardware
+floating-point operations (FPU or vector float extensions), variations
+in processor microarchitectures, compiler optimizations, and rounding
+modes (such as differences between IEEE 754 implementations or x87
+extended precision versus SSE) could result in different output streams
+for the identical input. By strictly eliminating floating-point math,
+7-Zip guarantees that LZMA produces bit-for-bit identical output
+regardless of the host CPU.</p>
+<h3 id="fixed-point-probability-modeling">Fixed-Point Probability
+Modeling</h3>
+<p>The LZMA entropy coder is a variant of a range coder, which
+continuously updates binary state probabilities. In pure mathematics,
+probabilities are real numbers between 0.0 and 1.0. LZMA implements
+these values as fixed-point integers:</p>
+<ul>
+<li><strong>State Scaling:</strong> LZMA scales probabilities using an
+integer constant (typically <code>kBitModelTotal = 2048</code>,
+representing an 11-bit fixed-point scale). A probability of 0.5 is
+represented as 1024.</li>
+<li><strong>Probability Adaptation:</strong> When a bit is processed,
+the model adapts using an integer shift formula:
+<code>Prob = Prob - (Prob &gt;&gt; MoveBits) + (Bit ? ((kBitModelTotal - 1) &gt;&gt; MoveBits) : 0)</code>
+This operation relies entirely on bitwise shifts, additions, and
+subtractions, bypassing the need for floating-point calculations.</li>
+</ul>
+<h3 id="logarithmic-bit-cost-estimation">Logarithmic Bit-Cost
+Estimation</h3>
+<p>During parsing, especially in maximum compression modes, LZMA uses an
+optimal parser (similar to the Viterbi algorithm) to determine whether
+to emit a literal, a match, or a repeat match. Evaluating the most
+cost-effective path requires estimating the bit cost (entropy) of
+encoding a symbol, mathematically defined as <span
+class="math inline">\(-\log_2(P)\)</span>.</p>
+<p>Computing logarithms with standard floating-point functions (such as
+<code>log2()</code> or <code>pow()</code>) in real-time would create
+severe CPU bottlenecks and precision discrepancies. 7-Zip solves this
+by:</p>
+<ol type="1">
+<li><strong>Precomputed Lookup Tables:</strong> Initializing an
+integer-based table (such as <code>ProbPrices</code>) during setup.</li>
+<li><strong>Integer Indexing:</strong> Mapping the 11-bit state
+probability directly to an entry in the table.</li>
+<li><strong>Fixed-Point Bit Costs:</strong> Representing bit costs as
+integers shifted by a scaling factor (e.g., fractional bits shifted by 6
+or 8 bits).</li>
+</ol>
+<p>When evaluating paths, the cost accumulator simply adds these integer
+prices together, executing basic integer addition rather than
+floating-point accumulation.</p>
+<h3 id="match-finding-and-memory-addressing">Match Finding and Memory
+Addressing</h3>
+<p>The match-finding stage of LZMA uses algorithms such as Hash Chains
+(HC) and Binary Trees (BT). These components operate directly on raw
+byte arrays, memory offsets, and integer distance metrics. Match
+lengths, match distances, and dictionary window pointers are strictly
+managed via integer indices, requiring zero floating-point
+computation.</p>
+<h3 id="hardware-efficiency">Hardware Efficiency</h3>
+<p>By confining all mathematical operations to basic integer logic:</p>
+<ul>
+<li>The algorithm runs efficiently on embedded hardware and low-power
+architectures lacking a dedicated Floating-Point Unit (FPU).</li>
+<li>The CPU maintains pipeline efficiency without switching between
+general-purpose registers and floating-point/vector registers.</li>
+<li>Compiler optimizations (such as loop unrolling and branch
+prediction) remain simple and consistent across various compilation
+targets.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-lzma-floating-point-calculations-explained';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

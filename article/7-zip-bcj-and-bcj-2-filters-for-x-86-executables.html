@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip BCJ and BCJ2 Filters for x86 Executables - 7-zip</title>
+    <meta name="description" content="This article examines the BCJ and BCJ2 executable pre-processing filters implemented in 7-Zip for x86 binaries. It explains the specific data redundancy challenges posed by compiled machine code, how BCJ transforms relative jumps into absolute addresses,">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-bcj-and-bcj-2-filters-for-x-86-executables">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip BCJ and BCJ2 Filters for x86 Executables - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-bcj-and-bcj-2-filters-for-x-86-executables" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines the BCJ and BCJ2 executable pre-processing filters implemented in 7-Zip for x86 binaries. It explains the specific data redundancy challenges posed by compiled machine code, how BCJ transforms relative jumps into absolute addresses," />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-bcj-and-bcj2-filters-for-x86-executables">7-Zip BCJ and
+BCJ2 Filters for x86 Executables</h1>
+<p>This article examines the BCJ and BCJ2 executable pre-processing
+filters implemented in 7-Zip for x86 binaries. It explains the specific
+data redundancy challenges posed by compiled machine code, how BCJ
+transforms relative jumps into absolute addresses, and how BCJ2 splits
+executable streams to maximize LZMA compression ratios.</p>
+<h3 id="the-purpose-of-executable-filters">The Purpose of Executable
+Filters</h3>
+<p>Compiled x86 executables naturally compress poorly with standard
+dictionary-based algorithms like LZMA. This is primarily caused by
+<code>CALL</code> and <code>JMP</code> instructions (opcodes
+<code>0xE8</code> and <code>0xE9</code>), which use relative 32-bit
+target offsets rather than absolute addresses. Even if a program
+repeatedly calls the same subroutines, each call site calculates a
+different relative offset depending on its position in memory. This
+continuous variation destroys recurring byte patterns, drastically
+reducing compression efficiency.</p>
+<p>To solve this, 7-Zip applies specialized pre-processing filters (BCJ
+and BCJ2) prior to the compression stage to normalize target addresses
+and restore pattern redundancy.</p>
+<hr />
+<h3 id="the-standard-bcj-filter">The Standard BCJ Filter</h3>
+<p>The standard BCJ (Branch/Call/Jump) filter is a single-stream
+converter designed for 32-bit x86 machine code:</p>
+<ul>
+<li><strong>In-Place Address Translation:</strong> The BCJ filter scans
+the byte stream sequentially for standard x86 <code>CALL</code>
+(<code>0xE8</code>) and unconditional <code>JMP</code>
+(<code>0xE9</code>) instructions followed by 32-bit displacement
+values.</li>
+<li><strong>Conversion Mechanism:</strong> It transforms these relative
+32-bit offsets into absolute virtual addresses by adding the current
+instruction pointer position. As a result, every call directed to the
+same function across the executable is transformed into an identical
+4-byte sequence.</li>
+<li><strong>Single Output Stream:</strong> The filter operates entirely
+in-place. The modified executable remains as a single, contiguous stream
+that is then passed directly to an encoder, typically LZMA or
+LZMA2.</li>
+<li><strong>Decompression Behavior:</strong> During decompression, the
+filter runs in reverse, subtracting the current file offset from the
+absolute addresses to reconstruct the original relative jump
+values.</li>
+</ul>
+<hr />
+<h3 id="the-advanced-bcj2-filter">The Advanced BCJ2 Filter</h3>
+<p>BCJ2 is an advanced 4-stream x86 filter exclusive to 7-Zip and the 7z
+archive format. Instead of keeping the transformed code within a single
+stream, BCJ2 separates the executable into four distinct data streams to
+achieve maximum compression density:</p>
+<ol type="1">
+<li><strong>Main Stream (Stream 0):</strong> Contains all standard
+machine code opcodes, uncompressed non-jump bytes, and operands not
+related to jump targets.</li>
+<li><strong>CALL Target Stream (Stream 1):</strong> Contains the
+extracted and normalized 32-bit absolute destination addresses for all
+detected <code>0xE8</code> (<code>CALL</code>) instructions.</li>
+<li><strong>JMP Target Stream (Stream 2):</strong> Contains the
+extracted and normalized 32-bit absolute destination addresses for all
+detected <code>0xE9</code> (<code>JMP</code>) instructions.</li>
+<li><strong>Control/Status Stream (Stream 3):</strong> A bitstream that
+tracks which bytes in the main stream correspond to genuine jump/call
+instructions versus arbitrary data that happens to match
+<code>0xE8</code> or <code>0xE9</code> opcodes.</li>
+</ol>
+<h4 id="how-bcj2-improves-compression">How BCJ2 Improves
+Compression</h4>
+<p>By segregating addresses and raw opcodes:</p>
+<ul>
+<li>The regular instruction code in the main stream remains contiguous,
+enabling LZMA to detect instruction loops and standard sequences without
+interruption from 4-byte jump targets.</li>
+<li>Jump and call addresses cluster into separate streams, allowing the
+compressor to identify frequently targeted memory locations across the
+entire binary.</li>
+<li>The control stream is compressed using a dedicated range encoder,
+minimizing the overhead required to track instruction boundaries.</li>
+</ul>
+<p>In 7-Zip, BCJ2 serves as the default filter for x86 Windows binaries
+in maximum and ultra compression profiles within the <code>.7z</code>
+container, consistently yielding significantly smaller archive sizes
+than the basic single-stream BCJ filter.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-bcj-and-bcj-2-filters-for-x-86-executables';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

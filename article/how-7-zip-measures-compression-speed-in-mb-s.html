@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Measures Compression Speed in MB/s - 7-zip</title>
+    <meta name="description" content="This article explains how the 7-Zip archiving utility calculates and displays compression throughput in megabytes per second (MB/s). It covers the mathematical ratio used to determine processing speed, the role of uncompressed source data in the calculati">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-measures-compression-speed-in-mb-s">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Measures Compression Speed in MB/s - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-measures-compression-speed-in-mb-s" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how the 7-Zip archiving utility calculates and displays compression throughput in megabytes per second (MB/s). It covers the mathematical ratio used to determine processing speed, the role of uncompressed source data in the calculati" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-measures-compression-speed-in-mbs">How 7-Zip Measures
+Compression Speed in MB/s</h1>
+<p>This article explains how the 7-Zip archiving utility calculates and
+displays compression throughput in megabytes per second (MB/s). It
+covers the mathematical ratio used to determine processing speed, the
+role of uncompressed source data in the calculation, the influence of
+multi-threading, and how MB/s throughput differs from the Millions of
+Instructions Per Second (MIPS) rating displayed in 7-Zip benchmarks.</p>
+<h2 id="the-core-throughput-formula">The Core Throughput Formula</h2>
+<p>7-Zip measures compression speed by tracking the volume of raw,
+uncompressed input data processed over a specific period of time. Rather
+than measuring the size of the resulting compressed archive, the metric
+focuses strictly on the speed at which the compression engine ingests
+and encodes source data.</p>
+<p>The throughput value is calculated using a standard rate formula:</p>
+<p><span class="math display">\[\text{Speed (MB/s)} =
+\frac{\text{Uncompressed Data Processed (in Megabytes)}}{\text{Elapsed
+Time (in Seconds)}}\]</span></p>
+<p>In 7-Zip's user interface, measurements historically use binary
+megabytes (mebibytes, where <span class="math inline">\(1\text{ MB} =
+1,048,576\text{ bytes}\)</span>), meaning the rate reflects <span
+class="math inline">\(2^{20}\)</span> bytes per second rather than the
+decimal equivalent (<span class="math inline">\(10^6\)</span>
+bytes).</p>
+<h2 id="source-data-size-vs-output-size">Source Data Size vs. Output
+Size</h2>
+<p>A common point of confusion is whether the megabytes per second
+figure reflects the rate of writing compressed data to the disk or
+reading the source files. 7-Zip calculates throughput using the original
+uncompressed stream.</p>
+<p>For example, if 7-Zip processes an uncompressed 100 MB file in 2
+seconds and reduces it to a 20 MB archive, the recorded speed is 50 MB/s
+(100 MB divided by 2 seconds), not 10 MB/s. This allows users to
+understand how quickly 7-Zip can work through a queue of files
+regardless of the resulting compression ratio.</p>
+<h2 id="time-measurement-and-multi-threading">Time Measurement and
+Multi-Threading</h2>
+<p>When calculating throughput, 7-Zip factors in real-world wall-clock
+time alongside CPU core utilization:</p>
+<ul>
+<li><strong>Wall-Clock Time:</strong> For overall task throughput (such
+as creating an actual <code>.7z</code> archive), the progress window
+calculates speed based on total elapsed real time from the start of the
+job to the current moment.</li>
+<li><strong>Multi-Threading Effects:</strong> When multi-threading is
+enabled (e.g., across 8 or 16 threads), 7-Zip splits the incoming data
+streams into blocks or uses multi-threaded match finders. The MB/s
+figure reflects the aggregate amount of data all threads processed
+simultaneously within that elapsed real-time window. As a result, adding
+threads increases the MB/s value proportionally until hardware
+bottlenecks (such as RAM bandwidth or cache limits) are reached.</li>
+</ul>
+<h2 id="the-built-in-benchmark-mbs-vs-mips">The Built-in Benchmark: MB/s
+vs. MIPS</h2>
+<p>7-Zip includes a dedicated benchmarking tool (<code>Tools</code> &gt;
+<code>Benchmark</code> or command line <code>7z b</code>) that
+explicitly tests compression and decompression performance using the
+LZMA algorithm.</p>
+<p>The benchmark produces two primary metrics:</p>
+<ol type="1">
+<li><strong>Speed (KB/s or MB/s):</strong> The actual throughput of data
+processed per second using fixed dictionary sizes (such as 32 MB)
+generated directly in RAM. This removes storage drive bottlenecks and
+isolates the raw processing speed of the CPU and memory subsystem.</li>
+<li><strong>Rating (MIPS):</strong> Millions of Instructions Per Second.
+7-Zip converts the measured throughput (MB/s) into an estimated MIPS
+rating based on an internal calibration algorithm. The benchmark
+algorithm defines a baseline instruction cost for compressing a specific
+sequence of data; it multiplies the processed MB/s by this predetermined
+complexity constant to estimate computational power independent of raw
+data size.</li>
+</ol></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-measures-compression-speed-in-mb-s';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

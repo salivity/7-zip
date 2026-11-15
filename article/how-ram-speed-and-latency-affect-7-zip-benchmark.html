@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How RAM Speed and Latency Affect 7-Zip Benchmark - 7-zip</title>
+    <meta name="description" content="The 7-Zip built-in benchmark is one of the most reliable tools for evaluating memory subsystem performance because its data-compression algorithms rely heavily on rapid memory access. RAM frequency (bandwidth) and latency (timings) both directly influence">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-ram-speed-and-latency-affect-7-zip-benchmark">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How RAM Speed and Latency Affect 7-Zip Benchmark - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-ram-speed-and-latency-affect-7-zip-benchmark" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The 7-Zip built-in benchmark is one of the most reliable tools for evaluating memory subsystem performance because its data-compression algorithms rely heavily on rapid memory access. RAM frequency (bandwidth) and latency (timings) both directly influence" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-ram-speed-and-latency-affect-7-zip-benchmark">How RAM Speed
+and Latency Affect 7-Zip Benchmark</h1>
+<p>The 7-Zip built-in benchmark is one of the most reliable tools for
+evaluating memory subsystem performance because its data-compression
+algorithms rely heavily on rapid memory access. RAM frequency
+(bandwidth) and latency (timings) both directly influence 7-Zip's rating
+in GIPS (Giga Instructions Per Second). While memory speed dictates how
+quickly large chunks of data can be transferred, memory latency dictates
+how fast the processor can search through compression dictionaries.
+Understanding how these two metrics interact reveals why 7-Zip scores
+scale significantly with tuned memory configurations.</p>
+<h3 id="compression-vs-decompression-workloads">Compression vs.
+Decompression Workloads</h3>
+<p>The 7-Zip benchmark evaluates two distinct operations that respond
+differently to memory performance:</p>
+<ul>
+<li><strong>Compression:</strong> This task involves searching for
+repetitive patterns within a sliding data window using the LZMA
+algorithm. This process causes frequent CPU cache misses, forcing the
+system to retrieve data directly from system RAM. Because of this,
+compression performance is intensely memory-dependent, scaling
+substantially with both higher memory bandwidth and lower access
+latency.</li>
+<li><strong>Decompression:</strong> Decompressing files is primarily an
+execution-bound task for the CPU. The processor follows explicit
+instructions to reconstruct files rather than searching for matches.
+Consequently, decompression scores show modest gains from RAM frequency
+and latency optimizations, relying mostly on CPU core count, clock
+speeds, and cache sizes.</li>
+</ul>
+<h3 id="the-impact-of-ram-speed-frequency-and-bandwidth">The Impact of
+RAM Speed (Frequency and Bandwidth)</h3>
+<p>Memory frequency, measured in megatransfers per second (MT/s) or
+megahertz (MHz), determines the maximum throughput or bandwidth of the
+memory bus.</p>
+<ol type="1">
+<li><strong>Data Streaming:</strong> High-frequency RAM allows 7-Zip to
+feed data to the CPU cores faster during multi-threaded compression
+passes.</li>
+<li><strong>Multithreading Saturation:</strong> As core counts increase
+on modern processors, available memory bandwidth often becomes a
+bottleneck. Increasing RAM speed widens this bottleneck, allowing
+high-core-count processors to maintain peak utilization in 7-Zip.</li>
+<li><strong>Measurable Gains:</strong> Jumping from standard JEDEC
+speeds (such as DDR4-2133 or DDR5-4800) to enthusiast profiles (like
+DDR4-3600 or DDR5-6000) typically yields a 10% to 25% improvement in
+overall compression ratings, even when the CPU clock remains
+identical.</li>
+</ol>
+<h3 id="the-impact-of-ram-latency-timings">The Impact of RAM Latency
+(Timings)</h3>
+<p>While raw speed provides wide data pipelines, memory latency—measured
+in nanoseconds through primary timings (like CAS Latency, or CL) and
+secondary sub-timings—determines the initial delay before data retrieval
+begins.</p>
+<ol type="1">
+<li><strong>Handling Cache Misses:</strong> 7-Zip's dictionary searches
+produce unpredictable memory access patterns. When the required data is
+not found in the CPU's L1, L2, or L3 cache, low-latency RAM reduces the
+idle cycles the CPU spends waiting for the RAM to deliver that
+address.</li>
+<li><strong>Sub-Timings Matter:</strong> In 7-Zip, secondary timings
+such as tRFC (Refresh Cycle Time) and tertiary timings often have a
+larger impact than primary CAS latency alone. Tightening tRFC allows the
+memory cells to refresh faster, drastically reducing wait times during
+continuous random reads.</li>
+<li><strong>True Latency Calculation:</strong> Frequency and CAS latency
+must be balanced. A DDR5 kit operating at 6000 MT/s CL30 offers lower
+absolute latency (10 ns) than a kit running at 5600 MT/s CL36 (12.85
+ns), resulting in noticeable improvements in compression
+throughput.</li>
+</ol>
+<h3 id="summary-of-performance-scaling">Summary of Performance
+Scaling</h3>
+<p>To maximize 7-Zip benchmark scores, system tuning should
+prioritize:</p>
+<ul>
+<li><strong>Dual- or Quad-Channel Configurations:</strong> Running
+memory in multi-channel modes is mandatory to supply sufficient
+bandwidth across all threads.</li>
+<li><strong>Balanced Frequency and Timings:</strong> Opting for the
+highest stable memory frequency supported natively by the CPU's memory
+controller (without decoupling the memory and controller clocks, such as
+maintaining a 1:1 ratio on AMD platforms).</li>
+<li><strong>Optimized Sub-Timings:</strong> Tightening tRFC, tFAW, and
+tREFI yields substantial performance jumps specifically within 7-Zip's
+compression metric.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-ram-speed-and-latency-affect-7-zip-benchmark';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

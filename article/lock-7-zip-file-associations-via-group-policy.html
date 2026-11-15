@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lock 7-Zip File Associations via Group Policy - 7-zip</title>
+    <meta name="description" content="While 7-Zip does not provide its own proprietary administrative policy templates (ADMX files), administrators can effectively lock down 7-Zip file associations across an enterprise using native Windows Group Policy templates. By leveraging the built-in Wi">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/lock-7-zip-file-associations-via-group-policy">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Lock 7-Zip File Associations via Group Policy - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/lock-7-zip-file-associations-via-group-policy" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="While 7-Zip does not provide its own proprietary administrative policy templates (ADMX files), administrators can effectively lock down 7-Zip file associations across an enterprise using native Windows Group Policy templates. By leveraging the built-in Wi" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="lock-7-zip-file-associations-via-group-policy">Lock 7-Zip File
+Associations via Group Policy</h1>
+<p>While 7-Zip does not provide its own proprietary administrative
+policy templates (ADMX files), administrators can effectively lock down
+7-Zip file associations across an enterprise using native Windows Group
+Policy templates. By leveraging the built-in Windows File Explorer
+administrative templates and a customized application association XML
+file, system administrators can enforce 7-Zip as the default handler for
+formats like <code>.7z</code>, <code>.zip</code>, and <code>.rar</code>,
+preventing end users from permanently changing these defaults.</p>
+<h2 id="native-7-zip-limitations">Native 7-Zip Limitations</h2>
+<p>7-Zip is a standalone utility that does not ship with official Group
+Policy Administrative Templates (<code>.admx</code> or
+<code>.adml</code>). Inside the application interface, file associations
+are managed locally under <strong>Tools &gt; Options</strong>, which
+writes to standard registry paths. However, since Windows 10 and Windows
+11 enforce hash-protected User Choice registry keys, simply pushing
+registry values via Group Policy Preferences often results in Windows
+resetting the defaults to File Explorer.</p>
+<h2 id="the-supported-group-policy-solution">The Supported Group Policy
+Solution</h2>
+<p>The standard, Microsoft-supported method to enforce 7-Zip file
+associations is using the <strong>Set a default associations
+configuration file</strong> policy provided in the standard Windows
+Administrative Templates.</p>
+<h3 id="step-1-export-a-baseline-association-file">Step 1: Export a
+Baseline Association File</h3>
+<ol type="1">
+<li><p>On a reference machine, install 7-Zip.</p></li>
+<li><p>Manually associate the desired extensions (such as
+<code>.7z</code>, <code>.zip</code>, <code>.tar</code>,
+<code>.gz</code>) with 7-Zip using Windows Settings or the 7-Zip
+interface.</p></li>
+<li><p>Open an elevated Command Prompt and export the configuration by
+running:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>dism <span class="at">/online</span> <span class="at">/Export-DefaultAppAssociations:</span>C:\Temp\AppAssoc.xml</span></code></pre></div></li>
+</ol>
+<h3 id="step-2-clean-and-edit-the-xml-file">Step 2: Clean and Edit the
+XML File</h3>
+<p>Open <code>AppAssoc.xml</code> in a text editor and remove all
+entries except the ones designated for 7-Zip. This prevents the policy
+from overwriting non-archive associations (like web browsers or PDF
+readers).</p>
+<p>A focused configuration will look similar to this:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode xml"><code class="sourceCode xml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">&lt;?xml</span> <span class="ot">version=</span><span class="st">&quot;1.0&quot;</span> <span class="ot">encoding=</span><span class="st">&quot;UTF-8&quot;</span><span class="fu">?&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">DefaultAssociations</span>&gt;</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  &lt;<span class="kw">Association</span> <span class="ot">Identifier=</span><span class="st">&quot;.7z&quot;</span> <span class="ot">ProgId=</span><span class="st">&quot;7-Zip.7z&quot;</span> <span class="ot">ApplicationName=</span><span class="st">&quot;7-Zip File Manager&quot;</span> /&gt;</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  &lt;<span class="kw">Association</span> <span class="ot">Identifier=</span><span class="st">&quot;.zip&quot;</span> <span class="ot">ProgId=</span><span class="st">&quot;7-Zip.zip&quot;</span> <span class="ot">ApplicationName=</span><span class="st">&quot;7-Zip File Manager&quot;</span> /&gt;</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  &lt;<span class="kw">Association</span> <span class="ot">Identifier=</span><span class="st">&quot;.tar&quot;</span> <span class="ot">ProgId=</span><span class="st">&quot;7-Zip.tar&quot;</span> <span class="ot">ApplicationName=</span><span class="st">&quot;7-Zip File Manager&quot;</span> /&gt;</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  &lt;<span class="kw">Association</span> <span class="ot">Identifier=</span><span class="st">&quot;.rar&quot;</span> <span class="ot">ProgId=</span><span class="st">&quot;7-Zip.rar&quot;</span> <span class="ot">ApplicationName=</span><span class="st">&quot;7-Zip File Manager&quot;</span> /&gt;</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>&lt;/<span class="kw">DefaultAssociations</span>&gt;</span></code></pre></div>
+<p>Save this file to a read-only central share (e.g.,
+<code>\\domain\sysvol\domain\Policies\AppAssoc.xml</code>) or copy it
+locally to targeted client machines via standard deployment tools.</p>
+<h3 id="step-3-apply-the-administrative-policy">Step 3: Apply the
+Administrative Policy</h3>
+<ol type="1">
+<li>Open the <strong>Group Policy Management Console
+(GPMC)</strong>.</li>
+<li>Create or edit an existing Group Policy Object (GPO) linked to the
+target Organizational Unit (OU).</li>
+<li>Navigate to:
+<code>Computer Configuration &gt; Policies &gt; Administrative Templates &gt; Windows Components &gt; File Explorer</code></li>
+<li>Locate and open the policy setting: <strong>Set a default
+associations configuration file</strong>.</li>
+<li>Set the policy to <strong>Enabled</strong>.</li>
+<li>Under <strong>Options</strong>, provide the path to the association
+XML file (either a local path like
+<code>C:\Windows\System32\AppAssoc.xml</code> or a UNC path).</li>
+<li>Apply the changes and close the editor.</li>
+</ol>
+<h2 id="enforcement-behavior">Enforcement Behavior</h2>
+<p>Once the GPO is applied and <code>gpupdate /force</code> is run on
+client systems, the policy reads the XML file during user logon.</p>
+<p>In Windows environments:</p>
+<ul>
+<li>The specified archive formats are assigned to 7-Zip
+automatically.</li>
+<li>While a user might change the default app temporarily during a
+single session, the policy reapplies the XML mapping on every subsequent
+logon, effectively locking down the file associations to organizational
+standards.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/lock-7-zip-file-associations-via-group-policy';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

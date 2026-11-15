@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Files After 7-Zip Compression - 7-zip</title>
+    <meta name="description" content="This guide explains how to automatically remove original source files after creating an archive with 7-Zip. Whether you prefer using the standard Windows graphical interface or automated command-line scripts, 7-Zip includes native options to handle file d">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/delete-files-after-7-zip-compression">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Delete Files After 7-Zip Compression - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/delete-files-after-7-zip-compression" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to automatically remove original source files after creating an archive with 7-Zip. Whether you prefer using the standard Windows graphical interface or automated command-line scripts, 7-Zip includes native options to handle file d" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="delete-files-after-7-zip-compression">Delete Files After 7-Zip
+Compression</h1>
+<p>This guide explains how to automatically remove original source files
+after creating an archive with 7-Zip. Whether you prefer using the
+standard Windows graphical interface or automated command-line scripts,
+7-Zip includes native options to handle file deletion immediately upon
+successful compression. Utilizing these settings prevents duplicate data
+from consuming storage space and eliminates the need for manual file
+cleanup.</p>
+<h3 id="method-1-using-the-7-zip-graphical-user-interface-gui">Method 1:
+Using the 7-Zip Graphical User Interface (GUI)</h3>
+<p>When working within the Windows desktop environment, you can
+configure 7-Zip to delete files directly from the archive creation
+window.</p>
+<ol type="1">
+<li>Select the files or folders you want to compress in File
+Explorer.</li>
+<li>Right-click the selection, navigate to the <strong>7-Zip</strong>
+context menu, and select <strong>Add to archive...</strong>.</li>
+<li>In the <strong>Add to Archive</strong> dialog window, locate the
+<strong>Options</strong> section on the right-hand side.</li>
+<li>Check the box labeled <strong>Delete files after
+compression</strong>.</li>
+<li>Configure your preferred archive format, compression level, and
+encryption settings as needed.</li>
+<li>Click <strong>OK</strong>.</li>
+</ol>
+<p>7-Zip will compress the selected data. Once the operation finishes
+without errors, the original source files are automatically removed.</p>
+<h3 id="method-2-using-the-7-zip-command-line-cli">Method 2: Using the
+7-Zip Command Line (CLI)</h3>
+<p>For scripting, automation, or batch processing, the 7-Zip
+command-line tool provides a dedicated switch to delete source
+files.</p>
+<p>The required switch is: <code>-sdel</code></p>
+<h4 id="command-syntax">Command Syntax:</h4>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-sdel</span> <span class="op">&lt;</span>archive_name<span class="op">&gt;</span> <span class="op">&lt;</span>source_files<span class="op">&gt;</span></span></code></pre></div>
+<h4 id="example">Example:</h4>
+<p>To compress a folder named <code>Logs</code> into a <code>.zip</code>
+archive and immediately delete the original folder contents:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-sdel</span> <span class="st">&quot;C:\Backups\Logs.zip&quot;</span> <span class="st">&quot;C:\Logs\*&quot;</span></span></code></pre></div>
+<p><strong>How it works:</strong></p>
+<ul>
+<li><code>a</code>: Adds files to the archive.</li>
+<li><code>-sdel</code>: Tells 7-Zip to delete the source files once the
+archive is written successfully. If the compression process fails or is
+interrupted, the original files remain intact.</li>
+</ul>
+<h3 id="important-considerations">Important Considerations</h3>
+<ul>
+<li><strong>Permanent Deletion:</strong> Files deleted by 7-Zip (via
+both the GUI option and the <code>-sdel</code> command-line switch) are
+permanently removed from the storage drive and do not go to the Windows
+Recycle Bin.</li>
+<li><strong>Write Permissions:</strong> Ensure your user account or
+script has appropriate write and delete permissions for the source
+directory; otherwise, the deletion step will fail.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/delete-files-after-7-zip-compression';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

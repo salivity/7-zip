@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configure 7-Zip Multi-Threading to Avoid Out of Memory - 7-zip</title>
+    <meta name="description" content="When compressing large files with 7-Zip, high thread counts paired with large dictionary sizes can quickly consume all available system RAM, resulting in &quot;Out of memory&quot; errors or system instability. This article explains how memory allocation works in 7-">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/configure-7-zip-multi-threading-to-avoid-out-of-memory">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Configure 7-Zip Multi-Threading to Avoid Out of Memory - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/configure-7-zip-multi-threading-to-avoid-out-of-memory" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When compressing large files with 7-Zip, high thread counts paired with large dictionary sizes can quickly consume all available system RAM, resulting in &quot;Out of memory&quot; errors or system instability. This article explains how memory allocation works in 7-" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1
+id="configure-7-zip-multi-threading-to-avoid-out-of-memory">Configure
+7-Zip Multi-Threading to Avoid Out of Memory</h1>
+<p>When compressing large files with 7-Zip, high thread counts paired
+with large dictionary sizes can quickly consume all available system
+RAM, resulting in "Out of memory" errors or system instability. This
+article explains how memory allocation works in 7-Zip's LZMA and LZMA2
+algorithms and provides actionable steps to configure thread and
+dictionary settings in both the Graphical User Interface (GUI) and
+Command-Line Interface (CLI) to keep memory usage within safe
+limits.</p>
+<h3 id="understanding-7-zip-memory-consumption">Understanding 7-Zip
+Memory Consumption</h3>
+<p>7-Zip's default LZMA2 compression algorithm splits files into chunks
+and processes them simultaneously across multiple CPU threads. Memory
+consumption is dictated primarily by two parameters:</p>
+<ul>
+<li><strong>Dictionary Size:</strong> The amount of data stored in
+memory to identify duplicate patterns.</li>
+<li><strong>Thread Count:</strong> The number of parallel processing
+threads used simultaneously.</li>
+</ul>
+<p>In LZMA2, the compression memory requirement roughly scales as:<br />
+<code>Memory Usage ≈ Dictionary Size × Number of Threads × 2</code>
+(plus additional overhead).</p>
+<p>For example, using a 64 MB dictionary across 16 threads can require
+over 2 GB to 3 GB of RAM for the compression phase alone, while a 256 MB
+dictionary across 16 threads can exceed 8 GB of RAM.</p>
+<hr />
+<h3 id="method-1-adjust-parameters-in-the-7-zip-gui">Method 1: Adjust
+Parameters in the 7-Zip GUI</h3>
+<p>To manage resource usage when using the desktop application:</p>
+<ol type="1">
+<li>Right-click the files or folders you want to compress and select
+<strong>7-Zip</strong> &gt; <strong>Add to archive...</strong>.</li>
+<li>Locate the <strong>Compression method</strong> dropdown and ensure
+it is set to <strong>LZMA2</strong> (which handles multithreading far
+more efficiently than the older LZMA).</li>
+<li>Look at the dynamic <strong>Memory usage for Compressing</strong>
+field in the lower-right section of the window.</li>
+<li>Reduce the <strong>Number of CPU threads</strong>:
+<ul>
+<li>Instead of using your maximum logical core count, set the value to
+half your available cores (e.g., 2, 4, or 6 threads).</li>
+</ul></li>
+<li>Reduce the <strong>Dictionary size</strong>:
+<ul>
+<li>Lower the dictionary size (e.g., from 64 MB down to 16 MB or 32 MB).
+Watch how the estimated memory usage indicator decreases
+immediately.</li>
+</ul></li>
+<li>Ensure that the estimated memory usage does not exceed 70% of your
+total free physical RAM to leave room for the operating system and
+background processes.</li>
+<li>Click <strong>OK</strong> to start the compression.</li>
+</ol>
+<hr />
+<h3
+id="method-2-configure-multi-threading-in-the-command-line-cli">Method
+2: Configure Multi-Threading in the Command Line (CLI)</h3>
+<p>When using <code>7z</code> or <code>7za</code> from the terminal or
+in automated scripts, use dedicated switches to prevent memory
+exhaustion:</p>
+<h4 id="1-limit-thread-count--mmt">1. Limit Thread Count
+(<code>-mmt</code>)</h4>
+<p>The <code>-mmt</code> switch defines the number of CPU threads
+allocated to the operation.</p>
+<ul>
+<li><p>Limit to a specific number of threads (e.g., 2 threads):</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-t7z</span> archive.7z /path/to/files <span class="at">-mmt</span><span class="op">=</span>2</span></code></pre></div></li>
+<li><p>Disable multi-threading entirely (single-thread mode):</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-t7z</span> archive.7z /path/to/files <span class="at">-mmt</span><span class="op">=</span>off</span></code></pre></div></li>
+</ul>
+<h4 id="2-restrict-dictionary-size--md">2. Restrict Dictionary Size
+(<code>-md</code>)</h4>
+<p>The <code>-md</code> switch controls the dictionary size, drastically
+decreasing the memory multiplier per thread.</p>
+<ul>
+<li><p>Set a 16 MB or 32 MB dictionary:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-t7z</span> archive.7z /path/to/files <span class="at">-md</span><span class="op">=</span>32m</span></code></pre></div></li>
+</ul>
+<h4 id="3-combined-safe-compression-command">3. Combined Safe
+Compression Command</h4>
+<p>Combine <code>-mmt</code> and <code>-md</code> with the LZMA2 method
+(<code>-m0=lzma2</code>) for stable execution in memory-constrained
+environments:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> a <span class="at">-t7z</span> archive.7z /path/to/files <span class="at">-m0</span><span class="op">=</span>lzma2 <span class="at">-mmt</span><span class="op">=</span>4 <span class="at">-md</span><span class="op">=</span>32m</span></code></pre></div>
+<hr />
+<h3 id="recommended-configurations-by-system-ram">Recommended
+Configurations by System RAM</h3>
+<ul>
+<li><strong>4 GB to 8 GB RAM Systems:</strong> Set <code>-mmt=2</code>
+with a dictionary size of <code>16m</code> or <code>24m</code>.</li>
+<li><strong>16 GB RAM Systems:</strong> Set <code>-mmt=4</code> or
+<code>-mmt=6</code> with a dictionary size of <code>32m</code> or
+<code>64m</code>.</li>
+<li><strong>Batch Scripts and Servers:</strong> Avoid omitting the
+<code>-mmt</code> flag; auto-detection selects all threads, which risks
+crashing background environments under load.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/configure-7-zip-multi-threading-to-avoid-out-of-memory';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impact of Word Size on 7-Zip Compression Ratio - 7-zip</title>
+    <meta name="description" content="Word size in 7-Zip defines the maximum length of identical byte patterns the LZMA and LZMA2 algorithms search for when compressing data. Choosing a larger word size generally improves the overall compression ratio by allowing the algorithm to replace long">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/impact-of-word-size-on-7-zip-compression-ratio">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Impact of Word Size on 7-Zip Compression Ratio - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/impact-of-word-size-on-7-zip-compression-ratio" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Word size in 7-Zip defines the maximum length of identical byte patterns the LZMA and LZMA2 algorithms search for when compressing data. Choosing a larger word size generally improves the overall compression ratio by allowing the algorithm to replace long" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="impact-of-word-size-on-7-zip-compression-ratio">Impact of Word
+Size on 7-Zip Compression Ratio</h1>
+<p>Word size in 7-Zip defines the maximum length of identical byte
+patterns the LZMA and LZMA2 algorithms search for when compressing data.
+Choosing a larger word size generally improves the overall compression
+ratio by allowing the algorithm to replace longer repeating sequences
+with compact references, though it requires significantly more
+processing time. This article explains how word size functions within
+7-Zip, how it influences archive size across different file types, and
+how to balance compression efficiency with performance.</p>
+<h3 id="what-word-size-means-in-7-zip">What Word Size Means in
+7-Zip</h3>
+<p>In 7-Zip, the "Word size" setting (often referred to as "fast bytes")
+controls the maximum match length evaluated by the match finder. For
+LZMA and LZMA2 compression methods, this parameter typically ranges from
+5 to 273 bytes, with standard presets defaulting to values like 32 or
+64.</p>
+<p>When the compressor scans input data, it looks for sequences of bytes
+that match previously encountered data within the designated dictionary
+window. If a match is found, the word size setting determines how far
+the algorithm will continue comparing bytes to find the longest possible
+match before writing a back-reference token.</p>
+<h3 id="how-increasing-word-size-improves-the-compression-ratio">How
+Increasing Word Size Improves the Compression Ratio</h3>
+<p>The primary mechanism connecting word size to the compression ratio
+is pattern matching efficiency:</p>
+<ul>
+<li><strong>Longer Back-References:</strong> A single back-reference
+token can represent up to the maximum configured word size. Replacing a
+200-byte identical string with a single distance-length pair yields a
+significantly smaller footprint than breaking that sequence into
+multiple smaller matches.</li>
+<li><strong>Higher Redundancy Capture:</strong> Files with large blocks
+of identical or near-identical content—such as source code repositories,
+log files, uncompressed databases, and repetitive structured text (XML,
+JSON, CSV)—benefit substantially from higher values, often achieving
+noticeably smaller archive sizes when pushed toward the maximum limit of
+273.</li>
+</ul>
+<h3 id="diminishing-returns-and-data-limitations">Diminishing Returns
+and Data Limitations</h3>
+<p>While a larger word size can enhance compression, its effectiveness
+depends entirely on the nature of the target files:</p>
+<ul>
+<li><strong>Incompressible or Unique Data:</strong> For files with low
+redundancy, such as already-compressed archives (ZIP, RAR), media
+formats (JPEG, MP3, MP4), or encrypted data, increasing the word size
+yields virtually zero improvement because long recurring byte sequences
+do not exist.</li>
+<li><strong>Marginal Gains Beyond 64:</strong> For typical mixed-data
+workloads, the majority of repeating patterns are relatively short.
+Increasing the word size from 32 to 64 often produces a measurable drop
+in file size, but moving from 64 to 273 frequently yields diminishing
+returns, often shaving off less than 1% of the final archive size.</li>
+</ul>
+<h3 id="performance-trade-offs">Performance Trade-Offs</h3>
+<p>The compression ratio gains provided by higher word sizes come with
+distinct computational costs:</p>
+<ul>
+<li><strong>CPU Utilization and Speed:</strong> As word size increases,
+the match finder must perform significantly more byte-by-byte
+comparisons per block. Selecting the maximum word size of 273 can
+increase compression time by several orders of magnitude compared to the
+default setting of 32 or 64.</li>
+<li><strong>Memory Usage:</strong> Word size has a minimal impact on RAM
+usage during compression, which is predominantly governed by dictionary
+size.</li>
+<li><strong>Decompression Impact:</strong> Word size has zero negative
+impact on decompression speed or decompression memory requirements.
+Archives compressed with a word size of 273 decompress just as quickly
+as those compressed with a word size of 32.</li>
+</ul>
+<h3 id="optimal-word-size-selection">Optimal Word Size Selection</h3>
+<p>To maximize efficiency, align the word size with your specific
+storage and time constraints:</p>
+<ul>
+<li><strong>Word Size 32 to 48 (Fast/Normal):</strong> Ideal for general
+day-to-day archiving where speed is important and data types are
+mixed.</li>
+<li><strong>Word Size 64 (Maximum Preset):</strong> Provides an optimal
+balance, capturing most meaningful patterns without causing excessive
+CPU bottlenecks.</li>
+<li><strong>Word Size 128 to 273 (Ultra Preset):</strong> Best reserved
+for distribution packages, long-term cold storage, or highly repetitive
+text and raw binary data where minimizing storage size justifies lengthy
+compression times.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/impact-of-word-size-on-7-zip-compression-ratio';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

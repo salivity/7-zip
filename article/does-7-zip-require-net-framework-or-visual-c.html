@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Does 7-Zip Require .NET Framework or Visual C++? - 7-zip</title>
+    <meta name="description" content="7-Zip does not require the Microsoft .NET Framework or external Visual C++ Redistributable runtimes to run. This article explains the technical reasons behind 7-Zip&#39;s lack of external dependencies, how it interacts directly with Windows system libraries,">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/does-7-zip-require-net-framework-or-visual-c">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Does 7-Zip Require .NET Framework or Visual C++? - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/does-7-zip-require-net-framework-or-visual-c" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip does not require the Microsoft .NET Framework or external Visual C++ Redistributable runtimes to run. This article explains the technical reasons behind 7-Zip&#39;s lack of external dependencies, how it interacts directly with Windows system libraries," />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="does-7-zip-require-net-framework-or-visual-c">Does 7-Zip Require
+.NET Framework or Visual C++?</h1>
+<p>7-Zip does not require the Microsoft .NET Framework or external
+Visual C++ Redistributable runtimes to run. This article explains the
+technical reasons behind 7-Zip's lack of external dependencies, how it
+interacts directly with Windows system libraries, and what you need to
+install it on a clean operating system.</p>
+<h3 id="why-7-zip-does-not-require-the-net-framework">Why 7-Zip Does Not
+Require the .NET Framework</h3>
+<p>The Microsoft .NET Framework is a software development platform used
+primarily for applications written in managed code languages, such as C#
+or VB.NET. 7-Zip is developed entirely in native C and C++. Because
+native code compiles directly into machine instructions rather than
+intermediate Common Intermediate Language (CIL), 7-Zip does not require
+the .NET Common Language Runtime (CLR) or any version of the .NET
+Framework to execute.</p>
+<h3 id="why-7-zip-does-not-require-visual-c-redistributables">Why 7-Zip
+Does Not Require Visual C++ Redistributables</h3>
+<p>Many modern C++ applications rely on dynamic links to external Visual
+C++ runtime libraries (such as <code>vcruntime140.dll</code> or
+<code>msvcp140.dll</code>). If these runtimes are missing from your PC,
+those applications will fail to launch until you install the
+corresponding Microsoft Visual C++ Redistributable package.</p>
+<p>7-Zip avoids this requirement in two ways:</p>
+<ol type="1">
+<li><strong>Direct Win32 API Calls:</strong> The core functionality of
+7-Zip relies heavily on standard Win32 APIs that are already built into
+every version of Windows.</li>
+<li><strong>Minimal and Native C Runtime Use:</strong> The developer
+compiles 7-Zip using custom runtime startup code and statically linked
+routines, or links against standard system libraries like
+<code>msvcrt.dll</code> that ship natively with the Windows operating
+system.</li>
+</ol>
+<p>Because the necessary code is bundled directly into the 7-Zip
+binaries (<code>7z.exe</code>, <code>7zG.exe</code>, and
+<code>7z.dll</code>), the software does not depend on third-party
+runtime installers.</p>
+<h3 id="system-compatibility">System Compatibility</h3>
+<p>Because of its independence from .NET and Visual C++ packages, 7-Zip
+is completely standalone. It will function immediately on a fresh,
+out-of-the-box Windows installation without downloading extra
+prerequisites. This design also allows the portable version of 7-Zip to
+run from a USB drive on any compatible Windows computer without
+administrative privileges or library installations.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/does-7-zip-require-net-framework-or-visual-c';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

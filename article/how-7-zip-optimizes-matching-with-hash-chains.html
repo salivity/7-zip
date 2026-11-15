@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How 7-Zip Optimizes Matching with Hash Chains - 7-zip</title>
+    <meta name="description" content="7-Zip relies heavily on the LZMA compression algorithm, which achieves high compression ratios by identifying recurring byte sequences inside a sliding dictionary. To locate these matches at high speeds, 7-Zip implements specialized hash chain search algo">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/how-7-zip-optimizes-matching-with-hash-chains">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How 7-Zip Optimizes Matching with Hash Chains - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/how-7-zip-optimizes-matching-with-hash-chains" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip relies heavily on the LZMA compression algorithm, which achieves high compression ratios by identifying recurring byte sequences inside a sliding dictionary. To locate these matches at high speeds, 7-Zip implements specialized hash chain search algo" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-7-zip-optimizes-matching-with-hash-chains">How 7-Zip
+Optimizes Matching with Hash Chains</h1>
+<p>7-Zip relies heavily on the LZMA compression algorithm, which
+achieves high compression ratios by identifying recurring byte sequences
+inside a sliding dictionary. To locate these matches at high speeds,
+7-Zip implements specialized hash chain search algorithms that quickly
+index previous data positions, discard irrelevant candidates, and
+balance search depth against processing time. This article breaks down
+how 7-Zip constructs and traverses hash chains to optimize dictionary
+matches during compression.</p>
+<h3 id="the-role-of-hash-chains-in-lzma-compression">The Role of Hash
+Chains in LZMA Compression</h3>
+<p>In dictionary-based compression like LZ77 and LZMA, the encoder must
+find the longest previous occurrence of the current data stream within a
+defined history window. A naive linear scan across a large
+dictionary—often 16 MB to 1 GB in size—would make compression impossibly
+slow.</p>
+<p>To solve this, 7-Zip employs a Match Finder subsystem. While
+maximum-compression modes often use Binary Trees (<code>bt2</code>,
+<code>bt3</code>, <code>bt4</code>), faster modes rely on Hash Chains
+(<code>hc3</code>, <code>hc4</code>). A hash chain records the positions
+of previous byte sequences using a hash table where entries with the
+same hash value are linked together in reverse chronological order.</p>
+<h3 id="multi-level-hashing">Multi-Level Hashing</h3>
+<p>A standard single hash table struggles to distinguish between very
+short matches and long matches efficiently. 7-Zip overcomes this by
+using multi-level hash arrays simultaneously:</p>
+<ul>
+<li><strong>2-Byte and 3-Byte Hashes:</strong> 7-Zip uses dedicated
+tables (often referred to as <code>Hash2</code> and <code>Hash3</code>)
+directly indexed by short byte combinations. This avoids hash collisions
+for small lengths and allows rapid evaluation of short matches.</li>
+<li><strong>4-Byte Hashes:</strong> A primary hash function maps 4-byte
+sequences into a larger hash table, pointing to the head of the chain
+for longer candidates.</li>
+</ul>
+<p>By separating lookups into discrete length tiers, 7-Zip eliminates
+the overhead of calculating complex hash functions or traversing deep
+chains when only short matches exist.</p>
+<h3 id="contiguous-array-storage-and-cache-locality">Contiguous Array
+Storage and Cache Locality</h3>
+<p>Instead of using traditional pointer-based linked lists, 7-Zip stores
+hash chains inside flat, pre-allocated cyclic arrays of 32-bit
+integers.</p>
+<ol type="1">
+<li><strong>Table Lookup:</strong> When the encoder processes a
+position, it computes the hash of the current bytes to retrieve the
+index of the most recent match candidate.</li>
+<li><strong>Chain Traversal:</strong> The chain array stores the index
+of the candidate that preceded the current one. The algorithm jumps
+backward through indices directly in memory.</li>
+<li><strong>In-Place Updates:</strong> The algorithm overwrites the
+oldest entries as the sliding window advances, avoiding dynamic memory
+allocation during active compression loops.</li>
+</ol>
+<p>Storing indices in contiguous arrays maximizes CPU cache utilization,
+reducing memory latency when walking through candidate positions.</p>
+<h3 id="search-depth-limiting-match-cycles">Search Depth Limiting (Match
+Cycles)</h3>
+<p>Iterating through an entire hash chain guarantees finding the
+absolute longest match, but long chains can cause severe performance
+drops on repetitive or redundant data.</p>
+<p>7-Zip prevents this bottleneck using a configurable cutoff parameter
+known as <code>MC</code> (Match Cycles):</p>
+<ul>
+<li>The search stops after inspecting a predetermined number of
+candidates, regardless of whether the chain has ended.</li>
+<li>If a candidate meets or exceeds a target threshold (such as a
+maximum match length or an early good-enough match), the search
+terminates immediately.</li>
+<li>This bound transforms the worst-case time complexity from <span
+class="math inline">\(O(N \times D)\)</span> down to a predictable,
+bounded number of operations per byte, ensuring stable throughput.</li>
+</ul>
+<h3 id="comparison-skip-optimizations">Comparison Skip
+Optimizations</h3>
+<p>When traversing the chain, comparing every candidate byte-by-byte
+would be inefficient. 7-Zip accelerates comparisons using two key
+techniques:</p>
+<ul>
+<li><strong>Boundary Checking:</strong> The engine checks the final byte
+of the currently known best match before comparing the full sequence. If
+the candidate does not match at that specific offset, the algorithm
+skips the candidate immediately.</li>
+<li><strong>Prefix Matching:</strong> Because the hash already
+guarantees that the initial bytes match (e.g., the first 2, 3, or 4
+bytes), the comparator skips inspecting those initial positions and
+begins verification further along the sequence.</li>
+</ul>
+<h3 id="hash-chains-vs-binary-trees-in-7-zip">Hash Chains vs. Binary
+Trees in 7-Zip</h3>
+<p>7-Zip selects hash chains when compression speed takes priority over
+absolute file size reduction. While binary trees maintain sorted
+branches to find optimal matches for the LZMA optimal parser, they
+require updating child pointers on every position shift. Hash chains
+simply update a single head pointer and prepend the current index to the
+list. This reduced maintenance cost makes 7-Zip's hash chain match
+finders significantly faster for medium and fast compression
+presets.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/how-7-zip-optimizes-matching-with-hash-chains';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

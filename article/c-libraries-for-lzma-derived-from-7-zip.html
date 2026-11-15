@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C Libraries for LZMA Derived from 7-Zip - 7-zip</title>
+    <meta name="description" content="The Lempel-Ziv-Markov chain algorithm (LZMA), originally developed by Igor Pavlov for the 7-Zip file archiver, delivers exceptionally high compression ratios and fast decompression speeds. Because 7-Zip was originally authored in a mix of C and C++, sever">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/c-libraries-for-lzma-derived-from-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="C Libraries for LZMA Derived from 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/c-libraries-for-lzma-derived-from-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The Lempel-Ziv-Markov chain algorithm (LZMA), originally developed by Igor Pavlov for the 7-Zip file archiver, delivers exceptionally high compression ratios and fast decompression speeds. Because 7-Zip was originally authored in a mix of C and C++, sever" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="c-libraries-for-lzma-derived-from-7-zip">C Libraries for LZMA
+Derived from 7-Zip</h1>
+<p>The Lempel-Ziv-Markov chain algorithm (LZMA), originally developed by
+Igor Pavlov for the 7-Zip file archiver, delivers exceptionally high
+compression ratios and fast decompression speeds. Because 7-Zip was
+originally authored in a mix of C and C++, several open-source projects
+have adapted its core compression and decompression logic into
+standalone C libraries. This article outlines the prominent open-source
+C libraries and tools directly derived from or packaging 7-Zip’s source
+code for LZMA and LZMA2 support.</p>
+<h2 id="1-the-lzma-sdk-c-implementation">1. The LZMA SDK (C
+Implementation)</h2>
+<p>The most direct C adaptation of 7-Zip's algorithm is the <strong>LZMA
+SDK</strong>, maintained by Igor Pavlov himself. While the full 7-Zip
+software package relies heavily on C++, Pavlov decoupled the core
+algorithmic routines into an ANSI C implementation distributed within
+the SDK.</p>
+<ul>
+<li><strong>Components:</strong> The SDK includes source files such as
+<code>LzmaDec.c</code> (LZMA decoder), <code>LzmaEnc.c</code> (LZMA
+encoder), <code>Lzma2Dec.c</code>, and <code>Lzma2Enc.c</code>.</li>
+<li><strong>Characteristics:</strong> It is designed to be
+self-contained, highly portable, and dependency-free, making it easy to
+drop directly into embedded systems, bootloaders, and firmware.</li>
+<li><strong>Licensing:</strong> The core C code in the LZMA SDK is
+placed in the public domain.</li>
+</ul>
+<h2 id="2-liblzma-xz-utils">2. liblzma (XZ Utils)</h2>
+<p><strong>liblzma</strong> is part of the XZ Utils package and
+represents the most widely deployed C library derived from 7-Zip's LZMA
+codebase.</p>
+<ul>
+<li><strong>Origins:</strong> It evolved from the older "LZMA Utils"
+project, which initially wrapped the LZMA SDK's C implementation. Over
+time, the developers refactored and expanded the code to create the
+<code>.xz</code> container format.</li>
+<li><strong>Capabilities:</strong> <code>liblzma</code> offers native
+support for both raw LZMA streams and the modernized <code>.xz</code>
+container format (which features LZMA2, integrity checks, and
+multithreading).</li>
+<li><strong>Usage:</strong> It serves as the standard decompression
+backend for package managers (such as <code>dpkg</code> and
+<code>rpm</code>), the Linux kernel build system, and general UNIX
+utility software.</li>
+</ul>
+<h2 id="3-p7zip">3. p7zip</h2>
+<p><strong>p7zip</strong> is the POSIX port of 7-Zip's command-line
+utilities.</p>
+<ul>
+<li><strong>Structure:</strong> While the broader architecture of p7zip
+is implemented in C++ to mirror the COM-like internal structure of
+7-Zip, the underlying compression algorithms remain the C routines
+imported straight from Pavlov's codebase.</li>
+<li><strong>Role:</strong> Developers requiring a build system tailored
+for Linux, macOS, and BSD environments often extract the C/C++ core
+routines directly from p7zip rather than the Windows-centric upstream
+7-Zip repository.</li>
+</ul>
+<h2 id="4-in-tree-kernel-and-bootloader-implementations">4. In-Tree
+Kernel and Bootloader Implementations</h2>
+<p>Several low-level infrastructure projects contain internal C
+libraries adapted directly from the 7-Zip LZMA SDK:</p>
+<ul>
+<li><strong>Linux Kernel
+(<code>lib/decompress_unlzma.c</code>):</strong> The Linux kernel
+contains an in-tree C decompressor derived directly from Pavlov’s LZMA
+SDK C decoder. It is utilized during the early boot process to unpack
+compressed kernel images (<code>vmlinuz</code>) and initial ramdisks
+(<code>initramfs</code>).</li>
+<li><strong>Das U-Boot:</strong> The popular bootloader for embedded
+devices features a minimal, standalone C port of
+<code>LzmaDecode.c</code> imported from the LZMA SDK to decompress
+payloads on memory-constrained systems.</li>
+<li><strong>GRUB 2:</strong> The GRUB bootloader includes bundled LZMA
+decompression code sourced from the LZMA SDK C library to reduce binary
+size on disk.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/c-libraries-for-lzma-derived-from-7-zip';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

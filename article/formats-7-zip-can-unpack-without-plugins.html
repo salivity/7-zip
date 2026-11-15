@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formats 7-Zip Can Unpack Without Plugins - 7-zip</title>
+    <meta name="description" content="7-Zip is a popular open-source file archiver known for its high compression ratios and broad format support out of the box. Without installing any third-party add-ons, DLLs, or external plugins, 7-Zip can natively unpack dozens of compressed archive forma">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/formats-7-zip-can-unpack-without-plugins">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Formats 7-Zip Can Unpack Without Plugins - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/formats-7-zip-can-unpack-without-plugins" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="7-Zip is a popular open-source file archiver known for its high compression ratios and broad format support out of the box. Without installing any third-party add-ons, DLLs, or external plugins, 7-Zip can natively unpack dozens of compressed archive forma" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="formats-7-zip-can-unpack-without-plugins">Formats 7-Zip Can
+Unpack Without Plugins</h1>
+<p>7-Zip is a popular open-source file archiver known for its high
+compression ratios and broad format support out of the box. Without
+installing any third-party add-ons, DLLs, or external plugins, 7-Zip can
+natively unpack dozens of compressed archive formats, system
+installation packages, and virtual disk images. This guide details every
+file format that 7-Zip can decompress and extract natively.</p>
+<h3 id="core-dual-support-formats-pack-and-unpack">Core Dual-Support
+Formats (Pack and Unpack)</h3>
+<p>7-Zip can both create and extract the following formats natively:</p>
+<ul>
+<li><strong>7z:</strong> 7-Zip's native high-compression format.</li>
+<li><strong>ZIP:</strong> The standard compression format widely used
+across Windows and macOS.</li>
+<li><strong>TAR:</strong> Tape archive format commonly used in
+Unix/Linux environments.</li>
+<li><strong>GZIP (.gz):</strong> Standard GNU compression format.</li>
+<li><strong>BZIP2 (.bz2):</strong> Block-sorting data compression
+format.</li>
+<li><strong>XZ (.xz):</strong> Modern container using LZMA/LZMA2
+compression.</li>
+<li><strong>WIM:</strong> Windows Imaging Format used for deployment and
+recovery images.</li>
+</ul>
+<h3 id="standard-archive-formats-unpack-only">Standard Archive Formats
+(Unpack Only)</h3>
+<p>7-Zip includes built-in extraction code for numerous standalone
+archives created by legacy or alternative compression utilities:</p>
+<ul>
+<li><strong>RAR (.rar):</strong> Supports unpacking both RAR4 and RAR5
+archives natively.</li>
+<li><strong>ARJ (.arj):</strong> Legacy DOS-era archive format.</li>
+<li><strong>CAB (.cab):</strong> Microsoft Cabinet archive format.</li>
+<li><strong>LZH / LHA (.lzh, .lha):</strong> Traditional algorithmic
+compression formats originally popular in Japan.</li>
+<li><strong>Z (.z):</strong> Unix compress file format.</li>
+<li><strong>CPIO (.cpio):</strong> General Unix archive format.</li>
+<li><strong>AR (.a, .ar):</strong> Unix archiver format commonly used
+for static libraries.</li>
+</ul>
+<h3 id="package-and-installer-formats-unpack-only">Package and Installer
+Formats (Unpack Only)</h3>
+<p>7-Zip can inspect and extract files contained within various software
+installers and package distributions:</p>
+<ul>
+<li><strong>MSI (.msi, .msp):</strong> Microsoft Windows Installer
+packages and patches.</li>
+<li><strong>NSIS:</strong> Nullsoft Scriptable Install System executable
+packages.</li>
+<li><strong>RPM (.rpm):</strong> Red Hat Package Manager format used in
+Linux distributions.</li>
+<li><strong>DEB (.deb):</strong> Debian software package format (handled
+via nested AR/TAR/GZ extraction).</li>
+<li><strong>CHM (.chm):</strong> Microsoft Compiled HTML Help
+files.</li>
+</ul>
+<h3 id="disk-images-and-filesystem-containers-unpack-only">Disk Images
+and Filesystem Containers (Unpack Only)</h3>
+<p>A standout native feature of 7-Zip is its ability to browse and
+extract contents from filesystem dumps and optical/virtual drive images
+without mounting them:</p>
+<ul>
+<li><strong>ISO (.iso):</strong> Standard CD/DVD optical disc
+images.</li>
+<li><strong>UDF (.udf):</strong> Universal Disk Format used on DVDs and
+Blu-ray discs.</li>
+<li><strong>DMG (.dmg):</strong> Apple disk image files.</li>
+<li><strong>HFS / HFS+:</strong> Apple Macintosh hierarchical file
+systems.</li>
+<li><strong>APFS:</strong> Apple File System containers.</li>
+<li><strong>FAT / FAT32 / NTFS:</strong> Standard Windows
+filesystems.</li>
+<li><strong>EXT / EXT2 / EXT3 / EXT4:</strong> Linux filesystem
+images.</li>
+<li><strong>VHD / VHDX:</strong> Microsoft Virtual Hard Disk
+formats.</li>
+<li><strong>VMDK:</strong> VMware virtual disk files.</li>
+<li><strong>VDI:</strong> VirtualBox disk image files.</li>
+<li><strong>QCOW2:</strong> QEMU copy-on-write disk images.</li>
+<li><strong>SquashFS / CramFS:</strong> Compressed read-only Linux
+filesystems.</li>
+<li><strong>MBR / GPT:</strong> Master Boot Record and GUID Partition
+Table disk layouts.</li>
+<li><strong>XAR (.xar):</strong> Extensible Archive format used in macOS
+package setups.</li>
+<li><strong>UEFI / IHEX:</strong> BIOS/UEFI firmware images and Intel
+HEX files.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/formats-7-zip-can-unpack-without-plugins';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

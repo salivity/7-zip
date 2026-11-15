@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Permissions Required to Install 7-Zip - 7-zip</title>
+    <meta name="description" content="Installing 7-Zip on a workstation typically requires local administrator permissions for a standard deployment, though alternative methods allow standard users to run the tool without elevated rights. This guide outlines the specific privileges needed for">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/system-permissions-required-to-install-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="System Permissions Required to Install 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/system-permissions-required-to-install-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Installing 7-Zip on a workstation typically requires local administrator permissions for a standard deployment, though alternative methods allow standard users to run the tool without elevated rights. This guide outlines the specific privileges needed for" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="system-permissions-required-to-install-7-zip">System Permissions
+Required to Install 7-Zip</h1>
+<p>Installing 7-Zip on a workstation typically requires local
+administrator permissions for a standard deployment, though alternative
+methods allow standard users to run the tool without elevated rights.
+This guide outlines the specific privileges needed for standard
+installation, explains why those permissions are necessary, and covers
+non-administrative alternatives for restricted corporate
+environments.</p>
+<h3 id="standard-installation-permissions-exe-and-msi">Standard
+Installation Permissions (.exe and .msi)</h3>
+<p>To run the standard 7-Zip executable (<code>.exe</code>) or Windows
+Installer package (<code>.msi</code>), you need <strong>Local
+Administrator</strong> privileges.</p>
+<p>When a standard user attempts to run the installer, Windows triggers
+a User Account Control (UAC) prompt requiring an administrator's
+credentials. If the user cannot provide these credentials, the
+installation fails.</p>
+<p>Administrative privileges are required for the following operations
+during setup:</p>
+<ul>
+<li><strong>Writing to Protected Directories:</strong> The installer
+places program files into protected system directories, typically
+<code>C:\Program Files\7-Zip</code> or
+<code>C:\Program Files (x86)\7-Zip</code>. Standard users lack write
+access to these folders.</li>
+<li><strong>Registry Modifications:</strong> The installer writes
+configuration data to the <code>HKEY_LOCAL_MACHINE</code> (HKLM)
+registry hive to make the application available to all users on the
+workstation.</li>
+<li><strong>Shell Integration:</strong> 7-Zip registers shell extension
+DLLs (<code>7-zip.dll</code>) to integrate with the Windows Explorer
+context menu (the right-click menu options for compressing and
+extracting files). Registering system-wide shell extensions requires
+elevated permissions.</li>
+</ul>
+<h3 id="installing-without-administrator-permissions">Installing Without
+Administrator Permissions</h3>
+<p>If you do not have administrative rights on the workstation, you can
+still use 7-Zip using alternative formats that operate entirely within
+user-space permissions:</p>
+<h4 id="1-portable-version">1. Portable Version</h4>
+<p>A portable build (available as a <code>.paf.exe</code> from
+third-party repositories like PortableApps or distributed as an archive)
+does not use a traditional Windows installer. It can be unpacked into
+any user-writable directory, such as
+<code>C:\Users\&lt;Username&gt;\AppData\Local</code> or the desktop.</p>
+<h4 id="2-manual-archive-extraction">2. Manual Archive Extraction</h4>
+<p>Advanced users can extract the core 7-Zip binaries
+(<code>7z.exe</code>, <code>7z.dll</code>, and <code>7zFM.exe</code>)
+directly into a user profile folder without running an installer.</p>
+<p><strong>Limitations of non-admin use:</strong></p>
+<ul>
+<li>No native right-click Windows Explorer context menu
+integration.</li>
+<li>File associations (e.g., automatically opening <code>.7z</code> or
+<code>.zip</code> files with 7-Zip) must be set per user in
+<code>HKEY_CURRENT_USER</code> (HKCU) or assigned manually via Windows
+"Open with" settings.</li>
+</ul>
+<h3 id="enterprise-and-managed-environments">Enterprise and Managed
+Environments</h3>
+<p>On centrally managed corporate workstations, standard users typically
+have their administrative privileges revoked to comply with security
+baselines. In these environments:</p>
+<ul>
+<li>IT administrators deploy 7-Zip silently using endpoint management
+software (such as Microsoft Intune, SCCM, or Group Policy).</li>
+<li>These automated deployments execute under the
+<code>NT AUTHORITY\SYSTEM</code> account, which possesses the necessary
+administrative rights to complete the system-wide installation without
+user interaction.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/system-permissions-required-to-install-7-zip';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

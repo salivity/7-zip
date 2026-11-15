@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Cannot Open File as Archive in 7-Zip - 7-zip</title>
+    <meta name="description" content="The &quot;Cannot open file as archive&quot; error in 7-Zip occurs when the software cannot recognize the start or end headers of a compressed file. This usually points to an incomplete download, file corruption, an incorrect file extension, or missing parts of a sp">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/fix-cannot-open-file-as-archive-in-7-zip">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Fix Cannot Open File as Archive in 7-Zip - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/fix-cannot-open-file-as-archive-in-7-zip" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The &quot;Cannot open file as archive&quot; error in 7-Zip occurs when the software cannot recognize the start or end headers of a compressed file. This usually points to an incomplete download, file corruption, an incorrect file extension, or missing parts of a sp" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="fix-cannot-open-file-as-archive-in-7-zip">Fix Cannot Open File
+as Archive in 7-Zip</h1>
+<p>The "Cannot open file as archive" error in 7-Zip occurs when the
+software cannot recognize the start or end headers of a compressed file.
+This usually points to an incomplete download, file corruption, an
+incorrect file extension, or missing parts of a split archive. This
+guide provides direct, practical troubleshooting methods to repair the
+damaged archive and recover your data.</p>
+<h3 id="1-verify-and-correct-the-file-extension">1. Verify and Correct
+the File Extension</h3>
+<p>Sometimes files are saved with the wrong extension or lack one
+entirely. If an archive was saved with the wrong format (for instance, a
+<code>.rar</code> file accidentally named <code>.7z</code> or
+<code>.zip</code>), 7-Zip may fail to read the file header properly.</p>
+<ul>
+<li>Ensure file extensions are visible in Windows by opening File
+Explorer, clicking <strong>View</strong>, and checking <strong>File name
+extensions</strong>.</li>
+<li>If you know the original archive format, right-click the file,
+select <strong>Rename</strong>, and update the extension to match its
+original type (e.g., <code>.zip</code>, <code>.rar</code>,
+<code>.7z</code>, or <code>.tar</code>).</li>
+<li>Try opening the file again in 7-Zip.</li>
+</ul>
+<h3 id="2-re-download-or-re-copy-the-archive">2. Re-Download or Re-Copy
+the Archive</h3>
+<p>An incomplete download is the most frequent cause of broken archive
+headers.</p>
+<ul>
+<li>Compare the file size of your local file with the source file size
+listed on the download page. Even a difference of a few kilobytes
+indicates an interrupted download.</li>
+<li>If checksums (MD5, SHA-256) are provided by the source, use a
+hash-checking tool or PowerShell
+(<code>Get-FileHash -Algorithm SHA256 "path\to\file"</code>) to verify
+the file's integrity.</li>
+<li>If the file is incomplete, download it again using a stable
+connection or copy it again from the original storage device.</li>
+</ul>
+<h3 id="3-check-for-missing-multi-part-volumes">3. Check for Missing
+Multi-Part Volumes</h3>
+<p>Multi-volume archives are split into smaller chunks (such as
+<code>.7z.001</code>, <code>.7z.002</code>, or <code>.part1.rar</code>,
+<code>.part2.rar</code>). 7-Zip will throw this error if:</p>
+<ul>
+<li>All split parts are not in the same folder.</li>
+<li>One or more parts are missing or renamed inconsistently.</li>
+<li>You did not start extraction from the first volume. Always
+right-click the first file (usually ending in <code>.001</code> or
+<code>.part1.rar</code>) to extract the entire set.</li>
+</ul>
+<h3 id="4-open-with-alternative-archive-tools">4. Open with Alternative
+Archive Tools</h3>
+<p>Different archive managers interpret damaged headers differently.
+7-Zip has strict integrity checks, whereas other utilities may bypass
+minor header corruption:</p>
+<ul>
+<li><strong>WinRAR</strong>: Right-click the file, open it with WinRAR,
+and test if it reads the directory. WinRAR can also run a native repair
+by opening the archive, clicking <strong>Tools</strong>, and selecting
+<strong>Repair archive</strong>.</li>
+<li><strong>PeaZip</strong>: Another open-source tool that often handles
+partially corrupted archive structures better than standard
+extractors.</li>
+</ul>
+<h3 id="5-repair-the-archive-header-using-a-hex-editor">5. Repair the
+Archive Header Using a Hex Editor</h3>
+<p>If the file's start or end headers are corrupt, advanced users can
+inspect the file using a free hex editor such as HxD.</p>
+<ul>
+<li>Open the file in HxD.</li>
+<li>Check the first few bytes (the "magic number"):
+<ul>
+<li>A valid <strong>ZIP</strong> file starts with
+<code>50 4B 03 04</code> (ASCII: <code>PK..</code>).</li>
+<li>A valid <strong>7z</strong> file starts with
+<code>37 7A BC AF 27 1C</code> (ASCII: <code>7z¼¯'.</code>).</li>
+<li>A valid <strong>RAR</strong> file starts with
+<code>52 61 72 21</code> (ASCII: <code>Rar!</code>).</li>
+</ul></li>
+<li>If the opening bytes are filled with zeros
+(<code>00 00 00...</code>) or garbage characters, the start header is
+missing. You can sometimes copy the missing header bytes from an intact
+archive of the same format and paste them at offset <code>0</code> to
+restore readability.</li>
+</ul></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/fix-cannot-open-file-as-archive-in-7-zip';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

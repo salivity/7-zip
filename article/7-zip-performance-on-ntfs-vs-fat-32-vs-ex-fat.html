@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Zip Performance on NTFS vs FAT32 vs exFAT - 7-zip</title>
+    <meta name="description" content="When using 7-Zip, the choice of file system impacts overall performance primarily through file I/O operations, metadata handling, and storage limitations rather than the compression algorithm itself. While the CPU handles the mathematical workload of pack">
+    <link rel="canonical" href="https://salivity.github.io/7-zip/article/7-zip-performance-on-ntfs-vs-fat-32-vs-ex-fat">
+    <link rel="search" type="application/opensearchdescription+xml" title="7-zip" href="/7-zip/opensearch.xml">
+    <link rel="icon" href="/7-zip/favicon.ico">
+    <link rel="stylesheet" href="/7-zip/css/style.css">
+    <link media="print" rel="stylesheet" href="/7-zip/css/print.css">
+    <script src="/7-zip/js/fuse.min.js"></script>
+    <script src="/7-zip/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="7-Zip Performance on NTFS vs FAT32 vs exFAT - 7-zip" />
+    <meta property="og:url" content="https://salivity.github.io/7-zip/article/7-zip-performance-on-ntfs-vs-fat-32-vs-ex-fat" />
+    <meta property="og:image" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/7-zip/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When using 7-Zip, the choice of file system impacts overall performance primarily through file I/O operations, metadata handling, and storage limitations rather than the compression algorithm itself. While the CPU handles the mathematical workload of pack" />
+    <link rel="manifest" href="/7-zip/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/7-zip/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>7-zip</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/7-zip/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="7-zip-performance-on-ntfs-vs-fat32-vs-exfat">7-Zip Performance
+on NTFS vs FAT32 vs exFAT</h1>
+<p>When using 7-Zip, the choice of file system impacts overall
+performance primarily through file I/O operations, metadata handling,
+and storage limitations rather than the compression algorithm itself.
+While the CPU handles the mathematical workload of packing and unpacking
+data identically across all platforms, NTFS, FAT32, and exFAT handle
+reading source files and writing output archives with varying degrees of
+efficiency. Factors such as file allocation unit sizes, directory
+indexing, journaling overhead, and file size constraints dictate whether
+an archive operation completes quickly or encounters bottlenecks.</p>
+<h3 id="file-size-and-architecture-limitations">File Size and
+Architecture Limitations</h3>
+<p>The most immediate operational difference among these formats is file
+size support:</p>
+<ul>
+<li><strong>FAT32:</strong> Imposes a strict 4GB maximum file size
+limit. Creating or extracting a single <code>.7z</code> or
+<code>.zip</code> archive larger than 4GB on a FAT32 volume will fail
+immediately unless split-volume archiving is enabled.</li>
+<li><strong>NTFS and exFAT:</strong> Both support multi-terabyte files,
+making them suitable for large single-file backups, disk images, and
+massive archive sets.</li>
+</ul>
+<h3 id="archiving-many-small-files">Archiving Many Small Files</h3>
+<p>When compressing or extracting thousands of individual files,
+directory structure traversal and metadata processing become the primary
+performance bottlenecks.</p>
+<ul>
+<li><strong>NTFS:</strong> Uses the Master File Table (MFT) with B-tree
+indexing. This architecture allows 7-Zip to enumerate, locate, and read
+thousands of source files rapidly. When extracting thousands of files,
+NTFS handles file creation and attribute writing far faster than older
+FAT architectures.</li>
+<li><strong>FAT32:</strong> Suffers from severe performance degradation
+as the number of files in a directory increases. Its linked-list
+directory structure requires sequential scans, causing 7-Zip to slow
+down significantly when reading or extracting large numbers of small
+files.</li>
+<li><strong>exFAT:</strong> Improves on FAT32 by using contiguous file
+allocation tables and better directory hashing, but it lacks the
+advanced B-tree indexing of NTFS. It performs noticeably better than
+FAT32 with small files, yet it still trails NTFS in raw directory query
+speeds.</li>
+</ul>
+<h3 id="sequential-read-and-write-throughput-large-files">Sequential
+Read and Write Throughput (Large Files)</h3>
+<p>When archiving a few large continuous files (such as video files or
+disk images), raw sequential transfer speed dictates performance:</p>
+<ul>
+<li><strong>exFAT:</strong> Because it lacks journaling overhead, exFAT
+often achieves slightly faster raw sequential write speeds on removable
+flash drives (SSDs, USB drives, SD cards) than NTFS. Writing a massive
+<code>.7z</code> file to an external drive formatted in exFAT is
+frequently faster than writing to an NTFS-formatted flash drive.</li>
+<li><strong>NTFS:</strong> Employs journaling (USN Journal), which logs
+file system transactions to prevent corruption during sudden power
+losses. This extra write step creates minor overhead during extraction,
+but Windows caching algorithms largely offset this on internal NVMe and
+SATA drives.</li>
+<li><strong>FAT32:</strong> Delivers competitive sequential read/write
+speeds on older media, but the 4GB cap restricts its usefulness for
+modern large-file sequential tasks.</li>
+</ul>
+<h3 id="cluster-size-and-storage-overhead">Cluster Size and Storage
+Overhead</h3>
+<p>File systems divide storage into clusters (allocation units), which
+directly affect how 7-Zip extracts files:</p>
+<ul>
+<li>If the cluster size is large (e.g., 128KB on some exFAT flash
+drives), extracting thousands of tiny files will lead to severe storage
+waste (internal fragmentation or "slack space").</li>
+<li>NTFS typically defaults to a 4KB cluster size, which minimizes
+wasted space when extracting mixed workloads.</li>
+<li>7-Zip reads and writes data in larger blocks (often matching its
+internal dictionary size and buffer settings). A cluster size aligned
+with hardware sector boundaries on NTFS or exFAT prevents unaligned I/O,
+reducing operational latency.</li>
+</ul>
+<h3 id="summary-verdict">Summary Verdict</h3>
+<p>For internal system drives and high-capacity multi-file workloads,
+<strong>NTFS</strong> offers the best performance with 7-Zip due to
+efficient directory indexing, robust caching, and support for massive
+archives. For external USB drives and flash storage,
+<strong>exFAT</strong> strikes the best balance by eliminating the 4GB
+file cap and avoiding journaling overhead to deliver fast sequential
+write speeds. <strong>FAT32</strong> is the least suitable option due to
+its 4GB file cap and poor performance when handling large volumes of
+files.</p></article>
+        <div id='disqus_thread'></div>
+        <script>
+
+            var disqus_config = function () {
+                this.page.url =         'https://salivity.github.io/7-zip/article/7-zip-performance-on-ntfs-vs-fat-32-vs-ex-fat';  
+                //this.page.identifier =  PAGE_IDENTIFIER; 
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://salivity-github-io.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="https://smvc.dev/contact">Contact</a></li>
+                <li><a href="/7-zip/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/7-zip/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>
